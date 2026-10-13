@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { ATTRIBUTES } from '../core/attributes';
-import { NO_DEATH_SAVES } from '../combat/deathSaves';
 import {
   POINT_BUY_BUDGET,
   STANDARD_ARRAY,
@@ -8,7 +7,6 @@ import {
   isValidPointBuy,
   pointBuyCost,
 } from './attributeGeneration';
-import type { Character } from './character';
 import {
   characterActions,
   characterOperatorAttackBonus,
@@ -24,49 +22,7 @@ import {
 } from './derived';
 import { maxHitPoints } from './hitPoints';
 import { experienceForLevel, levelForExperience, proficiencyBonusForLevel } from './progression';
-
-function makeCharacter(overrides: Partial<Character> = {}): Character {
-  return {
-    id: 'test',
-    name: 'Testa',
-    ethnicityId: 'welsh',
-    backgroundId: 'sage',
-    professions: [{ professionId: 'scholar', level: 5, specializationPath: ['occult-researcher'] }],
-    experience: 6500,
-    size: 'medium',
-    speed: { walk: 30 },
-    senses: {},
-    attributeScores: {
-      might: 8,
-      agility: 14,
-      hardiness: 14,
-      intellect: 17,
-      wisdom: 12,
-      charisma: 10,
-      fortune: 10,
-      sanity: 10,
-    },
-    hitPoints: { current: 32, max: 32, temporary: 0 },
-    hitDiceSpent: {},
-    deathSaves: NO_DEATH_SAVES,
-    exhaustion: 0,
-    conditions: [],
-    heroicInspiration: false,
-    proficiencies: {
-      savingThrows: ['intellect', 'sanity'],
-      skills: { science: 'expertise', perception: 'proficient', history: 'proficient' },
-      weapons: [{ category: 'simple' }],
-      armor: [],
-      tools: [],
-      languages: ['english', 'welsh'],
-      disciplines: ['aetherics'],
-    },
-    feats: [],
-    inventory: [],
-    money: 0,
-    ...overrides,
-  };
-}
+import { makeCharacter } from '../testing/characters';
 
 describe('progression', () => {
   it('maps experience to level and back', () => {

@@ -90,6 +90,20 @@ export function professionDc(proficiencyBonus: number, primaryAttributeModifier:
   return 8 + proficiencyBonus + primaryAttributeModifier;
 }
 
+/** Profession levels at which a character gains a General feat, as classes do in 2024. */
+export const GENERAL_FEAT_LEVELS = [4, 8, 12, 16] as const;
+
+/** The profession level at which a character gains an Epic Boon feat. */
+export const EPIC_BOON_LEVEL = 19;
+
+/** The kind of feat gained on reaching a level in a profession, if any. */
+export function featGainedAtLevel(professionLevel: number): 'general' | 'epic-boon' | null {
+  if (professionLevel === EPIC_BOON_LEVEL) {
+    return 'epic-boon';
+  }
+  return (GENERAL_FEAT_LEVELS as readonly number[]).includes(professionLevel) ? 'general' : null;
+}
+
 /** Taking up a second profession needs at least this score in its primary attribute. */
 export const MULTI_PROFESSION_ATTRIBUTE_MINIMUM = 13;
 
