@@ -1,66 +1,105 @@
-export const COINS = ['cp', 'sp', 'ep', 'gp', 'pp'] as const;
+/**
+ * Money in pence, in the British pounds-shillings-pence (£sd) system. Fractions of a penny are
+ * halfpennies (0.5) and farthings (0.25).
+ */
+export type Money = number;
 
-export type Coin = (typeof COINS)[number];
+export const PENCE_PER_SHILLING = 12;
+export const SHILLINGS_PER_POUND = 20;
+export const PENCE_PER_POUND = PENCE_PER_SHILLING * SHILLINGS_PER_POUND;
+/** A guinea is 21 shillings, used for professional fees and luxury goods. */
+export const PENCE_PER_GUINEA = 21 * PENCE_PER_SHILLING;
 
-export const COIN_NAMES: Readonly<Record<Coin, string>> = {
-  cp: 'Copper',
-  sp: 'Silver',
-  ep: 'Electrum',
-  gp: 'Gold',
-  pp: 'Platinum',
-};
+/** Coins in circulation and their values in pence. */
+export const COINS = {
+  farthing: 0.25,
+  halfpenny: 0.5,
+  penny: 1,
+  threepence: 3,
+  sixpence: 6,
+  shilling: 12,
+  florin: 24,
+  'half-crown': 30,
+  crown: 60,
+  'half-sovereign': 120,
+  sovereign: 240,
+} as const;
 
-export const COIN_VALUE_IN_CP: Readonly<Record<Coin, number>> = {
-  cp: 1,
-  sp: 10,
-  ep: 50,
-  gp: 100,
-  pp: 1000,
-};
+export type Coin = keyof typeof COINS;
 
-/** Fifty coins of any kind weigh 1 pound. */
-export const COINS_PER_POUND = 50;
-
-export type Currency = Record<Coin, number>;
-
-export interface Price {
-  amount: number;
-  coin: Coin;
+/** Builds an amount from pounds, shillings and pence. */
+export function lsd(pounds: number, shillings = 0, pence = 0): Money {
+  return pounds * PENCE_PER_POUND + shillings * PENCE_PER_SHILLING + pence;
 }
 
-export function emptyPurse(): Currency {
-  return { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 };
+export function guineas(count: number): Money {
+  return count * PENCE_PER_GUINEA;
 }
 
-export function toCopper(currency: Partial<Currency>): number {
-  return COINS.reduce((sum, coin) => sum + (currency[coin] ?? 0) * COIN_VALUE_IN_CP[coin], 0);
+export interface Lsd {
+  pounds: number;
+  shillings: number;
+  /** May include a fraction: 0.25, 0.5 or 0.75. */
+  pence: number;
 }
 
-export function priceInCopper(price: Price): number {
-  return price.amount * COIN_VALUE_IN_CP[price.coin];
-}
-
-/** Breaks a copper value into the fewest coins of the given denominations. */
-export function fromCopper(
-  copper: number,
-  denominations: readonly Coin[] = ['gp', 'sp', 'cp'],
-): Currency {
-  const purse = emptyPurse();
-  let remaining = copper;
-  const ordered = [...denominations].sort((a, b) => COIN_VALUE_IN_CP[b] - COIN_VALUE_IN_CP[a]);
-  for (const coin of ordered) {
-    purse[coin] = Math.floor(remaining / COIN_VALUE_IN_CP[coin]);
-    remaining -= purse[coin] * COIN_VALUE_IN_CP[coin];
+/** Splits an amount into pounds, shillings and pence. */
+export function toLsd(money: Money): Lsd {
+  if (money < 0) {
+    throw new RangeError(`Money can't be negative, got ${String(money)}`);
   }
-  if (remaining !== 0) {
-    throw new RangeError(
-      `${String(copper)} cp can't be made from ${denominations.join(', ')} alone`,
-    );
-  }
-  return purse;
+  const pounds = Math.floor(money / PENCE_PER_POUND);
+  const afterPounds = money - pounds * PENCE_PER_POUND;
+  const shillings = Math.floor(afterPounds / PENCE_PER_SHILLING);
+  return { pounds, shillings, pence: afterPounds - shillings * PENCE_PER_SHILLING };
 }
 
-export function coinWeight(currency: Partial<Currency>): number {
-  const count = COINS.reduce((sum, coin) => sum + (currency[coin] ?? 0), 0);
-  return count / COINS_PER_POUND;
+const FRACTIONS: Readonly<Record<string, number>> = { '¼': 0.25, '½': 0.5, '¾': 0.75 };
+
+function formatPence(pence: number): string {
+  const whole = Math.floor(pence);
+  const fraction = Object.entries(FRACTIONS).find(([, value]) => value === pence - whole)?.[0];
+  if (fraction === undefined) {
+    return `${String(whole)}d`;
+  }
+  return `${whole === 0 ? '' : String(whole)}${fraction}d`;
+}
+
+/** Formats an amount the period way: "£1 2s 6d", "2s 6d", "6½d", "£5". */
+export function formatMoney(money: Money): string {
+  const { pounds, shillings, pence } = toLsd(money);
+  const parts = [
+    pounds > 0 ? `£${String(pounds)}` : '',
+    shillings > 0 ? `${String(shillings)}s` : '',
+    pence > 0 ? formatPence(pence) : '',
+  ].filter((part) => part !== '');
+  return parts.length === 0 ? '0d' : parts.join(' ');
+}
+
+const AMOUNT = String.raw`(\d+)?([¼½¾])?`;
+const MONEY_PATTERN = new RegExp(String.raw`^(?:£(\d+))?\s*(?:(\d+)s)?\s*(?:${AMOUNT}d)?$`);
+const SLASH_PATTERN = /^(\d+)\/(\d+|-)$/;
+const GUINEA_PATTERN = /^(\d+)\s*gns?$/;
+
+/** Parses "£1 2s 6d", "2s 6d", "6½d", "2/6" (2s 6d), "5/-" (5s) or "3 gns" (guineas). */
+export function parseMoney(text: string): Money {
+  const trimmed = text.trim();
+  const guinea = GUINEA_PATTERN.exec(trimmed);
+  if (guinea) {
+    return guineas(Number(guinea[1]));
+  }
+  const slash = SLASH_PATTERN.exec(trimmed);
+  if (slash) {
+    return lsd(0, Number(slash[1]), slash[2] === '-' ? 0 : Number(slash[2]));
+  }
+  const match = MONEY_PATTERN.exec(trimmed);
+  if (trimmed === '' || !match) {
+    throw new Error(`Invalid amount of money: "${text}"`);
+  }
+  const [, pounds, shillings, pence, fraction] = match;
+  return lsd(
+    Number(pounds ?? 0),
+    Number(shillings ?? 0),
+    Number(pence ?? 0) + (fraction === undefined ? 0 : (FRACTIONS[fraction] ?? 0)),
+  );
 }

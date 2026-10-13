@@ -1,3 +1,4 @@
+import { lsd } from '../../core/currency';
 import { dice } from '../../core/dice';
 import {
   DEFAULT_RECHARGE,
@@ -39,7 +40,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'optics',
     power: 'galvanic',
     weightLb: 2,
-    cost: { amount: 10, coin: 'gp' },
+    cost: lsd(1, 10),
     rarity: 'common',
     effects: [
       {
@@ -59,7 +60,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'galvanism',
     power: 'galvanic',
     weightLb: 3,
-    cost: { amount: 50, coin: 'gp' },
+    cost: lsd(8),
     rarity: 'uncommon',
     effects: [
       {
@@ -82,7 +83,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'chemistry',
     power: 'chemical',
     weightLb: 3,
-    cost: { amount: 50, coin: 'gp' },
+    cost: lsd(6),
     rarity: 'uncommon',
     effects: [
       {
@@ -104,7 +105,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'chemistry',
     power: 'chemical',
     weightLb: 4,
-    cost: { amount: 50, coin: 'gp' },
+    cost: lsd(10),
     rarity: 'uncommon',
     effects: [
       {
@@ -126,7 +127,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'mechanics',
     power: 'clockwork',
     weightLb: 5,
-    cost: { amount: 25, coin: 'gp' },
+    cost: lsd(3),
     rarity: 'common',
     effects: [
       {
@@ -149,7 +150,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'optics',
     power: 'galvanic',
     weightLb: 12,
-    cost: { amount: 400, coin: 'gp' },
+    cost: lsd(40),
     rarity: 'rare',
     maxCharges: 4,
     effects: [
@@ -185,7 +186,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'mesmerism',
     power: 'aetheric',
     weightLb: 0.5,
-    cost: { amount: 500, coin: 'gp' },
+    cost: lsd(50),
     rarity: 'rare',
     maxCharges: 6,
     effects: [
@@ -246,7 +247,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'acoustics',
     power: 'steam',
     weightLb: 8,
-    cost: { amount: 100, coin: 'gp' },
+    cost: lsd(15),
     rarity: 'uncommon',
     maxCharges: 3,
     effects: [
@@ -273,7 +274,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'chemistry',
     power: 'chemical',
     weightLb: 25,
-    cost: { amount: 150, coin: 'gp' },
+    cost: lsd(25),
     rarity: 'uncommon',
     maxCharges: 3,
     effects: [
@@ -299,7 +300,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'galvanism',
     power: 'galvanic',
     weightLb: 4,
-    cost: { amount: 200, coin: 'gp' },
+    cost: lsd(35),
     rarity: 'uncommon',
     maxCharges: 4,
     effects: [
@@ -323,7 +324,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'mechanics',
     power: 'clockwork',
     weightLb: 4,
-    cost: { amount: 75, coin: 'gp' },
+    cost: lsd(12),
     rarity: 'uncommon',
     maxCharges: 2,
     effects: [
@@ -346,7 +347,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'mechanics',
     power: 'clockwork',
     weightLb: 4,
-    cost: { amount: 100, coin: 'gp' },
+    cost: lsd(10),
     rarity: 'uncommon',
     maxCharges: 3,
     effects: [
@@ -368,7 +369,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'acoustics',
     power: 'clockwork',
     weightLb: 10,
-    cost: { amount: 100, coin: 'gp' },
+    cost: lsd(6),
     rarity: 'uncommon',
     maxCharges: 2,
     effects: [
@@ -391,7 +392,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'chemistry',
     power: 'chemical',
     weightLb: 2,
-    cost: { amount: 150, coin: 'gp' },
+    cost: lsd(15),
     rarity: 'uncommon',
     maxCharges: 3,
     effects: [
@@ -413,7 +414,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'galvanism',
     power: 'galvanic',
     weightLb: 3,
-    cost: { amount: 300, coin: 'gp' },
+    cost: lsd(60),
     rarity: 'rare',
     maxCharges: 4,
     effects: [
@@ -437,7 +438,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'optics',
     power: 'aetheric',
     weightLb: 3,
-    cost: { amount: 2000, coin: 'gp' },
+    cost: lsd(400),
     rarity: 'prototype',
     maxCharges: 6,
     effects: [
@@ -467,7 +468,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'optics',
     power: 'chemical',
     weightLb: 1,
-    cost: { amount: 150, coin: 'gp' },
+    cost: lsd(20),
     rarity: 'uncommon',
     maxCharges: 2,
     effects: [
@@ -487,7 +488,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'acoustics',
     power: 'galvanic',
     weightLb: 6,
-    cost: { amount: 300, coin: 'gp' },
+    cost: lsd(60),
     rarity: 'rare',
     maxCharges: 4,
     effects: [
@@ -514,7 +515,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'mechanics',
     power: 'steam',
     weightLb: 20,
-    cost: { amount: 150, coin: 'gp' },
+    cost: lsd(20),
     rarity: 'uncommon',
     maxCharges: 4,
     effects: [
@@ -539,7 +540,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'galvanism',
     power: 'galvanic',
     weightLb: 40,
-    cost: { amount: 1500, coin: 'gp' },
+    cost: lsd(300),
     rarity: 'prototype',
     maxCharges: 6,
     effects: [
@@ -565,7 +566,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'mechanics',
     power: 'steam',
     weightLb: 45,
-    cost: { amount: 2500, coin: 'gp' },
+    cost: lsd(500),
     rarity: 'prototype',
     maxCharges: 3,
     effects: [
@@ -588,7 +589,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'galvanism',
     power: 'galvanic',
     weightLb: 50,
-    cost: { amount: 5000, coin: 'gp' },
+    cost: lsd(1000),
     rarity: 'prototype',
     maxCharges: 5,
     effects: [
@@ -632,7 +633,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'galvanism',
     power: 'galvanic',
     weightLb: 30,
-    cost: { amount: 800, coin: 'gp' },
+    cost: lsd(150),
     rarity: 'rare',
     maxCharges: 3,
     effects: [
@@ -654,7 +655,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'acoustics',
     power: 'steam',
     weightLb: 15,
-    cost: { amount: 600, coin: 'gp' },
+    cost: lsd(80),
     rarity: 'rare',
     maxCharges: 3,
     effects: [
@@ -679,7 +680,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'optics',
     power: 'galvanic',
     weightLb: 18,
-    cost: { amount: 1200, coin: 'gp' },
+    cost: lsd(200),
     rarity: 'rare',
     maxCharges: 4,
     effects: [
@@ -706,7 +707,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'galvanism',
     power: 'galvanic',
     weightLb: 60,
-    cost: { amount: 3000, coin: 'gp' },
+    cost: lsd(600),
     rarity: 'prototype',
     maxCharges: 5,
     effects: [
@@ -730,7 +731,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
     discipline: 'aetherics',
     power: 'aetheric',
     weightLb: 25,
-    cost: { amount: 5000, coin: 'gp' },
+    cost: lsd(1000),
     rarity: 'prototype',
     maxCharges: 5,
     effects: [

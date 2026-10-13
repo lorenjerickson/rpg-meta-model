@@ -24,7 +24,7 @@ export const SAILOR: ProfessionDefinition = {
   },
   weaponProficiencies: [{ category: 'simple' }, { category: 'martial' }],
   armorTraining: [],
-  toolProficiencies: ["navigator's tools", 'vehicles (water)'],
+  toolProficiencies: ['navigators-tools', 'vehicles-water'],
   rankTitles: { novice: 'Deckhand', apprentice: 'Able Seaman' },
   actions: [
     reaction(

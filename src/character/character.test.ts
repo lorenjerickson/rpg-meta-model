@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { ATTRIBUTES } from '../core/attributes';
-import { emptyPurse } from '../core/currency';
 import { NO_DEATH_SAVES } from '../combat/deathSaves';
 import {
   POINT_BUY_BUDGET,
@@ -64,7 +63,7 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
     },
     feats: [],
     inventory: [],
-    currency: emptyPurse(),
+    money: 0,
     ...overrides,
   };
 }

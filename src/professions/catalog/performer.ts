@@ -24,7 +24,7 @@ export const PERFORMER: ProfessionDefinition = {
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
-  toolProficiencies: ['disguise kit', 'musical instrument'],
+  toolProficiencies: ['disguise-kit', 'musical-instrument'],
   actions: [
     bonusAction(
       'Captivate',

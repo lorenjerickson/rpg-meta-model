@@ -1,7 +1,8 @@
 import type { Attribute } from '../core/attributes';
-import type { Price } from '../core/currency';
+import type { Money } from '../core/currency';
 import type { ApparatusDefinition, PreparationDefinition } from '../science/apparatus';
 import type { ArmorDefinition } from './armor';
+import type { MountDefinition, VehicleDefinition } from './transport';
 import type { WeaponDefinition } from './weapons';
 
 export const ITEM_CATEGORIES = [
@@ -28,7 +29,8 @@ export interface ItemBase {
   name: string;
   category: ItemCategory;
   weightLb: number;
-  cost?: Price;
+  /** Price in pence. */
+  cost?: Money;
   description?: string;
   rarity?: Rarity;
   /**
@@ -58,8 +60,14 @@ export interface ToolDefinition extends ItemBase {
   craft: readonly string[];
 }
 
+export interface AmmunitionDefinition extends ItemBase {
+  category: 'ammunition';
+  /** How many rounds come in one purchase; cost and weight are for the whole bundle. */
+  bundle: number;
+}
+
 export interface GearDefinition extends ItemBase {
-  category: Exclude<ItemCategory, 'weapon' | 'armor' | 'tool' | 'apparatus' | 'preparation'>;
+  category: 'adventuring-gear';
 }
 
 export type ItemDefinition =
@@ -68,4 +76,7 @@ export type ItemDefinition =
   | ToolDefinition
   | ApparatusDefinition
   | PreparationDefinition
+  | AmmunitionDefinition
+  | MountDefinition
+  | VehicleDefinition
   | GearDefinition;

@@ -24,7 +24,7 @@ export const FRONTIER_HAND: ProfessionDefinition = {
   },
   weaponProficiencies: [{ category: 'simple' }, { category: 'martial' }],
   armorTraining: ['light'],
-  toolProficiencies: ["leatherworker's tools"],
+  toolProficiencies: ['leatherworkers-tools'],
   actions: [bonusAction('Keen Eye', 'You take the Search action.')],
   specializations: [
     specialization('trapper', 'apprentice', null, {

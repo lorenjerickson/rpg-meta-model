@@ -23,7 +23,7 @@ export const HOSPITALITY: ProfessionDefinition = {
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
-  toolProficiencies: ["cook's utensils"],
+  toolProficiencies: ['cooks-utensils'],
   actions: [
     bonusAction(
       'Read the Room',

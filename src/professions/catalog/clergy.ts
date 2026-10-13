@@ -24,7 +24,7 @@ export const CLERGY: ProfessionDefinition = {
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
-  toolProficiencies: ["calligrapher's supplies"],
+  toolProficiencies: ['writing-kit'],
   actions: [
     action(
       'Blessing',

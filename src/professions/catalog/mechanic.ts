@@ -23,7 +23,7 @@ export const MECHANIC: ProfessionDefinition = {
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
-  toolProficiencies: ["tinker's tools"],
+  toolProficiencies: ['tinkers-tools'],
   disciplineProficiencies: ['mechanics'],
   actions: [
     action(
@@ -37,7 +37,7 @@ export const MECHANIC: ProfessionDefinition = {
       name: 'Machinist',
       description: 'Shapes metal parts on lathe and mill.',
       skills: ['athletics'],
-      tools: ["smith's tools"],
+      tools: ['smiths-tools'],
       actions: [bonusAction('Tool in Hand', 'You take the Utilize action.')],
     }),
     specialization('engineer', 'journeyman', 'machinist', {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { attributeModifier, formatModifier } from './attributes';
 import { expandConditions, exhaustionD20Penalty, exhaustionSpeedReduction } from './conditions';
-import { fromCopper, toCopper } from './currency';
+import { COINS, formatMoney, guineas, lsd, parseMoney, toLsd } from './currency';
 import { passiveScore, resolveD20Test, resolveRollMode, rollD20 } from './d20';
 import { adjustDamage } from './damage';
 import {
@@ -162,11 +162,32 @@ describe('conditions', () => {
 });
 
 describe('currency', () => {
-  it('converts to and from copper', () => {
-    expect(toCopper({ gp: 1, sp: 2, cp: 3 })).toBe(123);
-    expect(toCopper({ pp: 1, ep: 1 })).toBe(1050);
-    expect(fromCopper(1234)).toEqual({ cp: 4, sp: 3, ep: 0, gp: 12, pp: 0 });
-    expect(() => fromCopper(15, ['gp', 'sp'])).toThrow(RangeError);
+  it('converts pounds, shillings and pence to pence and back', () => {
+    expect(lsd(1, 2, 6)).toBe(270);
+    expect(guineas(2)).toBe(504);
+    expect(COINS['half-crown']).toBe(30);
+    expect(toLsd(270.75)).toEqual({ pounds: 1, shillings: 2, pence: 6.75 });
+    expect(() => toLsd(-1)).toThrow(RangeError);
+  });
+
+  it('formats money the period way', () => {
+    expect(formatMoney(lsd(1, 2, 6))).toBe('£1 2s 6d');
+    expect(formatMoney(lsd(0, 2, 6))).toBe('2s 6d');
+    expect(formatMoney(6.5)).toBe('6½d');
+    expect(formatMoney(0.25)).toBe('¼d');
+    expect(formatMoney(lsd(5))).toBe('£5');
+    expect(formatMoney(0)).toBe('0d');
+  });
+
+  it('parses period notations', () => {
+    expect(parseMoney('£1 2s 6d')).toBe(270);
+    expect(parseMoney('2s 6d')).toBe(30);
+    expect(parseMoney('6½d')).toBe(6.5);
+    expect(parseMoney('2/6')).toBe(30);
+    expect(parseMoney('5/-')).toBe(60);
+    expect(parseMoney('3 gns')).toBe(756);
+    expect(parseMoney('£12')).toBe(2880);
+    expect(() => parseMoney('12 dollars')).toThrow(/Invalid amount/);
   });
 });
 

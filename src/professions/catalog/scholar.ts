@@ -23,7 +23,7 @@ export const SCHOLAR: ProfessionDefinition = {
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
-  toolProficiencies: ["calligrapher's supplies"],
+  toolProficiencies: ['writing-kit'],
   actions: [bonusAction('Recall Lore', 'You take the Study action.')],
   specializations: [
     specialization('antiquarian', 'apprentice', null, {

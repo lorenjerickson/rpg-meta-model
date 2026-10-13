@@ -21,7 +21,7 @@ export const CONSTABLE: ProfessionDefinition = {
     choose: 2,
     from: ['investigation', 'insight', 'perception', 'intimidation', 'athletics', 'history'],
   },
-  weaponProficiencies: [{ category: 'simple' }, { weaponId: 'revolver' }],
+  weaponProficiencies: [{ category: 'simple' }, { weaponId: 'service-revolver' }],
   armorTraining: [],
   toolProficiencies: [],
   rankTitles: { novice: 'Probationer' },

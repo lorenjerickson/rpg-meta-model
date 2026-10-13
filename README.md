@@ -12,12 +12,12 @@ TypeScript domain model and rules helpers for D&D 5th edition, following the 202
 | `src/professions` | Professions, ranks, specialization trees and the profession catalog                                   |
 | `src/science`     | Scientific disciplines, apparatus and preparations, charges and malfunctions, and their catalog       |
 | `src/combat`      | Hit point state, death saves, attack resolution, cover                                                |
-| `src/equipment`   | Items, weapons (properties, mastery), armor and AC, carrying capacity                                 |
+| `src/equipment`   | Items, weapons and firearms, armour and AC, tools, gear, mounts and vehicles, and the item catalog    |
 | `src/monsters`    | Stat blocks, challenge ratings, encounter XP budgets                                                  |
 
 Closed sets such as attributes, skills and conditions are `as const` arrays with a derived
-union type (`SKILLS` / `Skill`). Weapons, armor, gear and monsters are modelled as types only;
-no catalogs are included for them.
+union type (`SKILLS` / `Skill`). Monsters are modelled as types only; no catalog is included
+for them.
 
 The setting is the real world of the late 19th and early 20th centuries, with Victorian,
 steampunk and gothic horror influences. Every character is human; `ETHNICITIES` takes the place
@@ -38,6 +38,12 @@ master (13) and grand master (17). From apprentice rank, each new rank lets the 
 the next specialization in the profession's tree, e.g. Soldier → Rifleman → Sniper → Assassin.
 Each specialization grants skill proficiencies and actions, bonus actions or reactions.
 `PROFESSIONS` holds a first-draft catalog of 14 period professions.
+
+Money is British pounds, shillings and pence, held as a number of pence: `lsd(1, 2, 6)` is
+£1 2s 6d, and `formatMoney` and `parseMoney` handle period notation such as "2/6" and "3 gns".
+`ITEMS` holds a first-draft catalog of period weapons, armour, tools, gear, mounts and vehicles,
+along with the science apparatus and preparations. Firearms hold a number of rounds, take an
+action to reload, and older or cheaper guns can misfire and jam; machine guns can fire bursts.
 
 ## Scripts
 

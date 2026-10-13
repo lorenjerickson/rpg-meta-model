@@ -23,7 +23,7 @@ export const JOURNALIST: ProfessionDefinition = {
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
-  toolProficiencies: [],
+  toolProficiencies: ['photographers-kit'],
   rankTitles: { novice: 'Copy Boy' },
   actions: [bonusAction('Take Notes', 'You take the Search or Study action.')],
   specializations: [

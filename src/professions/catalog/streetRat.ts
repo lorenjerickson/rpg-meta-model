@@ -32,7 +32,7 @@ export const STREET_RAT: ProfessionDefinition = {
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: ['light'],
-  toolProficiencies: ["thieves' tools"],
+  toolProficiencies: ['burglars-tools'],
   rankTitles: { novice: 'Urchin' },
   actions: [bonusAction('Slip Away', 'You take the Disengage or Hide action.')],
   specializations: [
@@ -84,7 +84,7 @@ export const STREET_RAT: ProfessionDefinition = {
       actions: [
         bonusAction(
           'Quick Fingers',
-          "You make a Sleight of Hand check, use thieves' tools, or take the Utilize action.",
+          "You make a Sleight of Hand check, use burglar's tools, or take the Utilize action.",
         ),
       ],
     }),

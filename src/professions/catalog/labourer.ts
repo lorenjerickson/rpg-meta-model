@@ -24,7 +24,7 @@ export const LABOURER: ProfessionDefinition = {
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
-  toolProficiencies: ["carpenter's tools"],
+  toolProficiencies: ['carpenters-tools'],
   actions: [
     bonusAction(
       'Put Your Back Into It',
@@ -77,7 +77,7 @@ export const LABOURER: ProfessionDefinition = {
       name: 'Miner',
       description: 'Digs coal, copper or gold from deep underground.',
       skills: ['survival'],
-      tools: ["mason's tools"],
+      tools: ['masons-tools'],
       actions: [
         reaction(
           'Brace',

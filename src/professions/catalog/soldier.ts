@@ -96,7 +96,7 @@ export const SOLDIER: ProfessionDefinition = {
       name: 'Demolitions Expert',
       description: 'A sapper who mines, breaches and blows up obstacles.',
       skills: ['investigation'],
-      tools: ['demolitions kit'],
+      tools: ['demolitions-kit'],
       actions: [
         action(
           'Set Charge',

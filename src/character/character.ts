@@ -1,14 +1,14 @@
 import type { Attribute, AttributeScores } from '../core/attributes';
 import type { Condition } from '../core/conditions';
 import type { Alignment, Senses, Size, Speed } from '../core/creatures';
-import type { Currency } from '../core/currency';
+import type { Money } from '../core/currency';
 import type { Language } from '../core/languages';
 import type { ProficiencyLevel } from '../core/proficiency';
 import type { Skill } from '../core/skills';
 import type { DeathSaves } from '../combat/deathSaves';
 import type { HitPoints } from '../combat/hitPoints';
 import type { ArmorCategory } from '../equipment/armor';
-import type { WeaponProficiency } from '../equipment/weapons';
+import type { FirearmState, WeaponProficiency } from '../equipment/weapons';
 import type { ApparatusState } from '../science/apparatus';
 import type { Discipline } from '../science/disciplines';
 import type { HitDie } from '../professions/profession';
@@ -27,6 +27,8 @@ export interface InventoryEntry {
   equipped: boolean;
   /** Charges and condition, for apparatus. */
   apparatus?: ApparatusState;
+  /** Rounds loaded and whether it is jammed, for firearms. */
+  firearm?: FirearmState;
 }
 
 export interface CharacterProficiencies {
@@ -67,5 +69,6 @@ export interface Character {
   proficiencies: CharacterProficiencies;
   feats: readonly string[];
   inventory: readonly InventoryEntry[];
-  currency: Currency;
+  /** Money carried, in pence. */
+  money: Money;
 }

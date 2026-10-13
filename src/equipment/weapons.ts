@@ -11,6 +11,13 @@ export const WEAPON_TYPES = ['melee', 'ranged'] as const;
 
 export type WeaponType = (typeof WEAPON_TYPES)[number];
 
+/**
+ * Firearm properties:
+ * - firearm: fires cartridges or powder and ball.
+ * - reload: holds `capacity` shots; reloading takes an action.
+ * - misfire: on a natural roll at or below `misfireOn`, the shot fails and the weapon jams.
+ * - burst-fire: can spray a 10-foot Cube with `BURST_FIRE_ROUNDS` shots instead of one attack.
+ */
 export const WEAPON_PROPERTIES = [
   'ammunition',
   'finesse',
@@ -22,6 +29,10 @@ export const WEAPON_PROPERTIES = [
   'thrown',
   'two-handed',
   'versatile',
+  'firearm',
+  'reload',
+  'misfire',
+  'burst-fire',
 ] as const;
 
 export type WeaponProperty = (typeof WEAPON_PROPERTIES)[number];
@@ -64,6 +75,62 @@ export interface WeaponDefinition extends ItemBase {
   range?: WeaponRange;
   /** Item id of the ammunition this weapon fires. */
   ammunition?: string;
+  /** Shots held when fully loaded; present with the Reload property. */
+  capacity?: number;
+  /** The highest natural roll that misfires; present with the Misfire property. */
+  misfireOn?: number;
+}
+
+/** Shots spent and save DC for a burst of automatic fire into a 10-foot Cube. */
+export const BURST_FIRE_ROUNDS = 10;
+export const BURST_FIRE_DC = 15;
+
+/** The loaded state of a firearm a character carries. */
+export interface FirearmState {
+  loaded: number;
+  jammed: boolean;
+}
+
+export function fullyLoaded(weapon: WeaponDefinition): FirearmState {
+  return { loaded: weapon.capacity ?? 1, jammed: false };
+}
+
+export interface ShotResult {
+  firearm: FirearmState;
+  /** The shot failed: the attack misses and the weapon is jammed. */
+  misfired: boolean;
+}
+
+/**
+ * Fires one shot (or a burst), spending rounds. A misfire still spends the rounds, the attack
+ * misses, and the weapon is jammed until cleared.
+ */
+export function fire(
+  weapon: WeaponDefinition,
+  state: FirearmState,
+  natural: number,
+  rounds = 1,
+): ShotResult {
+  if (state.jammed) {
+    throw new Error(`${weapon.name} is jammed and must be cleared`);
+  }
+  if (state.loaded < rounds) {
+    throw new Error(
+      `${weapon.name} has ${String(state.loaded)} rounds loaded, needs ${String(rounds)}`,
+    );
+  }
+  const misfired = hasProperty(weapon, 'misfire') && natural <= (weapon.misfireOn ?? 1);
+  return { firearm: { loaded: state.loaded - rounds, jammed: misfired }, misfired };
+}
+
+/** Reloading takes an action and refills the weapon to capacity. */
+export function reload(weapon: WeaponDefinition, state: FirearmState): FirearmState {
+  return { ...state, loaded: weapon.capacity ?? 1 };
+}
+
+/** Clearing a jam takes the Utilize action and a successful Agility check against this DC. */
+export function clearJamDc(weapon: WeaponDefinition): number {
+  return 8 + (weapon.misfireOn ?? 1);
 }
 
 /** A proficiency that covers a whole category, a category limited by property, or one weapon. */

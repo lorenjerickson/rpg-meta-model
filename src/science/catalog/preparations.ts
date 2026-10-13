@@ -1,3 +1,4 @@
+import { lsd } from '../../core/currency';
 import { dice } from '../../core/dice';
 import type { PreparationDefinition, ScientificEffect } from '../apparatus';
 import { INSTANTANEOUS, TOUCH, feet, lasting, slug } from './builders';
@@ -18,7 +19,7 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
     description: 'A vial of ammonium carbonate, sharp enough to wake the dying.',
     discipline: 'chemistry',
     weightLb: 0.1,
-    cost: { amount: 5, coin: 'gp' },
+    cost: lsd(0, 0, 6),
     rarity: 'common',
     effect: {
       name: 'Revive',
@@ -33,7 +34,7 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
     description: 'A bitter patent tonic of laudanum, quinine and things best left unnamed.',
     discipline: 'chemistry',
     weightLb: 0.5,
-    cost: { amount: 50, coin: 'gp' },
+    cost: lsd(0, 5),
     rarity: 'common',
     effect: {
       name: 'Restorative Draught',
@@ -48,7 +49,7 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
     description: 'An expensive compound of charcoal and alkaloids that counters most toxins.',
     discipline: 'chemistry',
     weightLb: 0.5,
-    cost: { amount: 100, coin: 'gp' },
+    cost: lsd(1),
     rarity: 'uncommon',
     effect: {
       name: 'Antidote',
@@ -65,7 +66,7 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
     description: 'A thin glass globe of chloroform that shatters into a stupefying vapour.',
     discipline: 'chemistry',
     weightLb: 1,
-    cost: { amount: 50, coin: 'gp' },
+    cost: lsd(0, 10),
     rarity: 'uncommon',
     effect: {
       name: 'Chloroform Cloud',
@@ -85,7 +86,7 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
     description: 'A tin of saltpetre and sugar that pours out thick white smoke.',
     discipline: 'chemistry',
     weightLb: 1,
-    cost: { amount: 10, coin: 'gp' },
+    cost: lsd(0, 2, 6),
     rarity: 'common',
     effect: {
       name: 'Smoke Screen',
@@ -102,7 +103,7 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
     description: 'A canister of rubber solution that erupts into a sticky, setting foam.',
     discipline: 'chemistry',
     weightLb: 2,
-    cost: { amount: 75, coin: 'gp' },
+    cost: lsd(1, 10),
     rarity: 'uncommon',
     effect: {
       name: 'Adhesive Foam',
@@ -122,7 +123,7 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
     description: 'A pouch of luminous powder that clings to anything it touches.',
     discipline: 'chemistry',
     weightLb: 0.5,
-    cost: { amount: 25, coin: 'gp' },
+    cost: lsd(0, 5),
     rarity: 'common',
     effect: {
       name: 'Luminous Cloud',
@@ -137,12 +138,53 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
         'from the Invisible condition.',
     },
   }),
+  preparation('dynamite-stick', {
+    name: 'Stick of Dynamite',
+    description: 'Nitroglycerine in sawdust, wrapped in paper with a short fuse.',
+    discipline: 'chemistry',
+    weightLb: 1,
+    cost: lsd(0, 1),
+    rarity: 'common',
+    effect: {
+      name: 'Dynamite Blast',
+      cost: 'action',
+      range: feet(60),
+      area: { shape: 'sphere', radius: 5 },
+      duration: INSTANTANEOUS,
+      savingThrow: 'agility',
+      damage: [{ dice: dice(3, 6), type: 'concussive' }],
+      description:
+        'Light the fuse and throw it. Each creature in the Sphere makes an Agility saving ' +
+        'throw, taking the damage on a failure or half on a success. Sticks bundled together ' +
+        'add 1d6 damage each (up to 10d6) and 5 feet of radius for every 5 sticks.',
+    },
+  }),
+  preparation('hand-grenade', {
+    name: 'Hand Grenade',
+    description: 'A segmented iron grenade with a pin and striker lever.',
+    discipline: 'chemistry',
+    weightLb: 1.5,
+    cost: lsd(0, 5),
+    rarity: 'uncommon',
+    effect: {
+      name: 'Grenade Burst',
+      cost: 'action',
+      range: feet(60),
+      area: { shape: 'sphere', radius: 10 },
+      duration: INSTANTANEOUS,
+      savingThrow: 'agility',
+      damage: [{ dice: dice(3, 6), type: 'piercing' }],
+      description:
+        'Pull the pin and throw it. Each creature in the Sphere makes an Agility saving throw, ' +
+        'taking the damage on a failure or half on a success.',
+    },
+  }),
   preparation('incendiary-shell', {
     name: 'Incendiary Shell',
     description: 'A thermite-packed shell, thrown by hand or fired from a launcher.',
     discipline: 'chemistry',
     weightLb: 3,
-    cost: { amount: 300, coin: 'gp' },
+    cost: lsd(5),
     rarity: 'rare',
     effect: {
       name: 'Incendiary Burst',
@@ -163,7 +205,7 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
     description: 'A spring syringe of adrenal extract that speeds the body to its limits.',
     discipline: 'chemistry',
     weightLb: 0.5,
-    cost: { amount: 400, coin: 'gp' },
+    cost: lsd(10),
     rarity: 'rare',
     effect: {
       name: 'Adrenal Surge',
@@ -182,7 +224,7 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
     description: 'A steel cylinder of chlorine gas, as used in the new war.',
     discipline: 'chemistry',
     weightLb: 5,
-    cost: { amount: 500, coin: 'gp' },
+    cost: lsd(8),
     rarity: 'rare',
     effect: {
       name: 'Poison Gas',
