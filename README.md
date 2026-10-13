@@ -21,6 +21,9 @@ union type (`SKILLS` / `Skill`).
 The setting is the real world of the late 19th and early 20th centuries, with Victorian,
 steampunk and gothic horror influences. Every character is human; `ETHNICITIES` takes the place
 of species and grants languages and traits, and `LANGUAGES` lists real languages of the period.
+`SKILLS` uses period skills: Natural History, Theology and Legerdemain replace Nature, Religion
+and Sleight of Hand; Etiquette, Streetwise, Mechanics and Bureaucracy are new; and Occult
+(Sanity) and Gambling (Fortune) give the two new attributes skills of their own.
 
 There is no magic, only poorly understood science. Effects that would be spells come from
 apparatus (galvanic gauntlets, mesmeric pendants, Tesla lances) that hold charges, and

@@ -20,7 +20,16 @@ export const PERFORMER: ProfessionDefinition = {
   savingThrows: ['agility', 'charisma'],
   skillProficiencies: {
     choose: 3,
-    from: ['performance', 'acrobatics', 'deception', 'persuasion', 'sleight-of-hand', 'insight'],
+    from: [
+      'performance',
+      'acrobatics',
+      'deception',
+      'persuasion',
+      'legerdemain',
+      'insight',
+      'etiquette',
+      'gambling',
+    ],
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
@@ -77,7 +86,7 @@ export const PERFORMER: ProfessionDefinition = {
     specialization('conjurer', 'apprentice', null, {
       name: 'Conjurer',
       description: 'A sleight-of-hand performer of the music hall.',
-      skills: ['sleight-of-hand'],
+      skills: ['legerdemain'],
       disciplines: ['optics'],
       actions: [
         bonusAction(

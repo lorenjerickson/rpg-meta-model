@@ -20,7 +20,15 @@ export const SAILOR: ProfessionDefinition = {
   savingThrows: ['might', 'agility'],
   skillProficiencies: {
     choose: 2,
-    from: ['athletics', 'acrobatics', 'perception', 'survival', 'nature', 'intimidation'],
+    from: [
+      'athletics',
+      'acrobatics',
+      'perception',
+      'survival',
+      'natural-history',
+      'intimidation',
+      'gambling',
+    ],
   },
   weaponProficiencies: [{ category: 'simple' }, { category: 'martial' }],
   armorTraining: [],

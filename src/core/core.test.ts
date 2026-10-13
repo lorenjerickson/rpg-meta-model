@@ -15,6 +15,7 @@ import {
   type Rng,
 } from './dice';
 import { proficiencyContribution } from './proficiency';
+import { SKILLS, SKILL_DEFINITIONS } from './skills';
 import { durationInSeconds } from './time';
 
 /** An RNG that returns the given values in order, then repeats the last one. */
@@ -123,6 +124,28 @@ describe('d20 tests', () => {
     expect(resolveD20Test('attack-roll', 1, 20, 10).success).toBe(false);
     expect(resolveD20Test('saving-throw', 20, -5, 16).success).toBe(false);
     expect(resolveD20Test('attribute-check', 1, 12, 10).success).toBe(true);
+  });
+});
+
+describe('skills', () => {
+  it('lists the period skills in alphabetical order', () => {
+    expect(SKILLS).toHaveLength(24);
+    expect([...SKILLS].sort()).toEqual([...SKILLS]);
+  });
+
+  it('gives every attribute but Hardiness at least one skill', () => {
+    const attributes = new Set(SKILLS.map((skill) => SKILL_DEFINITIONS[skill].attribute));
+    expect([...attributes].sort()).toEqual(
+      ['agility', 'charisma', 'fortune', 'intellect', 'might', 'sanity', 'wisdom'].sort(),
+    );
+    expect(SKILL_DEFINITIONS.occult.attribute).toBe('sanity');
+    expect(SKILL_DEFINITIONS.gambling.attribute).toBe('fortune');
+  });
+
+  it('describes every skill', () => {
+    for (const skill of SKILLS) {
+      expect(SKILL_DEFINITIONS[skill].description.length, skill).toBeGreaterThan(10);
+    }
   });
 });
 

@@ -20,7 +20,7 @@ export const CLERGY: ProfessionDefinition = {
   savingThrows: ['wisdom', 'sanity'],
   skillProficiencies: {
     choose: 2,
-    from: ['religion', 'insight', 'persuasion', 'history', 'medicine', 'performance'],
+    from: ['theology', 'insight', 'persuasion', 'history', 'medicine', 'performance', 'occult'],
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
@@ -101,7 +101,7 @@ export const CLERGY: ProfessionDefinition = {
     specialization('exorcist', 'master', 'spiritual-director', {
       name: 'Exorcist',
       description: 'Confronts possession, obsession and things that should not be.',
-      skills: ['intimidation', 'religion'],
+      skills: ['occult', 'theology'],
       disciplines: ['mesmerism'],
       actions: [
         action(

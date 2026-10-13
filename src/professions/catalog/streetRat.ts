@@ -26,8 +26,10 @@ export const STREET_RAT: ProfessionDefinition = {
       'insight',
       'intimidation',
       'perception',
-      'sleight-of-hand',
+      'legerdemain',
       'stealth',
+      'streetwise',
+      'gambling',
     ],
   },
   weaponProficiencies: [{ category: 'simple' }],
@@ -39,7 +41,7 @@ export const STREET_RAT: ProfessionDefinition = {
     specialization('gang-leader', 'apprentice', null, {
       name: 'Gang Leader',
       description: 'Runs a crew on a few blocks of turf.',
-      skills: ['intimidation'],
+      skills: ['intimidation', 'streetwise'],
       actions: [
         bonusAction(
           'Rally the Gang',
@@ -80,11 +82,11 @@ export const STREET_RAT: ProfessionDefinition = {
     specialization('pickpocket', 'apprentice', null, {
       name: 'Pickpocket',
       description: "A dip with quick hands and a crowd's anonymity.",
-      skills: ['sleight-of-hand'],
+      skills: ['legerdemain'],
       actions: [
         bonusAction(
           'Quick Fingers',
-          "You make a Sleight of Hand check, use burglar's tools, or take the Utilize action.",
+          "You make a Legerdemain check, use burglar's tools, or take the Utilize action.",
         ),
       ],
     }),

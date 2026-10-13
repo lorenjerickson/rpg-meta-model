@@ -19,7 +19,15 @@ export const SOLDIER: ProfessionDefinition = {
   savingThrows: ['might', 'hardiness'],
   skillProficiencies: {
     choose: 2,
-    from: ['athletics', 'intimidation', 'perception', 'survival', 'medicine', 'animal-handling'],
+    from: [
+      'athletics',
+      'intimidation',
+      'perception',
+      'survival',
+      'medicine',
+      'animal-handling',
+      'gambling',
+    ],
   },
   weaponProficiencies: [{ category: 'simple' }, { category: 'martial' }],
   armorTraining: ['light'],

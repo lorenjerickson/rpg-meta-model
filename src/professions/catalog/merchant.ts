@@ -20,7 +20,15 @@ export const MERCHANT: ProfessionDefinition = {
   savingThrows: ['intellect', 'fortune'],
   skillProficiencies: {
     choose: 2,
-    from: ['persuasion', 'deception', 'insight', 'investigation', 'history', 'animal-handling'],
+    from: [
+      'persuasion',
+      'deception',
+      'insight',
+      'investigation',
+      'bureaucracy',
+      'etiquette',
+      'gambling',
+    ],
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
@@ -60,7 +68,7 @@ export const MERCHANT: ProfessionDefinition = {
     specialization('tycoon', 'master', 'wholesaler', {
       name: 'Tycoon',
       description: 'Owns an industry and the politicians who regulate it.',
-      skills: ['history', 'intimidation'],
+      skills: ['etiquette', 'intimidation'],
       actions: [
         action(
           'Money Talks',
@@ -73,7 +81,7 @@ export const MERCHANT: ProfessionDefinition = {
     specialization('speculator', 'apprentice', null, {
       name: 'Speculator',
       description: 'Bets on prices, ventures and luck.',
-      skills: ['deception'],
+      skills: ['gambling'],
       actions: [
         bonusAction(
           'Calculated Risk',

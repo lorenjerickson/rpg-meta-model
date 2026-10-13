@@ -20,7 +20,7 @@ export const LABOURER: ProfessionDefinition = {
   savingThrows: ['might', 'hardiness'],
   skillProficiencies: {
     choose: 2,
-    from: ['athletics', 'survival', 'perception', 'intimidation', 'animal-handling', 'nature'],
+    from: ['athletics', 'survival', 'perception', 'intimidation', 'animal-handling', 'mechanics'],
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
@@ -102,7 +102,7 @@ export const LABOURER: ProfessionDefinition = {
     specialization('mine-superintendent', 'master', 'shift-boss', {
       name: 'Mine Superintendent',
       description: 'Plans the workings and knows the rock.',
-      skills: ['investigation', 'nature'],
+      skills: ['investigation', 'natural-history'],
       actions: [
         action(
           'Survey',

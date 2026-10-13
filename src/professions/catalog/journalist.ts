@@ -19,7 +19,7 @@ export const JOURNALIST: ProfessionDefinition = {
   savingThrows: ['wisdom', 'fortune'],
   skillProficiencies: {
     choose: 2,
-    from: ['investigation', 'insight', 'persuasion', 'deception', 'history', 'perception'],
+    from: ['investigation', 'insight', 'persuasion', 'deception', 'streetwise', 'bureaucracy'],
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { SKILLS, type Skill } from '../core/skills';
 import { findItem, isKnownToolProficiency } from '../equipment/catalog';
+import { PROFESSIONS } from '../professions/catalog';
 import { featGainedAtLevel } from '../professions/profession';
 import { makeCharacter } from '../testing/characters';
 import {
@@ -132,6 +134,19 @@ describe('feat prerequisites', () => {
     expect(meetsFeatPrerequisite(feat('gadgeteer'), scholar)).toBe(true);
     const layman = makeCharacter({ proficiencies: { ...scholar.proficiencies, disciplines: [] } });
     expect(meetsFeatPrerequisite(feat('gadgeteer'), layman)).toBe(false);
+  });
+});
+
+describe('skill coverage', () => {
+  it('makes every skill available from some profession or background', () => {
+    const available = new Set<Skill>([
+      ...BACKGROUNDS.flatMap((entry) => entry.skillProficiencies),
+      ...PROFESSIONS.flatMap((profession) => [
+        ...profession.skillProficiencies.from,
+        ...profession.specializations.flatMap((entry) => entry.skills),
+      ]),
+    ]);
+    expect(SKILLS.filter((skill) => !available.has(skill))).toEqual([]);
   });
 });
 

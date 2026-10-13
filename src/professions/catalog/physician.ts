@@ -19,7 +19,7 @@ export const PHYSICIAN: ProfessionDefinition = {
   savingThrows: ['intellect', 'sanity'],
   skillProficiencies: {
     choose: 2,
-    from: ['medicine', 'insight', 'nature', 'investigation', 'persuasion', 'history'],
+    from: ['medicine', 'insight', 'natural-history', 'investigation', 'persuasion', 'science'],
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],

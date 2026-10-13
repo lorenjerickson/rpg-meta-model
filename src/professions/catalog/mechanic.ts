@@ -19,7 +19,7 @@ export const MECHANIC: ProfessionDefinition = {
   savingThrows: ['intellect', 'hardiness'],
   skillProficiencies: {
     choose: 2,
-    from: ['investigation', 'athletics', 'perception', 'nature', 'history', 'sleight-of-hand'],
+    from: ['mechanics', 'investigation', 'athletics', 'perception', 'science', 'legerdemain'],
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
@@ -36,7 +36,7 @@ export const MECHANIC: ProfessionDefinition = {
     specialization('machinist', 'apprentice', null, {
       name: 'Machinist',
       description: 'Shapes metal parts on lathe and mill.',
-      skills: ['athletics'],
+      skills: ['mechanics'],
       tools: ['smiths-tools'],
       actions: [bonusAction('Tool in Hand', 'You take the Utilize action.')],
     }),
@@ -69,7 +69,7 @@ export const MECHANIC: ProfessionDefinition = {
     specialization('tinkerer', 'apprentice', null, {
       name: 'Tinkerer',
       description: 'Builds clever gadgets from scrap.',
-      skills: ['sleight-of-hand'],
+      skills: ['legerdemain'],
       disciplines: ['chemistry'],
       actions: [
         action(
@@ -85,7 +85,7 @@ export const MECHANIC: ProfessionDefinition = {
     specialization('inventor', 'journeyman', 'tinkerer', {
       name: 'Inventor',
       description: 'Patents new machines.',
-      skills: ['nature'],
+      skills: ['natural-history'],
       disciplines: ['optics'],
       actions: [
         bonusAction(

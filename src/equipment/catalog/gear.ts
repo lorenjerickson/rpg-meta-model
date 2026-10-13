@@ -117,7 +117,7 @@ export const GEAR: readonly GearDefinition[] = [
   gear('handcuffs', {
     name: 'Handcuffs',
     description:
-      'Restrain a Small or Medium creature. Escaping takes a DC 20 Agility (Sleight of Hand) ' +
+      'Restrain a Small or Medium creature. Escaping takes a DC 20 Agility (Legerdemain) ' +
       'check; breaking them takes a DC 25 Might (Athletics) check.',
     weightLb: 2,
     cost: lsd(0, 10),

@@ -19,7 +19,15 @@ export const CONSTABLE: ProfessionDefinition = {
   savingThrows: ['wisdom', 'intellect'],
   skillProficiencies: {
     choose: 2,
-    from: ['investigation', 'insight', 'perception', 'intimidation', 'athletics', 'history'],
+    from: [
+      'investigation',
+      'insight',
+      'perception',
+      'intimidation',
+      'athletics',
+      'streetwise',
+      'bureaucracy',
+    ],
   },
   weaponProficiencies: [{ category: 'simple' }, { weaponId: 'service-revolver' }],
   armorTraining: [],
@@ -100,7 +108,7 @@ export const CONSTABLE: ProfessionDefinition = {
     specialization('commissioner', 'master', 'police-captain', {
       name: 'Commissioner',
       description: "Runs a city's police and answers only to politicians.",
-      skills: ['insight', 'persuasion'],
+      skills: ['bureaucracy', 'persuasion'],
       actions: [
         action(
           'Call for Reinforcements',

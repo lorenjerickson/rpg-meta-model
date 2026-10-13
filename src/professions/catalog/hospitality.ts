@@ -19,7 +19,7 @@ export const HOSPITALITY: ProfessionDefinition = {
   savingThrows: ['hardiness', 'charisma'],
   skillProficiencies: {
     choose: 2,
-    from: ['insight', 'persuasion', 'perception', 'deception', 'performance', 'medicine'],
+    from: ['insight', 'persuasion', 'perception', 'deception', 'performance', 'etiquette'],
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],

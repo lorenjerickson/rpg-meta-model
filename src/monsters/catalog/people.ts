@@ -21,7 +21,7 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
     hitDice: '2d8',
     speed: { walk: 30 },
     scores: [11, 12, 10, 10, 11, 10, 10, 8],
-    skills: { deception: 'proficient', religion: 'proficient' },
+    skills: { deception: 'proficient', occult: 'proficient' },
     languages: ['English'],
     challengeRating: 1 / 8,
     actions: [
@@ -41,7 +41,7 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
     speed: { walk: 30 },
     scores: [11, 14, 12, 10, 13, 14, 10, 6],
     saves: ['wisdom'],
-    skills: { deception: 'proficient', persuasion: 'proficient', religion: 'proficient' },
+    skills: { deception: 'proficient', persuasion: 'proficient', occult: 'proficient' },
     languages: ['English'],
     challengeRating: 2,
     actions: [

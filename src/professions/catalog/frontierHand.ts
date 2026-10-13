@@ -20,7 +20,7 @@ export const FRONTIER_HAND: ProfessionDefinition = {
   savingThrows: ['hardiness', 'wisdom'],
   skillProficiencies: {
     choose: 3,
-    from: ['survival', 'nature', 'animal-handling', 'perception', 'stealth', 'athletics'],
+    from: ['survival', 'natural-history', 'animal-handling', 'perception', 'stealth', 'athletics'],
   },
   weaponProficiencies: [{ category: 'simple' }, { category: 'martial' }],
   armorTraining: ['light'],
@@ -55,7 +55,7 @@ export const FRONTIER_HAND: ProfessionDefinition = {
     specialization('scout', 'master', 'tracker', {
       name: 'Scout',
       description: 'Goes ahead of armies and expeditions, unseen.',
-      skills: ['nature', 'perception'],
+      skills: ['natural-history', 'perception'],
       actions: [
         reaction(
           'Ambush',
