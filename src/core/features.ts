@@ -1,4 +1,4 @@
-/** A named rules element such as a class feature, species trait or feat benefit. */
+/** A named rules element such as a class feature, ethnicity trait or feat benefit. */
 export interface Feature {
   id: string;
   name: string;

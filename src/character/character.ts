@@ -42,14 +42,14 @@ export interface CharacterSpellcasting {
 }
 
 /**
- * A player character. Values that come from species, background and class (size, speed,
- * senses) are stored resolved, so the character can be used without its source definitions.
+ * A player character. Values that come from being human, ethnicity, background and class
+ * (size, speed, senses) are stored resolved, so the character can be used without its source
+ * definitions.
  */
 export interface Character {
   id: string;
   name: string;
-  speciesId: string;
-  lineageId?: string;
+  ethnicityId: string;
   backgroundId: string;
   alignment?: Alignment;
   /** In the order taken; the first entry is the starting class. */

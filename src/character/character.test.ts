@@ -30,7 +30,7 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
   return {
     id: 'test',
     name: 'Testa',
-    speciesId: 'human',
+    ethnicityId: 'welsh',
     backgroundId: 'sage',
     classes: [{ classId: 'wizard', level: 5 }],
     experience: 6500,
@@ -59,7 +59,7 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
       weapons: [{ category: 'simple' }],
       armor: [],
       tools: [],
-      languages: ['common', 'elvish'],
+      languages: ['english', 'welsh'],
     },
     feats: [],
     inventory: [],
