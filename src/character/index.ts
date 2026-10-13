@@ -1,7 +1,6 @@
 export * from './attributeGeneration';
 export * from './backgrounds';
 export * from './character';
-export * from './classes';
 export * from './derived';
 export * from './ethnicities';
 export * from './ethnicity';

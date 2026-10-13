@@ -9,7 +9,6 @@ export const ITEM_CATEGORIES = [
   'tool',
   'adventuring-gear',
   'ammunition',
-  'spellcasting-focus',
   'mount',
   'vehicle',
   'wondrous-item',
@@ -48,7 +47,7 @@ export const MAX_ATTUNED_ITEMS = 3;
 export interface MagicItemProperties {
   rarity: Rarity;
   magicCategory: MagicItemCategory;
-  /** False if no attunement is needed; otherwise who can attune, e.g. "by a Wizard". */
+  /** False if no attunement is needed; otherwise who can attune, e.g. "by a Physician". */
   attunement: false | { restriction?: string };
   /** Bonus to attack and damage rolls (weapons) or AC (armor), e.g. +1. */
   bonus?: number;

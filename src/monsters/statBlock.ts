@@ -48,7 +48,7 @@ export interface MonsterStatBlock {
   /** Usually one size; swarms and some creatures list a choice. */
   size: Size;
   creatureType: CreatureType;
-  /** Descriptive tags such as "Wizard" or "Goblinoid". */
+  /** Descriptive tags such as "Cultist" or "Soldier". */
   tags?: readonly string[];
   alignment: Alignment;
   armorClass: number;

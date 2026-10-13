@@ -35,11 +35,10 @@ export interface ArmorClassInput {
   armor?: ArmorDefinition;
   shield?: ArmorDefinition;
   /**
-   * An extra attribute added while unarmored, e.g. Hardiness for a Barbarian's or Wisdom for a
-   * Monk's Unarmored Defense.
+   * An extra attribute added to unarmored AC by a feature, e.g. Hardiness or Wisdom.
    */
   unarmoredDefenseAttribute?: Attribute;
-  /** Flat bonuses from magic items, spells and features. */
+  /** Flat bonuses from magic items and features. */
   bonus?: number;
 }
 

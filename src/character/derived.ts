@@ -4,33 +4,50 @@ import { proficiencyContribution } from '../core/proficiency';
 import { SKILL_DEFINITIONS, type Skill } from '../core/skills';
 import { carryingCapacity } from '../equipment/carrying';
 import { MAX_ATTUNED_ITEMS } from '../equipment/items';
+import { PROFESSIONS } from '../professions/catalog';
 import {
-  casterLevel,
-  pactMagicForLevel,
-  spellSlotsForCasterLevel,
-  type PactMagicSlots,
-  type SpellcastingClassLevel,
-  type SpellSlots,
-} from '../magic/slots';
-import { spellAttackBonus, spellSaveDc } from '../magic/spellcasting';
-import type { Character, ClassLevel } from './character';
-import { CLASS_CORE, type ClassId, type HitDie } from './classes';
+  professionDc,
+  type HitDie,
+  type ProfessionAction,
+  type ProfessionDefinition,
+} from '../professions/profession';
+import { rankForLevel, type Rank } from '../professions/ranks';
+import { specializationGrants } from '../professions/specializations';
+import type { Character, ProfessionLevel } from './character';
 import { proficiencyBonusForLevel } from './progression';
 
-export function totalLevel(character: Character): number {
-  return character.classes.reduce((total, entry) => total + entry.level, 0);
+/** Where profession definitions are looked up. Defaults to the built-in catalog. */
+export type ProfessionCatalog = readonly ProfessionDefinition[];
+
+function professionFrom(catalog: ProfessionCatalog, id: string): ProfessionDefinition {
+  const profession = catalog.find((entry) => entry.id === id);
+  if (profession === undefined) {
+    throw new Error(`Unknown profession: ${id}`);
+  }
+  return profession;
 }
 
-export function startingClass(character: Character): ClassLevel {
-  const [first] = character.classes;
+export function totalLevel(character: Character): number {
+  return character.professions.reduce((total, entry) => total + entry.level, 0);
+}
+
+export function startingProfession(character: Character): ProfessionLevel {
+  const [first] = character.professions;
   if (first === undefined) {
-    throw new Error(`${character.name} has no class levels`);
+    throw new Error(`${character.name} has no profession`);
   }
   return first;
 }
 
-export function classLevel(character: Character, classId: ClassId): number {
-  return character.classes.find((entry) => entry.classId === classId)?.level ?? 0;
+export function professionLevel(character: Character, professionId: string): number {
+  return character.professions.find((entry) => entry.professionId === professionId)?.level ?? 0;
+}
+
+/** The character's rank in each of their professions. */
+export function professionRanks(character: Character): Record<string, Rank> {
+  return Object.fromEntries(
+    character.professions.map((entry) => [entry.professionId, rankForLevel(entry.level)]),
+  );
 }
 
 export function characterProficiencyBonus(character: Character): number {
@@ -67,18 +84,24 @@ export function initiativeModifier(character: Character): number {
   return characterAttributeModifier(character, 'agility');
 }
 
-/** Total hit dice by die size, from all class levels. */
-export function hitDiceTotal(character: Character): Partial<Record<HitDie, number>> {
+/** Total hit dice by die size, from all profession levels. */
+export function hitDiceTotal(
+  character: Character,
+  catalog: ProfessionCatalog = PROFESSIONS,
+): Partial<Record<HitDie, number>> {
   const totals: Partial<Record<HitDie, number>> = {};
-  for (const { classId, level } of character.classes) {
-    const die = CLASS_CORE[classId].hitDie;
+  for (const { professionId, level } of character.professions) {
+    const die = professionFrom(catalog, professionId).hitDie;
     totals[die] = (totals[die] ?? 0) + level;
   }
   return totals;
 }
 
-export function hitDiceRemaining(character: Character): Partial<Record<HitDie, number>> {
-  const remaining = hitDiceTotal(character);
+export function hitDiceRemaining(
+  character: Character,
+  catalog: ProfessionCatalog = PROFESSIONS,
+): Partial<Record<HitDie, number>> {
+  const remaining = hitDiceTotal(character, catalog);
   for (const [die, total] of Object.entries(remaining)) {
     const size = Number(die) as HitDie;
     remaining[size] = total - (character.hitDiceSpent[size] ?? 0);
@@ -87,45 +110,42 @@ export function hitDiceRemaining(character: Character): Partial<Record<HitDie, n
 }
 
 /**
- * Spell slots from every spellcasting class. Subclasses that grant spellcasting (Eldritch
- * Knight, Arcane Trickster) aren't in CLASS_CORE, so pass their progression in `additional`.
+ * The save DC for one of the character's professions. With several primary attributes, the
+ * highest modifier among them is used.
  */
-export function characterSpellSlots(
+export function characterProfessionDc(
   character: Character,
-  additional: readonly SpellcastingClassLevel[] = [],
-): SpellSlots {
-  const fromClasses = character.classes.flatMap(({ classId, level }) => {
-    const spellcasting = CLASS_CORE[classId].spellcasting;
-    return spellcasting === null ? [] : [{ progression: spellcasting.progression, level }];
-  });
-  return spellSlotsForCasterLevel(casterLevel([...fromClasses, ...additional]));
-}
-
-export function characterPactMagic(character: Character): PactMagicSlots | null {
-  const level = classLevel(character, 'warlock');
-  return level === 0 ? null : pactMagicForLevel(level);
-}
-
-function spellcastingAttributeFor(classId: ClassId): Attribute {
-  const spellcasting = CLASS_CORE[classId].spellcasting;
-  if (spellcasting === null) {
-    throw new Error(`${CLASS_CORE[classId].name} is not a spellcasting class`);
-  }
-  return spellcasting.attribute;
-}
-
-export function characterSpellSaveDc(character: Character, classId: ClassId): number {
-  return spellSaveDc(
-    characterProficiencyBonus(character),
-    characterAttributeModifier(character, spellcastingAttributeFor(classId)),
+  professionId: string,
+  catalog: ProfessionCatalog = PROFESSIONS,
+): number {
+  const { primaryAttributes } = professionFrom(catalog, professionId);
+  const best = Math.max(
+    ...primaryAttributes.map((attribute) => characterAttributeModifier(character, attribute)),
   );
+  return professionDc(characterProficiencyBonus(character), best);
 }
 
-export function characterSpellAttackBonus(character: Character, classId: ClassId): number {
-  return spellAttackBonus(
-    characterProficiencyBonus(character),
-    characterAttributeModifier(character, spellcastingAttributeFor(classId)),
+export interface CharacterActions {
+  actions: ProfessionAction[];
+  bonusActions: ProfessionAction[];
+  reactions: ProfessionAction[];
+}
+
+/** Every action, bonus action and reaction the character's professions and paths grant. */
+export function characterActions(
+  character: Character,
+  catalog: ProfessionCatalog = PROFESSIONS,
+): CharacterActions {
+  const all = character.professions.flatMap(
+    (entry) =>
+      specializationGrants(professionFrom(catalog, entry.professionId), entry.specializationPath)
+        .actions,
   );
+  return {
+    actions: all.filter((entry) => entry.cost === 'action'),
+    bonusActions: all.filter((entry) => entry.cost === 'bonus-action'),
+    reactions: all.filter((entry) => entry.cost === 'reaction'),
+  };
 }
 
 export function characterCarryingCapacity(character: Character): number {

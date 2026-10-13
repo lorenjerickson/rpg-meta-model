@@ -9,12 +9,14 @@ import type { DeathSaves } from '../combat/deathSaves';
 import type { HitPoints } from '../combat/hitPoints';
 import type { ArmorCategory } from '../equipment/armor';
 import type { WeaponProficiency } from '../equipment/weapons';
-import type { ClassId, HitDie } from './classes';
+import type { HitDie } from '../professions/profession';
 
-export interface ClassLevel {
-  classId: ClassId;
+export interface ProfessionLevel {
+  professionId: string;
+  /** Levels in this profession; its rank follows from this. */
   level: number;
-  subclassId?: string;
+  /** Specializations chosen so far, in order, e.g. ['rifleman', 'sniper']. */
+  specializationPath: readonly string[];
 }
 
 export interface InventoryEntry {
@@ -33,18 +35,10 @@ export interface CharacterProficiencies {
   languages: readonly Language[];
 }
 
-export interface CharacterSpellcasting {
-  /** Expended slots per spell level; index 0 is 1st level. */
-  expendedSlots: readonly number[];
-  expendedPactSlots: number;
-  preparedSpells: readonly string[];
-  cantrips: readonly string[];
-}
-
 /**
- * A player character. Values that come from being human, ethnicity, background and class
- * (size, speed, senses) are stored resolved, so the character can be used without its source
- * definitions.
+ * A player character. Values that come from being human, ethnicity, background and profession
+ * (size, speed, senses, proficiencies) are stored resolved, so the character can be used without
+ * its source definitions.
  */
 export interface Character {
   id: string;
@@ -52,8 +46,8 @@ export interface Character {
   ethnicityId: string;
   backgroundId: string;
   alignment?: Alignment;
-  /** In the order taken; the first entry is the starting class. */
-  classes: readonly ClassLevel[];
+  /** In the order taken; the first entry is the starting profession. */
+  professions: readonly ProfessionLevel[];
   experience: number;
   size: Size;
   speed: Speed;
@@ -69,5 +63,4 @@ export interface Character {
   feats: readonly string[];
   inventory: readonly InventoryEntry[];
   currency: Currency;
-  spellcasting?: CharacterSpellcasting;
 }

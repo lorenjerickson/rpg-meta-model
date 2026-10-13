@@ -10,15 +10,13 @@ import {
   pointBuyCost,
 } from './attributeGeneration';
 import type { Character } from './character';
-import { CLASSES, CLASS_CORE, meetsMulticlassPrerequisite } from './classes';
 import {
-  characterPactMagic,
+  characterActions,
+  characterProfessionDc,
   characterProficiencyBonus,
-  characterSpellAttackBonus,
-  characterSpellSaveDc,
-  characterSpellSlots,
   hitDiceRemaining,
   passivePerception,
+  professionRanks,
   savingThrowModifier,
   skillModifier,
   totalLevel,
@@ -32,7 +30,7 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
     name: 'Testa',
     ethnicityId: 'welsh',
     backgroundId: 'sage',
-    classes: [{ classId: 'wizard', level: 5 }],
+    professions: [{ professionId: 'scholar', level: 5, specializationPath: ['occult-researcher'] }],
     experience: 6500,
     size: 'medium',
     speed: { walk: 30 },
@@ -176,39 +174,6 @@ describe('attribute generation', () => {
   });
 });
 
-describe('classes', () => {
-  it('gives every class two different saving throws', () => {
-    for (const classId of CLASSES) {
-      const [first, second] = CLASS_CORE[classId].savingThrows;
-      expect(first, classId).not.toBe(second);
-    }
-  });
-
-  it('gives Fortune and Sanity saves to their classes', () => {
-    const savingWith = (attribute: 'fortune' | 'sanity') =>
-      CLASSES.filter((classId) => CLASS_CORE[classId].savingThrows.includes(attribute));
-    expect(savingWith('fortune')).toEqual(['bard', 'rogue']);
-    expect(savingWith('sanity')).toEqual(['warlock', 'wizard']);
-  });
-
-  it('checks multiclass prerequisites', () => {
-    const scores = {
-      might: 13,
-      agility: 12,
-      hardiness: 10,
-      intellect: 10,
-      wisdom: 13,
-      charisma: 12,
-      fortune: 10,
-      sanity: 10,
-    };
-    expect(meetsMulticlassPrerequisite('fighter', scores)).toBe(true);
-    expect(meetsMulticlassPrerequisite('monk', scores)).toBe(false);
-    expect(meetsMulticlassPrerequisite('paladin', scores)).toBe(false);
-    expect(meetsMulticlassPrerequisite('cleric', scores)).toBe(true);
-  });
-});
-
 describe('max hit points', () => {
   it('takes the full die at level 1 and the fixed value after', () => {
     const levels = [{ hitDie: 6 as const }, { hitDie: 6 as const }, { hitDie: 6 as const }];
@@ -221,53 +186,45 @@ describe('max hit points', () => {
 });
 
 describe('derived character stats', () => {
-  const wizard = makeCharacter();
+  const scholar = makeCharacter();
 
-  it('computes level and proficiency', () => {
-    expect(totalLevel(wizard)).toBe(5);
-    expect(characterProficiencyBonus(wizard)).toBe(3);
+  it('computes level, proficiency and rank', () => {
+    expect(totalLevel(scholar)).toBe(5);
+    expect(characterProficiencyBonus(scholar)).toBe(3);
+    expect(professionRanks(scholar)).toEqual({ scholar: 'apprentice' });
   });
 
   it('computes saves and skills', () => {
-    expect(savingThrowModifier(wizard, 'intellect')).toBe(6);
-    expect(savingThrowModifier(wizard, 'might')).toBe(-1);
-    expect(savingThrowModifier(wizard, 'sanity')).toBe(3);
-    expect(savingThrowModifier(wizard, 'wisdom')).toBe(1);
-    expect(skillModifier(wizard, 'arcana')).toBe(9);
-    expect(skillModifier(wizard, 'stealth')).toBe(2);
-    expect(passivePerception(wizard)).toBe(14);
+    expect(savingThrowModifier(scholar, 'intellect')).toBe(6);
+    expect(savingThrowModifier(scholar, 'might')).toBe(-1);
+    expect(savingThrowModifier(scholar, 'sanity')).toBe(3);
+    expect(savingThrowModifier(scholar, 'wisdom')).toBe(1);
+    expect(skillModifier(scholar, 'arcana')).toBe(9);
+    expect(skillModifier(scholar, 'stealth')).toBe(2);
+    expect(passivePerception(scholar)).toBe(14);
   });
 
-  it('computes spellcasting', () => {
-    expect(characterSpellSlots(wizard)).toEqual([4, 3, 2]);
-    expect(characterSpellSaveDc(wizard, 'wizard')).toBe(14);
-    expect(characterSpellAttackBonus(wizard, 'wizard')).toBe(6);
-    expect(characterPactMagic(wizard)).toBeNull();
-    expect(() => characterSpellSaveDc(wizard, 'fighter')).toThrow(/not a spellcasting class/);
+  it('computes the profession DC from the best primary attribute', () => {
+    expect(characterProfessionDc(scholar, 'scholar')).toBe(14);
+    expect(() => characterProfessionDc(scholar, 'wizard')).toThrow(/Unknown profession/);
   });
 
-  it('combines multiclass spell slots and keeps pact magic separate', () => {
-    const multiclass = makeCharacter({
-      classes: [
-        { classId: 'paladin', level: 5 },
-        { classId: 'sorcerer', level: 3 },
-        { classId: 'warlock', level: 2 },
-      ],
-    });
-    // Paladin 5 -> 3, plus Sorcerer 3 = caster level 6.
-    expect(characterSpellSlots(multiclass)).toEqual([4, 3, 3]);
-    expect(characterPactMagic(multiclass)).toEqual({ slots: 2, slotLevel: 1 });
+  it('collects actions from the profession and specialization path', () => {
+    const { actions, bonusActions, reactions } = characterActions(scholar);
+    expect(actions).toEqual([]);
+    expect(bonusActions.map((entry) => entry.id)).toEqual(['recall-lore', 'forbidden-insight']);
+    expect(reactions).toEqual([]);
   });
 
-  it('tracks remaining hit dice by die size', () => {
-    const multiclass = makeCharacter({
-      classes: [
-        { classId: 'fighter', level: 3 },
-        { classId: 'paladin', level: 2 },
-        { classId: 'wizard', level: 1 },
+  it('tracks remaining hit dice by die size across professions', () => {
+    const multiProfession = makeCharacter({
+      professions: [
+        { professionId: 'soldier', level: 3, specializationPath: [] },
+        { professionId: 'sailor', level: 2, specializationPath: [] },
+        { professionId: 'scholar', level: 1, specializationPath: [] },
       ],
       hitDiceSpent: { 10: 2 },
     });
-    expect(hitDiceRemaining(multiclass)).toEqual({ 10: 3, 6: 1 });
+    expect(hitDiceRemaining(multiProfession)).toEqual({ 10: 3, 6: 1 });
   });
 });

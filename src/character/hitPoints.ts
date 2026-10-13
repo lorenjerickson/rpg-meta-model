@@ -1,4 +1,4 @@
-import type { HitDie } from './classes';
+import type { HitDie } from '../professions/profession';
 
 /** The fixed hit point increase per level for players who don't roll: half the die + 1. */
 export function fixedHitPointIncrease(die: HitDie): number {
@@ -14,7 +14,7 @@ export interface HitPointLevel {
 /**
  * Maximum hit points from levels in the order they were gained. The first level takes the full
  * hit die; later levels take the roll or the fixed value. Every level adds the Hardiness
- * modifier and any per-level bonus (e.g. Dwarven Toughness), and adds at least 1.
+ * modifier and any per-level bonus (e.g. from a feat), and adds at least 1.
  */
 export function maxHitPoints(
   levels: readonly HitPointLevel[],

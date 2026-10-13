@@ -13,7 +13,6 @@ export interface FeatPrerequisite {
   features?: readonly string[];
   /** e.g. "Medium Armor Training". */
   proficiencies?: readonly string[];
-  spellcasting?: boolean;
 }
 
 export interface FeatDefinition extends Feature {
