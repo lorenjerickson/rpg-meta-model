@@ -1,4 +1,4 @@
-import { abilityModifier, type Ability } from '../core/abilities';
+import { attributeModifier, type Attribute } from '../core/attributes';
 import { passiveScore } from '../core/d20';
 import { proficiencyContribution } from '../core/proficiency';
 import { SKILL_DEFINITIONS, type Skill } from '../core/skills';
@@ -37,15 +37,15 @@ export function characterProficiencyBonus(character: Character): number {
   return proficiencyBonusForLevel(totalLevel(character));
 }
 
-export function characterAbilityModifier(character: Character, ability: Ability): number {
-  return abilityModifier(character.abilityScores[ability]);
+export function characterAttributeModifier(character: Character, attribute: Attribute): number {
+  return attributeModifier(character.attributeScores[attribute]);
 }
 
 /** Does not include the exhaustion penalty, which applies to the roll rather than the bonus. */
-export function savingThrowModifier(character: Character, ability: Ability): number {
-  const proficient = character.proficiencies.savingThrows.includes(ability);
+export function savingThrowModifier(character: Character, attribute: Attribute): number {
+  const proficient = character.proficiencies.savingThrows.includes(attribute);
   return (
-    characterAbilityModifier(character, ability) +
+    characterAttributeModifier(character, attribute) +
     (proficient ? characterProficiencyBonus(character) : 0)
   );
 }
@@ -54,7 +54,7 @@ export function savingThrowModifier(character: Character, ability: Ability): num
 export function skillModifier(character: Character, skill: Skill): number {
   const proficiency = character.proficiencies.skills[skill] ?? 'none';
   return (
-    characterAbilityModifier(character, SKILL_DEFINITIONS[skill].ability) +
+    characterAttributeModifier(character, SKILL_DEFINITIONS[skill].attribute) +
     proficiencyContribution(proficiency, characterProficiencyBonus(character))
   );
 }
@@ -64,7 +64,7 @@ export function passivePerception(character: Character): number {
 }
 
 export function initiativeModifier(character: Character): number {
-  return characterAbilityModifier(character, 'dex');
+  return characterAttributeModifier(character, 'agility');
 }
 
 /** Total hit dice by die size, from all class levels. */
@@ -106,30 +106,30 @@ export function characterPactMagic(character: Character): PactMagicSlots | null 
   return level === 0 ? null : pactMagicForLevel(level);
 }
 
-function spellcastingAbilityFor(classId: ClassId): Ability {
+function spellcastingAttributeFor(classId: ClassId): Attribute {
   const spellcasting = CLASS_CORE[classId].spellcasting;
   if (spellcasting === null) {
     throw new Error(`${CLASS_CORE[classId].name} is not a spellcasting class`);
   }
-  return spellcasting.ability;
+  return spellcasting.attribute;
 }
 
 export function characterSpellSaveDc(character: Character, classId: ClassId): number {
   return spellSaveDc(
     characterProficiencyBonus(character),
-    characterAbilityModifier(character, spellcastingAbilityFor(classId)),
+    characterAttributeModifier(character, spellcastingAttributeFor(classId)),
   );
 }
 
 export function characterSpellAttackBonus(character: Character, classId: ClassId): number {
   return spellAttackBonus(
     characterProficiencyBonus(character),
-    characterAbilityModifier(character, spellcastingAbilityFor(classId)),
+    characterAttributeModifier(character, spellcastingAttributeFor(classId)),
   );
 }
 
 export function characterCarryingCapacity(character: Character): number {
-  return carryingCapacity(character.abilityScores.str, character.size);
+  return carryingCapacity(character.attributeScores.might, character.size);
 }
 
 export function attunedItemCount(character: Character): number {

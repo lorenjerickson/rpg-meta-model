@@ -1,4 +1,4 @@
-import type { Ability, AbilityScores } from '../core/abilities';
+import type { Attribute, AttributeScores } from '../core/attributes';
 import type { Condition } from '../core/conditions';
 import type { Alignment, CreatureType, Senses, Size, Speed } from '../core/creatures';
 import type { DamageType } from '../core/damage';
@@ -23,7 +23,7 @@ export interface MonsterAttack {
 }
 
 export interface MonsterSavingThrowEffect {
-  ability: Ability;
+  attribute: Attribute;
   dc: number;
   damage?: readonly MonsterDamage[];
 }
@@ -55,9 +55,9 @@ export interface MonsterStatBlock {
   initiative: { modifier: number; score: number };
   hitPoints: { average: number; formula: DiceExpression };
   speed: Speed;
-  abilityScores: AbilityScores;
-  /** Saving throw bonuses where they differ from the ability modifier. */
-  savingThrows?: Partial<Record<Ability, number>>;
+  attributeScores: AttributeScores;
+  /** Saving throw bonuses where they differ from the attribute modifier. */
+  savingThrows?: Partial<Record<Attribute, number>>;
   skills?: Partial<Record<Skill, number>>;
   vulnerabilities?: readonly DamageType[];
   resistances?: readonly DamageType[];

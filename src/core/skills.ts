@@ -1,4 +1,4 @@
-import type { Ability } from './abilities';
+import type { Attribute } from './attributes';
 
 export const SKILLS = [
   'acrobatics',
@@ -25,26 +25,26 @@ export type Skill = (typeof SKILLS)[number];
 
 export interface SkillDefinition {
   name: string;
-  ability: Ability;
+  attribute: Attribute;
 }
 
 export const SKILL_DEFINITIONS: Readonly<Record<Skill, SkillDefinition>> = {
-  acrobatics: { name: 'Acrobatics', ability: 'dex' },
-  'animal-handling': { name: 'Animal Handling', ability: 'wis' },
-  arcana: { name: 'Arcana', ability: 'int' },
-  athletics: { name: 'Athletics', ability: 'str' },
-  deception: { name: 'Deception', ability: 'cha' },
-  history: { name: 'History', ability: 'int' },
-  insight: { name: 'Insight', ability: 'wis' },
-  intimidation: { name: 'Intimidation', ability: 'cha' },
-  investigation: { name: 'Investigation', ability: 'int' },
-  medicine: { name: 'Medicine', ability: 'wis' },
-  nature: { name: 'Nature', ability: 'int' },
-  perception: { name: 'Perception', ability: 'wis' },
-  performance: { name: 'Performance', ability: 'cha' },
-  persuasion: { name: 'Persuasion', ability: 'cha' },
-  religion: { name: 'Religion', ability: 'int' },
-  'sleight-of-hand': { name: 'Sleight of Hand', ability: 'dex' },
-  stealth: { name: 'Stealth', ability: 'dex' },
-  survival: { name: 'Survival', ability: 'wis' },
+  acrobatics: { name: 'Acrobatics', attribute: 'agility' },
+  'animal-handling': { name: 'Animal Handling', attribute: 'wisdom' },
+  arcana: { name: 'Arcana', attribute: 'intellect' },
+  athletics: { name: 'Athletics', attribute: 'might' },
+  deception: { name: 'Deception', attribute: 'charisma' },
+  history: { name: 'History', attribute: 'intellect' },
+  insight: { name: 'Insight', attribute: 'wisdom' },
+  intimidation: { name: 'Intimidation', attribute: 'charisma' },
+  investigation: { name: 'Investigation', attribute: 'intellect' },
+  medicine: { name: 'Medicine', attribute: 'wisdom' },
+  nature: { name: 'Nature', attribute: 'intellect' },
+  perception: { name: 'Perception', attribute: 'wisdom' },
+  performance: { name: 'Performance', attribute: 'charisma' },
+  persuasion: { name: 'Persuasion', attribute: 'charisma' },
+  religion: { name: 'Religion', attribute: 'intellect' },
+  'sleight-of-hand': { name: 'Sleight of Hand', attribute: 'agility' },
+  stealth: { name: 'Stealth', attribute: 'agility' },
+  survival: { name: 'Survival', attribute: 'wisdom' },
 };

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { abilityModifier, formatModifier } from './abilities';
+import { attributeModifier, formatModifier } from './attributes';
 import { expandConditions, exhaustionD20Penalty, exhaustionSpeedReduction } from './conditions';
 import { fromCopper, toCopper } from './currency';
 import { passiveScore, resolveD20Test, resolveRollMode, rollD20 } from './d20';
@@ -28,7 +28,7 @@ function face(value: number, die: number): number {
   return (value - 1) / die;
 }
 
-describe('abilities', () => {
+describe('attributes', () => {
   it.each([
     [1, -5],
     [8, -1],
@@ -39,7 +39,7 @@ describe('abilities', () => {
     [20, 5],
     [30, 10],
   ])('score %i has modifier %i', (score, expected) => {
-    expect(abilityModifier(score)).toBe(expected);
+    expect(attributeModifier(score)).toBe(expected);
   });
 
   it('formats modifiers with a sign', () => {
@@ -122,7 +122,7 @@ describe('d20 tests', () => {
     });
     expect(resolveD20Test('attack-roll', 1, 20, 10).success).toBe(false);
     expect(resolveD20Test('saving-throw', 20, -5, 16).success).toBe(false);
-    expect(resolveD20Test('ability-check', 1, 12, 10).success).toBe(true);
+    expect(resolveD20Test('attribute-check', 1, 12, 10).success).toBe(true);
   });
 });
 

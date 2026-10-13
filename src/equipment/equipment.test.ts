@@ -4,12 +4,21 @@ import { armorSpeedPenalty, calculateArmorClass, type ArmorDefinition } from './
 import { carryingCapacity, dragLiftPushCapacity } from './carrying';
 import {
   isProficientWithWeapon,
-  weaponAttackAbility,
+  weaponAttackAttribute,
   weaponReach,
   type WeaponDefinition,
 } from './weapons';
 
-const modifiers = { str: 1, dex: 3, con: 2, int: 0, wis: 2, cha: -1 };
+const modifiers = {
+  might: 1,
+  agility: 3,
+  hardiness: 2,
+  intellect: 0,
+  wisdom: 2,
+  charisma: -1,
+  fortune: 0,
+  sanity: 0,
+};
 
 const halfPlate: ArmorDefinition = {
   id: 'half-plate',
@@ -17,7 +26,7 @@ const halfPlate: ArmorDefinition = {
   category: 'armor',
   weightLb: 40,
   armorCategory: 'medium',
-  armorClass: { base: 15, dexterityCap: 2 },
+  armorClass: { base: 15, agilityCap: 2 },
   stealthDisadvantage: true,
 };
 
@@ -27,8 +36,8 @@ const plate: ArmorDefinition = {
   category: 'armor',
   weightLb: 65,
   armorCategory: 'heavy',
-  armorClass: { base: 18, dexterityCap: 0 },
-  strengthRequirement: 15,
+  armorClass: { base: 18, agilityCap: 0 },
+  mightRequirement: 15,
   stealthDisadvantage: true,
 };
 
@@ -38,7 +47,7 @@ const shield: ArmorDefinition = {
   category: 'armor',
   weightLb: 6,
   armorCategory: 'shield',
-  armorClass: { base: 2, dexterityCap: 0 },
+  armorClass: { base: 2, agilityCap: 0 },
   stealthDisadvantage: false,
 };
 
@@ -67,16 +76,16 @@ const glaive: WeaponDefinition = {
 };
 
 describe('armor class', () => {
-  it('uses 10 + Dex unarmored, with optional Unarmored Defense', () => {
-    expect(calculateArmorClass({ abilityModifiers: modifiers })).toBe(13);
+  it('uses 10 + Agility unarmored, with optional Unarmored Defense', () => {
+    expect(calculateArmorClass({ attributeModifiers: modifiers })).toBe(13);
     expect(
-      calculateArmorClass({ abilityModifiers: modifiers, unarmoredDefenseAbility: 'wis' }),
+      calculateArmorClass({ attributeModifiers: modifiers, unarmoredDefenseAttribute: 'wisdom' }),
     ).toBe(15);
   });
 
-  it('caps Dex for medium and ignores it for heavy armor', () => {
-    expect(calculateArmorClass({ abilityModifiers: modifiers, armor: halfPlate })).toBe(17);
-    expect(calculateArmorClass({ abilityModifiers: modifiers, armor: plate, shield })).toBe(20);
+  it('caps Agility for medium and ignores it for heavy armor', () => {
+    expect(calculateArmorClass({ attributeModifiers: modifiers, armor: halfPlate })).toBe(17);
+    expect(calculateArmorClass({ attributeModifiers: modifiers, armor: plate, shield })).toBe(20);
   });
 
   it('adds magic and flat bonuses', () => {
@@ -84,18 +93,18 @@ describe('armor class', () => {
       ...plate,
       magic: { rarity: 'rare', magicCategory: 'armor', attunement: false, bonus: 1 },
     };
-    expect(calculateArmorClass({ abilityModifiers: modifiers, armor: magicPlate, bonus: 1 })).toBe(
-      20,
-    );
+    expect(
+      calculateArmorClass({ attributeModifiers: modifiers, armor: magicPlate, bonus: 1 }),
+    ).toBe(20);
   });
 
   it('rejects a shield worn as armor', () => {
-    expect(() => calculateArmorClass({ abilityModifiers: modifiers, armor: shield })).toThrow(
+    expect(() => calculateArmorClass({ attributeModifiers: modifiers, armor: shield })).toThrow(
       /is a shield/,
     );
   });
 
-  it('slows wearers who lack the Strength requirement', () => {
+  it('slows wearers who lack the Might requirement', () => {
     expect(armorSpeedPenalty(plate, 14)).toBe(10);
     expect(armorSpeedPenalty(plate, 15)).toBe(0);
     expect(armorSpeedPenalty(halfPlate, 8)).toBe(0);
@@ -103,9 +112,9 @@ describe('armor class', () => {
 });
 
 describe('weapons', () => {
-  it('picks the attack ability', () => {
-    expect(weaponAttackAbility(rapier, modifiers)).toBe('dex');
-    expect(weaponAttackAbility(glaive, modifiers)).toBe('str');
+  it('picks the attack attribute', () => {
+    expect(weaponAttackAttribute(rapier, modifiers)).toBe('agility');
+    expect(weaponAttackAttribute(glaive, modifiers)).toBe('might');
   });
 
   it('computes reach', () => {
@@ -125,7 +134,7 @@ describe('weapons', () => {
 });
 
 describe('carrying capacity', () => {
-  it('scales with Strength and size', () => {
+  it('scales with Might and size', () => {
     expect(carryingCapacity(10)).toBe(150);
     expect(carryingCapacity(10, 'tiny')).toBe(75);
     expect(carryingCapacity(20, 'large')).toBe(600);

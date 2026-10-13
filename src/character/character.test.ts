@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
+import { ATTRIBUTES } from '../core/attributes';
 import { emptyPurse } from '../core/currency';
 import { NO_DEATH_SAVES } from '../combat/deathSaves';
-import { applyBackgroundAbilityIncrease, isValidPointBuy, pointBuyCost } from './abilityGeneration';
+import {
+  POINT_BUY_BUDGET,
+  STANDARD_ARRAY,
+  applyBackgroundAttributeIncrease,
+  isValidPointBuy,
+  pointBuyCost,
+} from './attributeGeneration';
 import type { Character } from './character';
 import { meetsMulticlassPrerequisite } from './classes';
 import {
@@ -30,7 +37,16 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
     size: 'medium',
     speed: { walk: 30 },
     senses: {},
-    abilityScores: { str: 8, dex: 14, con: 14, int: 17, wis: 12, cha: 10 },
+    attributeScores: {
+      might: 8,
+      agility: 14,
+      hardiness: 14,
+      intellect: 17,
+      wisdom: 12,
+      charisma: 10,
+      fortune: 10,
+      sanity: 10,
+    },
     hitPoints: { current: 32, max: 32, temporary: 0 },
     hitDiceSpent: {},
     deathSaves: NO_DEATH_SAVES,
@@ -38,7 +54,7 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
     conditions: [],
     heroicInspiration: false,
     proficiencies: {
-      savingThrows: ['int', 'wis'],
+      savingThrows: ['intellect', 'wisdom'],
       skills: { arcana: 'expertise', perception: 'proficient', history: 'proficient' },
       weapons: [{ category: 'simple' }],
       armor: [],
@@ -80,43 +96,81 @@ describe('progression', () => {
   });
 });
 
-describe('ability generation', () => {
+describe('attribute generation', () => {
   it('prices point buy', () => {
-    const scores = { str: 15, dex: 15, con: 15, int: 8, wis: 8, cha: 8 };
-    expect(pointBuyCost(scores)).toBe(27);
+    const scores = {
+      might: 15,
+      agility: 15,
+      hardiness: 15,
+      intellect: 8,
+      wisdom: 8,
+      charisma: 8,
+      fortune: 11,
+      sanity: 9,
+    };
+    expect(pointBuyCost(scores)).toBe(31);
     expect(isValidPointBuy(scores)).toBe(true);
-    expect(isValidPointBuy({ ...scores, int: 9 })).toBe(false);
-    expect(isValidPointBuy({ ...scores, str: 16 })).toBe(false);
+    expect(isValidPointBuy({ ...scores, intellect: 9 })).toBe(false);
+    expect(isValidPointBuy({ ...scores, might: 16 })).toBe(false);
+  });
+
+  it('prices the standard array at exactly the point buy budget', () => {
+    const [might, agility, hardiness, intellect, wisdom, charisma, fortune, sanity] =
+      STANDARD_ARRAY;
+    expect(STANDARD_ARRAY).toHaveLength(ATTRIBUTES.length);
+    expect(
+      pointBuyCost({ might, agility, hardiness, intellect, wisdom, charisma, fortune, sanity }),
+    ).toBe(POINT_BUY_BUDGET);
   });
 
   it('applies background increases', () => {
-    const scores = { str: 8, dex: 14, con: 13, int: 15, wis: 12, cha: 10 };
+    const scores = {
+      might: 8,
+      agility: 14,
+      hardiness: 13,
+      intellect: 15,
+      wisdom: 12,
+      charisma: 10,
+      fortune: 10,
+      sanity: 10,
+    };
     expect(
-      applyBackgroundAbilityIncrease(scores, ['con', 'int', 'wis'], {
+      applyBackgroundAttributeIncrease(scores, ['hardiness', 'intellect', 'wisdom'], {
         kind: 'two-and-one',
-        plusTwo: 'int',
-        plusOne: 'con',
+        plusTwo: 'intellect',
+        plusOne: 'hardiness',
       }),
-    ).toEqual({ ...scores, int: 17, con: 14 });
+    ).toEqual({ ...scores, intellect: 17, hardiness: 14 });
     expect(
-      applyBackgroundAbilityIncrease(scores, ['con', 'int', 'wis'], { kind: 'one-each' }),
-    ).toEqual({ ...scores, con: 14, int: 16, wis: 13 });
+      applyBackgroundAttributeIncrease(scores, ['hardiness', 'intellect', 'wisdom'], {
+        kind: 'one-each',
+      }),
+    ).toEqual({ ...scores, hardiness: 14, intellect: 16, wisdom: 13 });
   });
 
   it('rejects increases outside the background or above 20', () => {
-    const scores = { str: 8, dex: 14, con: 13, int: 19, wis: 12, cha: 10 };
+    const scores = {
+      might: 8,
+      agility: 14,
+      hardiness: 13,
+      intellect: 19,
+      wisdom: 12,
+      charisma: 10,
+      fortune: 10,
+      sanity: 10,
+    };
     expect(() =>
-      applyBackgroundAbilityIncrease(scores, ['con', 'int', 'wis'], {
+      applyBackgroundAttributeIncrease(scores, ['hardiness', 'intellect', 'wisdom'], {
         kind: 'two-and-one',
-        plusTwo: 'str',
-        plusOne: 'con',
+        plusTwo: 'might',
+        plusOne: 'hardiness',
       }),
     ).toThrow(/not one of/);
     expect(() =>
-      applyBackgroundAbilityIncrease(scores, ['con', 'int', 'wis'], {
+      applyBackgroundAttributeIncrease(scores, ['hardiness', 'intellect', 'wisdom'], {
         kind: 'two-and-one',
-        plusTwo: 'int',
-        plusOne: 'con',
+        plusTwo: 'intellect',
+        plusOne: 'hardiness',
       }),
     ).toThrow(RangeError);
   });
@@ -124,7 +178,16 @@ describe('ability generation', () => {
 
 describe('classes', () => {
   it('checks multiclass prerequisites', () => {
-    const scores = { str: 13, dex: 12, con: 10, int: 10, wis: 13, cha: 12 };
+    const scores = {
+      might: 13,
+      agility: 12,
+      hardiness: 10,
+      intellect: 10,
+      wisdom: 13,
+      charisma: 12,
+      fortune: 10,
+      sanity: 10,
+    };
     expect(meetsMulticlassPrerequisite('fighter', scores)).toBe(true);
     expect(meetsMulticlassPrerequisite('monk', scores)).toBe(false);
     expect(meetsMulticlassPrerequisite('paladin', scores)).toBe(false);
@@ -152,8 +215,8 @@ describe('derived character stats', () => {
   });
 
   it('computes saves and skills', () => {
-    expect(savingThrowModifier(wizard, 'int')).toBe(6);
-    expect(savingThrowModifier(wizard, 'str')).toBe(-1);
+    expect(savingThrowModifier(wizard, 'intellect')).toBe(6);
+    expect(savingThrowModifier(wizard, 'might')).toBe(-1);
     expect(skillModifier(wizard, 'arcana')).toBe(9);
     expect(skillModifier(wizard, 'stealth')).toBe(2);
     expect(passivePerception(wizard)).toBe(14);

@@ -1,10 +1,10 @@
 export function attackBonus(
-  abilityModifier: number,
+  attributeModifier: number,
   proficiencyBonus: number,
   proficient: boolean,
   bonus = 0,
 ): number {
-  return abilityModifier + (proficient ? proficiencyBonus : 0) + bonus;
+  return attributeModifier + (proficient ? proficiencyBonus : 0) + bonus;
 }
 
 export type AttackOutcome = 'miss' | 'hit' | 'critical-hit';
@@ -33,7 +33,7 @@ export const COVER_LEVELS = ['none', 'half', 'three-quarters', 'total'] as const
 export type Cover = (typeof COVER_LEVELS)[number];
 
 /**
- * Bonus to AC and Dexterity saving throws from cover, or null for total cover, which means the
+ * Bonus to AC and Agility saving throws from cover, or null for total cover, which means the
  * target can't be targeted directly.
  */
 export function coverBonus(cover: Cover): number | null {

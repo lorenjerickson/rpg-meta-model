@@ -1,4 +1,4 @@
-import type { Ability, AbilityScores } from '../core/abilities';
+import type { Attribute, AttributeScores } from '../core/attributes';
 import type { Condition } from '../core/conditions';
 import type { Alignment, Senses, Size, Speed } from '../core/creatures';
 import type { Currency } from '../core/currency';
@@ -25,7 +25,7 @@ export interface InventoryEntry {
 }
 
 export interface CharacterProficiencies {
-  savingThrows: readonly Ability[];
+  savingThrows: readonly Attribute[];
   skills: Partial<Record<Skill, ProficiencyLevel>>;
   weapons: readonly WeaponProficiency[];
   armor: readonly ArmorCategory[];
@@ -58,7 +58,7 @@ export interface Character {
   size: Size;
   speed: Speed;
   senses: Senses;
-  abilityScores: AbilityScores;
+  attributeScores: AttributeScores;
   hitPoints: HitPoints;
   hitDiceSpent: Partial<Record<HitDie, number>>;
   deathSaves: DeathSaves;

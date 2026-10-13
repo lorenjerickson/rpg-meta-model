@@ -1,4 +1,4 @@
-import type { Ability, AbilityScores } from '../core/abilities';
+import type { Attribute, AttributeScores } from '../core/attributes';
 import type { Feature } from '../core/features';
 import type { Skill } from '../core/skills';
 import type { ArmorCategory } from '../equipment/armor';
@@ -27,18 +27,18 @@ export type HitDie = 6 | 8 | 10 | 12;
 
 export interface ClassSpellcasting {
   progression: CasterProgression;
-  ability: Ability;
+  attribute: Attribute;
 }
 
 /** The parts of a class the core rules calculations depend on. */
 export interface ClassCore {
   name: string;
   hitDie: HitDie;
-  primaryAbilities: readonly Ability[];
-  /** Whether multiclassing needs 13+ in all primary abilities or any one of them. */
-  primaryAbilityRequirement: 'all' | 'any';
+  primaryAttributes: readonly Attribute[];
+  /** Whether multiclassing needs 13+ in all primary attributes or any one of them. */
+  primaryAttributeRequirement: 'all' | 'any';
   /** Only the class you start with grants saving throw proficiencies. */
-  savingThrows: readonly [Ability, Ability];
+  savingThrows: readonly [Attribute, Attribute];
   spellcasting: ClassSpellcasting | null;
 }
 
@@ -46,113 +46,113 @@ export const CLASS_CORE: Readonly<Record<ClassId, ClassCore>> = {
   barbarian: {
     name: 'Barbarian',
     hitDie: 12,
-    primaryAbilities: ['str'],
-    primaryAbilityRequirement: 'all',
-    savingThrows: ['str', 'con'],
+    primaryAttributes: ['might'],
+    primaryAttributeRequirement: 'all',
+    savingThrows: ['might', 'hardiness'],
     spellcasting: null,
   },
   bard: {
     name: 'Bard',
     hitDie: 8,
-    primaryAbilities: ['cha'],
-    primaryAbilityRequirement: 'all',
-    savingThrows: ['dex', 'cha'],
-    spellcasting: { progression: 'full', ability: 'cha' },
+    primaryAttributes: ['charisma'],
+    primaryAttributeRequirement: 'all',
+    savingThrows: ['agility', 'charisma'],
+    spellcasting: { progression: 'full', attribute: 'charisma' },
   },
   cleric: {
     name: 'Cleric',
     hitDie: 8,
-    primaryAbilities: ['wis'],
-    primaryAbilityRequirement: 'all',
-    savingThrows: ['wis', 'cha'],
-    spellcasting: { progression: 'full', ability: 'wis' },
+    primaryAttributes: ['wisdom'],
+    primaryAttributeRequirement: 'all',
+    savingThrows: ['wisdom', 'charisma'],
+    spellcasting: { progression: 'full', attribute: 'wisdom' },
   },
   druid: {
     name: 'Druid',
     hitDie: 8,
-    primaryAbilities: ['wis'],
-    primaryAbilityRequirement: 'all',
-    savingThrows: ['int', 'wis'],
-    spellcasting: { progression: 'full', ability: 'wis' },
+    primaryAttributes: ['wisdom'],
+    primaryAttributeRequirement: 'all',
+    savingThrows: ['intellect', 'wisdom'],
+    spellcasting: { progression: 'full', attribute: 'wisdom' },
   },
   fighter: {
     name: 'Fighter',
     hitDie: 10,
-    primaryAbilities: ['str', 'dex'],
-    primaryAbilityRequirement: 'any',
-    savingThrows: ['str', 'con'],
+    primaryAttributes: ['might', 'agility'],
+    primaryAttributeRequirement: 'any',
+    savingThrows: ['might', 'hardiness'],
     spellcasting: null,
   },
   monk: {
     name: 'Monk',
     hitDie: 8,
-    primaryAbilities: ['dex', 'wis'],
-    primaryAbilityRequirement: 'all',
-    savingThrows: ['str', 'dex'],
+    primaryAttributes: ['agility', 'wisdom'],
+    primaryAttributeRequirement: 'all',
+    savingThrows: ['might', 'agility'],
     spellcasting: null,
   },
   paladin: {
     name: 'Paladin',
     hitDie: 10,
-    primaryAbilities: ['str', 'cha'],
-    primaryAbilityRequirement: 'all',
-    savingThrows: ['wis', 'cha'],
-    spellcasting: { progression: 'half', ability: 'cha' },
+    primaryAttributes: ['might', 'charisma'],
+    primaryAttributeRequirement: 'all',
+    savingThrows: ['wisdom', 'charisma'],
+    spellcasting: { progression: 'half', attribute: 'charisma' },
   },
   ranger: {
     name: 'Ranger',
     hitDie: 10,
-    primaryAbilities: ['dex', 'wis'],
-    primaryAbilityRequirement: 'all',
-    savingThrows: ['str', 'dex'],
-    spellcasting: { progression: 'half', ability: 'wis' },
+    primaryAttributes: ['agility', 'wisdom'],
+    primaryAttributeRequirement: 'all',
+    savingThrows: ['might', 'agility'],
+    spellcasting: { progression: 'half', attribute: 'wisdom' },
   },
   rogue: {
     name: 'Rogue',
     hitDie: 8,
-    primaryAbilities: ['dex'],
-    primaryAbilityRequirement: 'all',
-    savingThrows: ['dex', 'int'],
+    primaryAttributes: ['agility'],
+    primaryAttributeRequirement: 'all',
+    savingThrows: ['agility', 'intellect'],
     spellcasting: null,
   },
   sorcerer: {
     name: 'Sorcerer',
     hitDie: 6,
-    primaryAbilities: ['cha'],
-    primaryAbilityRequirement: 'all',
-    savingThrows: ['con', 'cha'],
-    spellcasting: { progression: 'full', ability: 'cha' },
+    primaryAttributes: ['charisma'],
+    primaryAttributeRequirement: 'all',
+    savingThrows: ['hardiness', 'charisma'],
+    spellcasting: { progression: 'full', attribute: 'charisma' },
   },
   warlock: {
     name: 'Warlock',
     hitDie: 8,
-    primaryAbilities: ['cha'],
-    primaryAbilityRequirement: 'all',
-    savingThrows: ['wis', 'cha'],
-    spellcasting: { progression: 'pact', ability: 'cha' },
+    primaryAttributes: ['charisma'],
+    primaryAttributeRequirement: 'all',
+    savingThrows: ['wisdom', 'charisma'],
+    spellcasting: { progression: 'pact', attribute: 'charisma' },
   },
   wizard: {
     name: 'Wizard',
     hitDie: 6,
-    primaryAbilities: ['int'],
-    primaryAbilityRequirement: 'all',
-    savingThrows: ['int', 'wis'],
-    spellcasting: { progression: 'full', ability: 'int' },
+    primaryAttributes: ['intellect'],
+    primaryAttributeRequirement: 'all',
+    savingThrows: ['intellect', 'wisdom'],
+    spellcasting: { progression: 'full', attribute: 'intellect' },
   },
 };
 
 /** Every class gains its subclass at this level. */
 export const SUBCLASS_LEVEL = 3;
 
-/** Multiclassing into or out of a class needs at least this score in its primary ability. */
-export const MULTICLASS_ABILITY_MINIMUM = 13;
+/** Multiclassing into or out of a class needs at least this score in its primary attribute. */
+export const MULTICLASS_ATTRIBUTE_MINIMUM = 13;
 
-export function meetsMulticlassPrerequisite(classId: ClassId, scores: AbilityScores): boolean {
-  const { primaryAbilities, primaryAbilityRequirement } = CLASS_CORE[classId];
-  const meets = (ability: Ability) => scores[ability] >= MULTICLASS_ABILITY_MINIMUM;
-  return primaryAbilityRequirement === 'all'
-    ? primaryAbilities.every(meets)
-    : primaryAbilities.some(meets);
+export function meetsMulticlassPrerequisite(classId: ClassId, scores: AttributeScores): boolean {
+  const { primaryAttributes, primaryAttributeRequirement } = CLASS_CORE[classId];
+  const meets = (attribute: Attribute) => scores[attribute] >= MULTICLASS_ATTRIBUTE_MINIMUM;
+  return primaryAttributeRequirement === 'all'
+    ? primaryAttributes.every(meets)
+    : primaryAttributes.some(meets);
 }
 
 export interface ClassFeature extends Feature {

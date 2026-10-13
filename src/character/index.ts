@@ -1,4 +1,4 @@
-export * from './abilityGeneration';
+export * from './attributeGeneration';
 export * from './backgrounds';
 export * from './character';
 export * from './classes';

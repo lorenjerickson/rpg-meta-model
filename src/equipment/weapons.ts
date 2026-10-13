@@ -1,4 +1,4 @@
-import type { Ability } from '../core/abilities';
+import type { Attribute } from '../core/attributes';
 import type { DamageType } from '../core/damage';
 import type { DiceExpression } from '../core/dice';
 import type { ItemBase } from './items';
@@ -75,17 +75,17 @@ export function hasProperty(weapon: WeaponDefinition, property: WeaponProperty):
 }
 
 /**
- * Melee weapons use Strength and ranged weapons use Dexterity. Finesse weapons use whichever
- * is higher. Thrown melee weapons keep their melee ability.
+ * Melee weapons use Might and ranged weapons use Agility. Finesse weapons use whichever
+ * is higher. Thrown melee weapons keep their melee attribute.
  */
-export function weaponAttackAbility(
+export function weaponAttackAttribute(
   weapon: WeaponDefinition,
-  modifiers: Readonly<Record<Ability, number>>,
-): Ability {
+  modifiers: Readonly<Record<Attribute, number>>,
+): Attribute {
   if (hasProperty(weapon, 'finesse')) {
-    return modifiers.dex > modifiers.str ? 'dex' : 'str';
+    return modifiers.agility > modifiers.might ? 'agility' : 'might';
   }
-  return weapon.weaponType === 'melee' ? 'str' : 'dex';
+  return weapon.weaponType === 'melee' ? 'might' : 'agility';
 }
 
 /** Melee reach in feet: 5, or 10 with the Reach property. */

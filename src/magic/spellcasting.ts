@@ -1,9 +1,9 @@
-/** Spell save DC = 8 + proficiency bonus + spellcasting ability modifier. */
+/** Spell save DC = 8 + proficiency bonus + spellcasting attribute modifier. */
 export function spellSaveDc(proficiencyBonus: number, spellcastingModifier: number): number {
   return 8 + proficiencyBonus + spellcastingModifier;
 }
 
-/** Spell attack modifier = proficiency bonus + spellcasting ability modifier. */
+/** Spell attack modifier = proficiency bonus + spellcasting attribute modifier. */
 export function spellAttackBonus(proficiencyBonus: number, spellcastingModifier: number): number {
   return proficiencyBonus + spellcastingModifier;
 }

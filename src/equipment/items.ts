@@ -1,4 +1,4 @@
-import type { Ability } from '../core/abilities';
+import type { Attribute } from '../core/attributes';
 import type { Price } from '../core/currency';
 import type { ArmorDefinition } from './armor';
 import type { WeaponDefinition } from './weapons';
@@ -78,8 +78,8 @@ export type ToolCategory = (typeof TOOL_CATEGORIES)[number];
 export interface ToolDefinition extends ItemBase {
   category: 'tool';
   toolCategory: ToolCategory;
-  /** The ability used for checks made with the tool. */
-  ability: Ability;
+  /** The attribute used for checks made with the tool. */
+  attribute: Attribute;
   /** Things you can do with the tool, each with its DC. */
   utilize: readonly { description: string; dc: number }[];
   /** Item ids the tool can craft. */

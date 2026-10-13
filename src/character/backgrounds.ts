@@ -1,12 +1,12 @@
-import type { Ability } from '../core/abilities';
+import type { Attribute } from '../core/attributes';
 import type { Skill } from '../core/skills';
 import type { EquipmentOption } from './startingEquipment';
 
 export interface BackgroundDefinition {
   id: string;
   name: string;
-  /** The three abilities the background can increase. */
-  abilityScores: readonly [Ability, Ability, Ability];
+  /** The three attributes the background can increase. */
+  attributes: readonly [Attribute, Attribute, Attribute];
   /** Id of the Origin feat the background grants. */
   feat: string;
   skillProficiencies: readonly [Skill, Skill];

@@ -1,7 +1,7 @@
 import { rollDie, type Rng } from './dice';
 
 /** The three kinds of roll the rules call D20 Tests. */
-export const D20_TESTS = ['ability-check', 'saving-throw', 'attack-roll'] as const;
+export const D20_TESTS = ['attribute-check', 'saving-throw', 'attack-roll'] as const;
 
 export type D20Test = (typeof D20_TESTS)[number];
 
@@ -58,7 +58,7 @@ export interface D20TestOutcome {
 
 /**
  * Resolves a D20 Test against a DC or AC. A natural 20 always hits and a natural 1 always
- * misses, but only for attack rolls; ability checks and saving throws just compare totals.
+ * misses, but only for attack rolls; attribute checks and saving throws just compare totals.
  */
 export function resolveD20Test(
   test: D20Test,
