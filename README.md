@@ -13,11 +13,10 @@ TypeScript domain model and rules helpers for D&D 5th edition, following the 202
 | `src/science`     | Scientific disciplines, apparatus and preparations, charges and malfunctions, and their catalog       |
 | `src/combat`      | Hit point state, death saves, attack resolution, cover                                                |
 | `src/equipment`   | Items, weapons and firearms, armour and AC, tools, gear, mounts and vehicles, and the item catalog    |
-| `src/monsters`    | Stat blocks, challenge ratings, encounter XP budgets                                                  |
+| `src/monsters`    | Stat blocks, challenge ratings, encounter XP budgets, and the bestiary                                |
 
 Closed sets such as attributes, skills and conditions are `as const` arrays with a derived
-union type (`SKILLS` / `Skill`). Monsters are modelled as types only; no catalog is included
-for them.
+union type (`SKILLS` / `Skill`).
 
 The setting is the real world of the late 19th and early 20th centuries, with Victorian,
 steampunk and gothic horror influences. Every character is human; `ETHNICITIES` takes the place
@@ -44,6 +43,13 @@ Money is British pounds, shillings and pence, held as a number of pence: `lsd(1,
 `ITEMS` holds a first-draft catalog of period weapons, armour, tools, gear, mounts and vehicles,
 along with the science apparatus and preparations. Firearms hold a number of rounds, take an
 action to reload, and older or cheaper guns can misfire and jam; machine guns can fire bursts.
+
+Something has been experimenting with mutation, grafting and reanimation, and the creatures of
+the world show it. There are no magical creatures: `MONSTERS` holds a first-draft bestiary of
+mutated beasts and people, hybrids, the galvanically reanimated, automata, aberrations from the
+deep, and anomalies (self-sustaining phenomena such as plasma held together by electromagnetic
+forces). Each stat block records its `origin`. The stat blocks are built from attribute scores
+and challenge rating, so attack bonuses, save DCs, hit points and rules text stay consistent.
 
 ## Scripts
 

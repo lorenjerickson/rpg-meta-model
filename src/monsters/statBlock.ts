@@ -42,9 +42,28 @@ export interface LegendaryActions {
   actions: readonly MonsterAbility[];
 }
 
+/**
+ * How a creature came to be. Most monsters are the work of whoever has been experimenting with
+ * mutation and grafting; some are natural, reanimated, built, or phenomena of nature.
+ */
+export const MONSTER_ORIGINS = [
+  'natural',
+  'human',
+  'mutation',
+  'hybrid',
+  'reanimation',
+  'automaton',
+  'anomaly',
+  'unknown',
+] as const;
+
+export type MonsterOrigin = (typeof MONSTER_ORIGINS)[number];
+
 export interface MonsterStatBlock {
   id: string;
   name: string;
+  description?: string;
+  origin?: MonsterOrigin;
   /** Usually one size; swarms and some creatures list a choice. */
   size: Size;
   creatureType: CreatureType;

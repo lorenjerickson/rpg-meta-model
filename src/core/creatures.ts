@@ -14,10 +14,12 @@ export const SIZE_SPACE_FEET: Readonly<Record<Size, number>> = {
 
 /**
  * Undead are the reanimated dead, constructs are automata and machines, and aberrations are the
- * things gothic horror warns of that science cannot yet explain.
+ * things gothic horror warns of that science cannot yet explain. Anomalies are self-sustaining
+ * physical phenomena, such as plasma held together by electromagnetic forces.
  */
 export const CREATURE_TYPES = [
   'aberration',
+  'anomaly',
   'beast',
   'construct',
   'giant',
