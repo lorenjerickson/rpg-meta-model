@@ -56,7 +56,7 @@ export const CLASS_CORE: Readonly<Record<ClassId, ClassCore>> = {
     hitDie: 8,
     primaryAttributes: ['charisma'],
     primaryAttributeRequirement: 'all',
-    savingThrows: ['agility', 'charisma'],
+    savingThrows: ['fortune', 'charisma'],
     spellcasting: { progression: 'full', attribute: 'charisma' },
   },
   cleric: {
@@ -112,7 +112,7 @@ export const CLASS_CORE: Readonly<Record<ClassId, ClassCore>> = {
     hitDie: 8,
     primaryAttributes: ['agility'],
     primaryAttributeRequirement: 'all',
-    savingThrows: ['agility', 'intellect'],
+    savingThrows: ['agility', 'fortune'],
     spellcasting: null,
   },
   sorcerer: {
@@ -128,7 +128,7 @@ export const CLASS_CORE: Readonly<Record<ClassId, ClassCore>> = {
     hitDie: 8,
     primaryAttributes: ['charisma'],
     primaryAttributeRequirement: 'all',
-    savingThrows: ['wisdom', 'charisma'],
+    savingThrows: ['sanity', 'charisma'],
     spellcasting: { progression: 'pact', attribute: 'charisma' },
   },
   wizard: {
@@ -136,7 +136,7 @@ export const CLASS_CORE: Readonly<Record<ClassId, ClassCore>> = {
     hitDie: 6,
     primaryAttributes: ['intellect'],
     primaryAttributeRequirement: 'all',
-    savingThrows: ['intellect', 'wisdom'],
+    savingThrows: ['intellect', 'sanity'],
     spellcasting: { progression: 'full', attribute: 'intellect' },
   },
 };

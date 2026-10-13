@@ -10,7 +10,7 @@ import {
   pointBuyCost,
 } from './attributeGeneration';
 import type { Character } from './character';
-import { meetsMulticlassPrerequisite } from './classes';
+import { CLASSES, CLASS_CORE, meetsMulticlassPrerequisite } from './classes';
 import {
   characterPactMagic,
   characterProficiencyBonus,
@@ -54,7 +54,7 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
     conditions: [],
     heroicInspiration: false,
     proficiencies: {
-      savingThrows: ['intellect', 'wisdom'],
+      savingThrows: ['intellect', 'sanity'],
       skills: { arcana: 'expertise', perception: 'proficient', history: 'proficient' },
       weapons: [{ category: 'simple' }],
       armor: [],
@@ -177,6 +177,20 @@ describe('attribute generation', () => {
 });
 
 describe('classes', () => {
+  it('gives every class two different saving throws', () => {
+    for (const classId of CLASSES) {
+      const [first, second] = CLASS_CORE[classId].savingThrows;
+      expect(first, classId).not.toBe(second);
+    }
+  });
+
+  it('gives Fortune and Sanity saves to their classes', () => {
+    const savingWith = (attribute: 'fortune' | 'sanity') =>
+      CLASSES.filter((classId) => CLASS_CORE[classId].savingThrows.includes(attribute));
+    expect(savingWith('fortune')).toEqual(['bard', 'rogue']);
+    expect(savingWith('sanity')).toEqual(['warlock', 'wizard']);
+  });
+
   it('checks multiclass prerequisites', () => {
     const scores = {
       might: 13,
@@ -217,6 +231,8 @@ describe('derived character stats', () => {
   it('computes saves and skills', () => {
     expect(savingThrowModifier(wizard, 'intellect')).toBe(6);
     expect(savingThrowModifier(wizard, 'might')).toBe(-1);
+    expect(savingThrowModifier(wizard, 'sanity')).toBe(3);
+    expect(savingThrowModifier(wizard, 'wisdom')).toBe(1);
     expect(skillModifier(wizard, 'arcana')).toBe(9);
     expect(skillModifier(wizard, 'stealth')).toBe(2);
     expect(passivePerception(wizard)).toBe(14);
