@@ -38,7 +38,7 @@ export interface ArmorClassInput {
    * An extra attribute added to unarmored AC by a feature, e.g. Hardiness or Wisdom.
    */
   unarmoredDefenseAttribute?: Attribute;
-  /** Flat bonuses from magic items and features. */
+  /** Flat bonuses from items and features. */
   bonus?: number;
 }
 
@@ -59,11 +59,11 @@ export function calculateArmorClass(input: ArmorClassInput): number {
     const { base, agilityCap } = armor.armorClass;
     const agility =
       agilityCap === null ? modifiers.agility : Math.min(modifiers.agility, agilityCap);
-    armorClass = base + agility + (armor.magic?.bonus ?? 0);
+    armorClass = base + agility + (armor.qualityBonus ?? 0);
   }
 
   if (shield !== undefined) {
-    armorClass += shield.armorClass.base + (shield.magic?.bonus ?? 0);
+    armorClass += shield.armorClass.base + (shield.qualityBonus ?? 0);
   }
   return armorClass + (input.bonus ?? 0);
 }

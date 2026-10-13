@@ -12,6 +12,8 @@ import {
 import type { Character } from './character';
 import {
   characterActions,
+  characterOperatorAttackBonus,
+  characterOperatorDc,
   characterProfessionDc,
   characterProficiencyBonus,
   hitDiceRemaining,
@@ -53,11 +55,12 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
     heroicInspiration: false,
     proficiencies: {
       savingThrows: ['intellect', 'sanity'],
-      skills: { arcana: 'expertise', perception: 'proficient', history: 'proficient' },
+      skills: { science: 'expertise', perception: 'proficient', history: 'proficient' },
       weapons: [{ category: 'simple' }],
       armor: [],
       tools: [],
       languages: ['english', 'welsh'],
+      disciplines: ['aetherics'],
     },
     feats: [],
     inventory: [],
@@ -199,14 +202,21 @@ describe('derived character stats', () => {
     expect(savingThrowModifier(scholar, 'might')).toBe(-1);
     expect(savingThrowModifier(scholar, 'sanity')).toBe(3);
     expect(savingThrowModifier(scholar, 'wisdom')).toBe(1);
-    expect(skillModifier(scholar, 'arcana')).toBe(9);
+    expect(skillModifier(scholar, 'science')).toBe(9);
     expect(skillModifier(scholar, 'stealth')).toBe(2);
     expect(passivePerception(scholar)).toBe(14);
   });
 
+  it('computes operator DCs per discipline, with proficiency and attribute', () => {
+    expect(characterOperatorDc(scholar, 'aetherics')).toBe(14);
+    expect(characterOperatorDc(scholar, 'galvanism')).toBe(11);
+    expect(characterOperatorDc(scholar, 'mesmerism')).toBe(8);
+    expect(characterOperatorAttackBonus(scholar, 'aetherics')).toBe(6);
+  });
+
   it('computes the profession DC from the best primary attribute', () => {
     expect(characterProfessionDc(scholar, 'scholar')).toBe(14);
-    expect(() => characterProfessionDc(scholar, 'wizard')).toThrow(/Unknown profession/);
+    expect(() => characterProfessionDc(scholar, 'alchemist')).toThrow(/Unknown profession/);
   });
 
   it('collects actions from the profession and specialization path', () => {

@@ -5,6 +5,7 @@ import type { Skill } from '../core/skills';
 import type { EquipmentOption } from '../character/startingEquipment';
 import type { ArmorCategory } from '../equipment/armor';
 import type { WeaponProficiency } from '../equipment/weapons';
+import type { Discipline } from '../science/disciplines';
 import type { Rank } from './ranks';
 
 export const PROFESSION_CATEGORIES = [
@@ -51,6 +52,8 @@ export interface SpecializationDefinition {
   tools?: readonly string[];
   weapons?: readonly WeaponProficiency[];
   armor?: readonly ArmorCategory[];
+  /** Scientific disciplines it grants proficiency in. */
+  disciplines?: readonly Discipline[];
   actions: readonly ProfessionAction[];
 }
 
@@ -69,6 +72,8 @@ export interface ProfessionDefinition {
   weaponProficiencies: readonly WeaponProficiency[];
   armorTraining: readonly ArmorCategory[];
   toolProficiencies: readonly string[];
+  /** Scientific disciplines every member is proficient in. */
+  disciplineProficiencies?: readonly Discipline[];
   startingEquipment?: readonly EquipmentOption[];
   /** Profession-specific titles for ranks, e.g. "Recruit" instead of "Novice". */
   rankTitles?: Partial<Record<Rank, string>>;

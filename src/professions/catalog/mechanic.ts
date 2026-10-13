@@ -24,6 +24,7 @@ export const MECHANIC: ProfessionDefinition = {
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
   toolProficiencies: ["tinker's tools"],
+  disciplineProficiencies: ['mechanics'],
   actions: [
     action(
       'Jury-Rig',
@@ -43,6 +44,7 @@ export const MECHANIC: ProfessionDefinition = {
       name: 'Engineer',
       description: 'Designs and runs engines, from locomotives to dynamos.',
       skills: ['investigation'],
+      disciplines: ['galvanism'],
       actions: [
         reaction(
           'Brace the Machine',
@@ -68,6 +70,7 @@ export const MECHANIC: ProfessionDefinition = {
       name: 'Tinkerer',
       description: 'Builds clever gadgets from scrap.',
       skills: ['sleight-of-hand'],
+      disciplines: ['chemistry'],
       actions: [
         action(
           'Gadget',
@@ -83,6 +86,7 @@ export const MECHANIC: ProfessionDefinition = {
       name: 'Inventor',
       description: 'Patents new machines.',
       skills: ['nature'],
+      disciplines: ['optics'],
       actions: [
         bonusAction(
           'Field Modification',
@@ -94,7 +98,8 @@ export const MECHANIC: ProfessionDefinition = {
     specialization('visionary', 'master', 'inventor', {
       name: 'Visionary Inventor',
       description: 'Harnesses forces others barely understand.',
-      skills: ['arcana', 'history'],
+      skills: ['science', 'history'],
+      disciplines: ['aetherics'],
       actions: [
         action(
           'Lightning Coil',

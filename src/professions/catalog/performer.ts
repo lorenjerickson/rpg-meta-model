@@ -76,8 +76,9 @@ export const PERFORMER: ProfessionDefinition = {
     }),
     specialization('conjurer', 'apprentice', null, {
       name: 'Conjurer',
-      description: 'A stage magician with quick hands.',
+      description: 'A sleight-of-hand performer of the music hall.',
       skills: ['sleight-of-hand'],
+      disciplines: ['optics'],
       actions: [
         bonusAction(
           'Misdirection',
@@ -90,6 +91,7 @@ export const PERFORMER: ProfessionDefinition = {
       name: 'Illusionist',
       description: 'Makes the impossible seem real with mirrors and smoke.',
       skills: ['insight'],
+      disciplines: ['acoustics'],
       actions: [
         action(
           'Stage Illusion',

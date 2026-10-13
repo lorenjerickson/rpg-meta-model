@@ -24,6 +24,7 @@ export const PHYSICIAN: ProfessionDefinition = {
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
   toolProficiencies: ["physician's kit"],
+  disciplineProficiencies: ['chemistry'],
   rankTitles: { novice: 'Medical Student', apprentice: 'Doctor' },
   actions: [
     action(
@@ -75,6 +76,7 @@ export const PHYSICIAN: ProfessionDefinition = {
       name: 'Alienist',
       description: 'A doctor of the mind and its disorders.',
       skills: ['insight'],
+      disciplines: ['mesmerism'],
       actions: [
         action(
           'Calming Words',

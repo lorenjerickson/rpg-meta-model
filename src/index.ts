@@ -3,4 +3,5 @@ export * from './character';
 export * from './combat';
 export * from './equipment';
 export * from './professions';
+export * from './science';
 export * from './monsters';

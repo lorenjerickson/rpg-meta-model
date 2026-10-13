@@ -7,7 +7,6 @@ export const ACTIONS = [
   'help',
   'hide',
   'influence',
-  'magic',
   'ready',
   'search',
   'study',

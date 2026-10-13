@@ -3,7 +3,6 @@ import { passiveScore } from '../core/d20';
 import { proficiencyContribution } from '../core/proficiency';
 import { SKILL_DEFINITIONS, type Skill } from '../core/skills';
 import { carryingCapacity } from '../equipment/carrying';
-import { MAX_ATTUNED_ITEMS } from '../equipment/items';
 import { PROFESSIONS } from '../professions/catalog';
 import {
   professionDc,
@@ -13,6 +12,8 @@ import {
 } from '../professions/profession';
 import { rankForLevel, type Rank } from '../professions/ranks';
 import { specializationGrants } from '../professions/specializations';
+import { operatorAttackBonus, operatorDc } from '../science/apparatus';
+import { DISCIPLINE_DEFINITIONS, type Discipline } from '../science/disciplines';
 import type { Character, ProfessionLevel } from './character';
 import { proficiencyBonusForLevel } from './progression';
 
@@ -152,10 +153,28 @@ export function characterCarryingCapacity(character: Character): number {
   return carryingCapacity(character.attributeScores.might, character.size);
 }
 
-export function attunedItemCount(character: Character): number {
-  return character.inventory.filter((entry) => entry.attuned).length;
+export function isProficientInDiscipline(character: Character, discipline: Discipline): boolean {
+  return character.proficiencies.disciplines.includes(discipline);
 }
 
-export function canAttuneAnotherItem(character: Character): boolean {
-  return attunedItemCount(character) < MAX_ATTUNED_ITEMS;
+function disciplineModifier(character: Character, discipline: Discipline): number {
+  return characterAttributeModifier(character, DISCIPLINE_DEFINITIONS[discipline].attribute);
+}
+
+/** Save DC for apparatus and preparations of a discipline that this character operates. */
+export function characterOperatorDc(character: Character, discipline: Discipline): number {
+  return operatorDc(
+    characterProficiencyBonus(character),
+    disciplineModifier(character, discipline),
+    isProficientInDiscipline(character, discipline),
+  );
+}
+
+/** Attack bonus for apparatus of a discipline that this character operates. */
+export function characterOperatorAttackBonus(character: Character, discipline: Discipline): number {
+  return operatorAttackBonus(
+    characterProficiencyBonus(character),
+    disciplineModifier(character, discipline),
+    isProficientInDiscipline(character, discipline),
+  );
 }

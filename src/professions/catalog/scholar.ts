@@ -19,7 +19,7 @@ export const SCHOLAR: ProfessionDefinition = {
   savingThrows: ['intellect', 'sanity'],
   skillProficiencies: {
     choose: 3,
-    from: ['arcana', 'history', 'investigation', 'nature', 'religion', 'medicine'],
+    from: ['science', 'history', 'investigation', 'nature', 'religion', 'medicine'],
   },
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
@@ -67,8 +67,9 @@ export const SCHOLAR: ProfessionDefinition = {
     }),
     specialization('occult-researcher', 'apprentice', null, {
       name: 'Occult Researcher',
-      description: 'Studies the esoteric, the mystical and the forbidden.',
-      skills: ['arcana'],
+      description: 'Studies the esoteric, the unexplained and the forbidden.',
+      skills: ['science'],
+      disciplines: ['aetherics'],
       actions: [
         bonusAction(
           'Forbidden Insight',
@@ -82,6 +83,7 @@ export const SCHOLAR: ProfessionDefinition = {
       name: 'Occultist',
       description: 'Practises the rites others only read about.',
       skills: ['religion'],
+      disciplines: ['mesmerism'],
       actions: [
         reaction(
           'Ward of Will',

@@ -3,7 +3,6 @@ import type { Attribute } from './attributes';
 export const SKILLS = [
   'acrobatics',
   'animal-handling',
-  'arcana',
   'athletics',
   'deception',
   'history',
@@ -16,6 +15,7 @@ export const SKILLS = [
   'performance',
   'persuasion',
   'religion',
+  'science',
   'sleight-of-hand',
   'stealth',
   'survival',
@@ -31,7 +31,6 @@ export interface SkillDefinition {
 export const SKILL_DEFINITIONS: Readonly<Record<Skill, SkillDefinition>> = {
   acrobatics: { name: 'Acrobatics', attribute: 'agility' },
   'animal-handling': { name: 'Animal Handling', attribute: 'wisdom' },
-  arcana: { name: 'Arcana', attribute: 'intellect' },
   athletics: { name: 'Athletics', attribute: 'might' },
   deception: { name: 'Deception', attribute: 'charisma' },
   history: { name: 'History', attribute: 'intellect' },
@@ -44,6 +43,7 @@ export const SKILL_DEFINITIONS: Readonly<Record<Skill, SkillDefinition>> = {
   performance: { name: 'Performance', attribute: 'charisma' },
   persuasion: { name: 'Persuasion', attribute: 'charisma' },
   religion: { name: 'Religion', attribute: 'intellect' },
+  science: { name: 'Science', attribute: 'intellect' },
   'sleight-of-hand': { name: 'Sleight of Hand', attribute: 'agility' },
   stealth: { name: 'Stealth', attribute: 'agility' },
   survival: { name: 'Survival', attribute: 'wisdom' },

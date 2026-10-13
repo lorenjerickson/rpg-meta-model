@@ -178,6 +178,6 @@ describe('time', () => {
     expect(
       durationInSeconds({ kind: 'timed', amount: 10, unit: 'round', concentration: false }),
     ).toBe(60);
-    expect(durationInSeconds({ kind: 'until-dispelled', orTriggered: false })).toBeNull();
+    expect(durationInSeconds({ kind: 'until-ended', orTriggered: false })).toBeNull();
   });
 });

@@ -102,6 +102,7 @@ export const CLERGY: ProfessionDefinition = {
       name: 'Exorcist',
       description: 'Confronts possession, obsession and things that should not be.',
       skills: ['intimidation', 'religion'],
+      disciplines: ['mesmerism'],
       actions: [
         action(
           'Rite of Exorcism',

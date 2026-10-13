@@ -81,6 +81,7 @@ export const SOLDIER: ProfessionDefinition = {
       name: 'Grenadier',
       description: 'A soldier trained to throw explosives.',
       skills: ['athletics'],
+      disciplines: ['chemistry'],
       actions: [
         action(
           'Grenade',

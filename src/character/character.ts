@@ -9,6 +9,8 @@ import type { DeathSaves } from '../combat/deathSaves';
 import type { HitPoints } from '../combat/hitPoints';
 import type { ArmorCategory } from '../equipment/armor';
 import type { WeaponProficiency } from '../equipment/weapons';
+import type { ApparatusState } from '../science/apparatus';
+import type { Discipline } from '../science/disciplines';
 import type { HitDie } from '../professions/profession';
 
 export interface ProfessionLevel {
@@ -23,7 +25,8 @@ export interface InventoryEntry {
   itemId: string;
   quantity: number;
   equipped: boolean;
-  attuned: boolean;
+  /** Charges and condition, for apparatus. */
+  apparatus?: ApparatusState;
 }
 
 export interface CharacterProficiencies {
@@ -33,6 +36,8 @@ export interface CharacterProficiencies {
   armor: readonly ArmorCategory[];
   tools: readonly string[];
   languages: readonly Language[];
+  /** Scientific disciplines the character can operate apparatus in proficiently. */
+  disciplines: readonly Discipline[];
 }
 
 /**

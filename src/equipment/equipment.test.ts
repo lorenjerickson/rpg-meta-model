@@ -88,14 +88,14 @@ describe('armor class', () => {
     expect(calculateArmorClass({ attributeModifiers: modifiers, armor: plate, shield })).toBe(20);
   });
 
-  it('adds magic and flat bonuses', () => {
-    const magicPlate: ArmorDefinition = {
+  it('adds quality and flat bonuses', () => {
+    const finePlate: ArmorDefinition = {
       ...plate,
-      magic: { rarity: 'rare', magicCategory: 'armor', attunement: false, bonus: 1 },
+      qualityBonus: 1,
     };
-    expect(
-      calculateArmorClass({ attributeModifiers: modifiers, armor: magicPlate, bonus: 1 }),
-    ).toBe(20);
+    expect(calculateArmorClass({ attributeModifiers: modifiers, armor: finePlate, bonus: 1 })).toBe(
+      20,
+    );
   });
 
   it('rejects a shield worn as armor', () => {

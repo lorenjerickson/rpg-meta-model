@@ -12,15 +12,14 @@ export const SIZE_SPACE_FEET: Readonly<Record<Size, number>> = {
   gargantuan: 20,
 };
 
+/**
+ * Undead are the reanimated dead, constructs are automata and machines, and aberrations are the
+ * things gothic horror warns of that science cannot yet explain.
+ */
 export const CREATURE_TYPES = [
   'aberration',
   'beast',
-  'celestial',
   'construct',
-  'dragon',
-  'elemental',
-  'fey',
-  'fiend',
   'giant',
   'humanoid',
   'monstrosity',
@@ -61,7 +60,7 @@ export interface Speed {
   hover?: boolean;
 }
 
-export const SENSES = ['blindsight', 'darkvision', 'tremorsense', 'truesight'] as const;
+export const SENSES = ['blindsight', 'darkvision', 'tremorsense'] as const;
 
 export type Sense = (typeof SENSES)[number];
 

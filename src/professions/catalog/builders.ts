@@ -2,6 +2,7 @@ import type { Usage } from '../../core/features';
 import type { Skill } from '../../core/skills';
 import type { ArmorCategory } from '../../equipment/armor';
 import type { WeaponProficiency } from '../../equipment/weapons';
+import type { Discipline } from '../../science/disciplines';
 import type { ProfessionAction, SpecializationDefinition } from '../profession';
 import type { Rank } from '../ranks';
 
@@ -49,6 +50,7 @@ interface SpecializationInput {
   tools?: readonly string[];
   weapons?: readonly WeaponProficiency[];
   armor?: readonly ArmorCategory[];
+  disciplines?: readonly Discipline[];
   actions: readonly ProfessionAction[];
 }
 
@@ -58,7 +60,7 @@ export function specialization(
   parentId: string | null,
   input: SpecializationInput,
 ): SpecializationDefinition {
-  const { tools, weapons, armor, ...rest } = input;
+  const { tools, weapons, armor, disciplines, ...rest } = input;
   return {
     id,
     rank,
@@ -67,5 +69,6 @@ export function specialization(
     ...(tools && { tools }),
     ...(weapons && { weapons }),
     ...(armor && { armor }),
+    ...(disciplines && { disciplines }),
   };
 }
