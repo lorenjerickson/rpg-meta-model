@@ -64,6 +64,8 @@ export interface Character {
   hitDiceSpent: Partial<Record<HitDie, number>>;
   deathSaves: DeathSaves;
   exhaustion: number;
+  /** Madness level, 0 to 6. */
+  madness: number;
   conditions: readonly Condition[];
   heroicInspiration: boolean;
   proficiencies: CharacterProficiencies;

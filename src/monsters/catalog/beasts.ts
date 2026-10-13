@@ -88,11 +88,11 @@ export const BEASTS: readonly MonsterStatBlock[] = [
     scores: [9, 11, 9, 2, 10, 3, 10, 10],
     resistances: ['bludgeoning', 'piercing', 'slashing'],
     conditionImmunities: [
-      'charmed',
+      'mesmerised',
       'frightened',
       'grappled',
       'paralyzed',
-      'petrified',
+      'calcified',
       'prone',
       'restrained',
       'stunned',
@@ -269,7 +269,7 @@ export const BEASTS: readonly MonsterStatBlock[] = [
         dcAttribute: 'charisma',
         target: 'each humanoid within 300 feet that can hear the song',
         failure:
-          'The target has the Charmed condition until the song ends, and on its turns moves ' +
+          'The target has the Mesmerised condition until the song ends, and on its turns moves ' +
           'toward the harpy by the most direct route. It repeats the save whenever it takes ' +
           'damage. The harpy can keep singing as a Bonus Action on later turns.',
         success: "The target is immune to this harpy's song for 24 hours.",
@@ -301,6 +301,7 @@ export const BEASTS: readonly MonsterStatBlock[] = [
         attack: 'ranged',
         range: { normal: 100, long: 200 },
         damage: [['1d8', 'piercing']],
+        extra: 'The barbed quill leaves the target with the Bleeding condition.',
       }),
     ],
   }),
@@ -322,7 +323,11 @@ export const BEASTS: readonly MonsterStatBlock[] = [
     challengeRating: 3,
     actions: [
       multiattack('The chimera makes two Rend attacks.'),
-      attack('Rend', { reach: 5, damage: [['2d8', 'slashing']] }),
+      attack('Rend', {
+        reach: 5,
+        damage: [['2d8', 'slashing']],
+        extra: 'The target has the Bleeding condition.',
+      }),
     ],
   }),
   monster('petrifying-lizard', {
@@ -354,7 +359,7 @@ export const BEASTS: readonly MonsterStatBlock[] = [
         target: 'each creature in a 15-foot Cone',
         failure:
           'The target has the Restrained condition as its flesh stiffens, and repeats the save ' +
-          'at the end of its next turn. On a second failure, it has the Petrified condition ' +
+          'at the end of its next turn. On a second failure, it has the Calcified condition ' +
           'until an antidote dissolves the mineral.',
         success: 'Nothing happens.',
         usage: RECHARGE_5,

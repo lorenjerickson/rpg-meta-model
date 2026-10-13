@@ -41,7 +41,8 @@ export const HOSPITALITY: ProfessionDefinition = {
         bonusAction(
           'Stiff Drink',
           'A creature within 5 feet of you takes a drink and gains Temporary Hit Points equal to ' +
-            '1d6 plus your Charisma modifier.',
+            '1d6 plus your Charisma modifier. If it wants Dutch courage, it also has the ' +
+            'Intoxicated condition.',
           PB_PER_LONG_REST,
         ),
         reaction(

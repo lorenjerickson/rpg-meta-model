@@ -26,7 +26,7 @@ export const HORRORS: readonly MonsterStatBlock[] = [
     speed: { walk: 15 },
     scores: [14, 3, 20, 1, 6, 1, 10, 10],
     damageImmunities: ['acid'],
-    conditionImmunities: ['blinded', 'charmed', 'deafened', 'exhaustion', 'frightened', 'prone'],
+    conditionImmunities: ['blinded', 'mesmerised', 'deafened', 'exhaustion', 'frightened', 'prone'],
     senses: { blindsight: 60 },
     challengeRating: 2,
     traits: [
@@ -65,7 +65,7 @@ export const HORRORS: readonly MonsterStatBlock[] = [
     damageImmunities: ['acid', 'cold', 'lightning', 'slashing'],
     conditionImmunities: [
       'blinded',
-      'charmed',
+      'mesmerised',
       'deafened',
       'exhaustion',
       'frightened',
@@ -354,7 +354,7 @@ export const HORRORS: readonly MonsterStatBlock[] = [
         dcAttribute: 'charisma',
         target: 'one creature the progenitor can see within 30 feet',
         failure:
-          'The target has the Charmed condition until the progenitor dies or is more than a mile ' +
+          'The target has the Mesmerised condition until the progenitor dies or is more than a mile ' +
           'away, and obeys its silent commands. It repeats the save whenever it takes damage.',
         success: 'Nothing happens.',
         usage: RECHARGE_5,
@@ -368,7 +368,7 @@ export const HORRORS: readonly MonsterStatBlock[] = [
         save('Mind Drain', {
           save: 'sanity',
           dcAttribute: 'charisma',
-          target: 'one Charmed creature the progenitor can see',
+          target: 'one Mesmerised creature the progenitor can see',
           damage: [['3d6', 'psychic']],
           success: 'Half damage.',
         }),

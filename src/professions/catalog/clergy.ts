@@ -53,7 +53,7 @@ export const CLERGY: ProfessionDefinition = {
       actions: [
         bonusAction(
           'Fervour',
-          'An ally within 30 feet has Advantage on its next saving throw against being Charmed ' +
+          'An ally within 30 feet has Advantage on its next saving throw against being Mesmerised ' +
             'or Frightened and adds 1d4 to its next attack roll.',
           PB_PER_LONG_REST,
         ),
@@ -67,7 +67,7 @@ export const CLERGY: ProfessionDefinition = {
         action(
           'Awakening',
           'Up to thirty creatures within 120 feet that can hear you make a Wisdom saving throw ' +
-            'against your Profession DC. On a failure, a creature is Charmed by you for 1 hour.',
+            'against your Profession DC. On a failure, a creature is Mesmerised by you for 1 hour.',
           ONCE_PER_LONG_REST,
         ),
       ],
@@ -106,7 +106,7 @@ export const CLERGY: ProfessionDefinition = {
       actions: [
         action(
           'Rite of Exorcism',
-          'One creature within 30 feet is no longer Charmed or Frightened. If another creature ' +
+          'One creature within 30 feet is no longer Mesmerised or Frightened. If another creature ' +
             'or entity is controlling it, that controller makes a Sanity saving throw against ' +
             'your Profession DC and loses control on a failure.',
           ONCE_PER_LONG_REST,

@@ -30,6 +30,7 @@ export function makeCharacter(overrides: Partial<Character> = {}): Character {
     hitDiceSpent: {},
     deathSaves: NO_DEATH_SAVES,
     exhaustion: 0,
+    madness: 0,
     conditions: [],
     heroicInspiration: false,
     proficiencies: {

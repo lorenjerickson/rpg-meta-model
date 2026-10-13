@@ -135,7 +135,7 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
       description:
         'Each creature in the Cube makes an Agility saving throw. On a failure, it glows with Dim ' +
         "Light in a 10-foot radius, attack rolls against it have Advantage, and it can't benefit " +
-        'from the Invisible condition.',
+        'from the Unseen condition.',
     },
   }),
   preparation('dynamite-stick', {

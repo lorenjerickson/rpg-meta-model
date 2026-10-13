@@ -73,7 +73,7 @@ export const MERCHANT: ProfessionDefinition = {
         action(
           'Money Talks',
           'A creature within 30 feet that can hear and understand you makes a Wisdom saving ' +
-            'throw against your Profession DC. On a failure, it is Charmed by you for 1 hour.',
+            'throw against your Profession DC. On a failure, it is Mesmerised by you for 1 hour.',
           ONCE_PER_LONG_REST,
         ),
       ],

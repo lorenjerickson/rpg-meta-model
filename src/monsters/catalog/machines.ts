@@ -3,11 +3,11 @@ import type { MonsterStatBlock } from '../statBlock';
 import { RECHARGE_5, RECHARGE_6, attack, feature, monster, multiattack, save } from './builders';
 
 const MINDLESS: readonly Condition[] = [
-  'charmed',
+  'mesmerised',
   'exhaustion',
   'frightened',
   'paralyzed',
-  'petrified',
+  'calcified',
   'poisoned',
 ];
 
@@ -28,7 +28,7 @@ const PHENOMENON: readonly Condition[] = [
   'exhaustion',
   'grappled',
   'paralyzed',
-  'petrified',
+  'calcified',
   'poisoned',
   'prone',
   'restrained',
@@ -336,7 +336,7 @@ export const MACHINES: readonly MonsterStatBlock[] = [
         attribute: 'agility',
         reach: 5,
         damage: [['2d6', 'fire']],
-        extra: 'If the target is a flammable object or creature, it starts burning.',
+        extra: 'A creature hit has the Burning condition; a flammable object hit catches fire.',
       }),
     ],
   }),
@@ -419,7 +419,7 @@ export const MACHINES: readonly MonsterStatBlock[] = [
     vulnerabilities: ['lightning'],
     damageImmunities: ['cold', 'decay', 'poison'],
     resistances: ['acid', 'fire', 'thunder', 'bludgeoning', 'piercing', 'slashing'],
-    conditionImmunities: [...PHENOMENON, 'charmed', 'frightened'],
+    conditionImmunities: [...PHENOMENON, 'mesmerised', 'frightened'],
     senses: { darkvision: 60 },
     languages: ['English'],
     challengeRating: 4,

@@ -427,7 +427,7 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
         save: 'wisdom',
         dcAttribute: 'charisma',
         target: 'one humanoid the progenitor can see within 30 feet',
-        failure: 'The target has the Charmed condition for 24 hours or until it takes damage.',
+        failure: 'The target has the Mesmerised condition for 24 hours or until it takes damage.',
         success: 'The target is immune to this gaze for 24 hours.',
       }),
     ],

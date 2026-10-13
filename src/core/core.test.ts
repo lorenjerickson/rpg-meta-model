@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { attributeModifier, formatModifier } from './attributes';
-import { expandConditions, exhaustionD20Penalty, exhaustionSpeedReduction } from './conditions';
+import {
+  CONDITIONS,
+  CONDITION_DEFINITIONS,
+  expandConditions,
+  exhaustionD20Penalty,
+  exhaustionSpeedReduction,
+  isLostToMadness,
+  madnessD20Penalty,
+} from './conditions';
 import { COINS, formatMoney, guineas, lsd, parseMoney, toLsd } from './currency';
 import { passiveScore, resolveD20Test, resolveRollMode, rollD20 } from './d20';
 import { adjustDamage } from './damage';
@@ -174,6 +182,27 @@ describe('conditions', () => {
       new Set(['unconscious', 'incapacitated', 'prone']),
     );
     expect(expandConditions(['grappled'])).toEqual(new Set(['grappled']));
+    expect(expandConditions(['calcified'])).toEqual(new Set(['calcified', 'incapacitated']));
+  });
+
+  it('lists the period conditions alphabetically, each with rules text', () => {
+    expect([...CONDITIONS].sort()).toEqual([...CONDITIONS]);
+    for (const condition of CONDITIONS) {
+      expect(CONDITION_DEFINITIONS[condition].effects.length, condition).toBeGreaterThan(0);
+    }
+    for (const magical of ['charmed', 'petrified', 'invisible']) {
+      expect(CONDITIONS, magical).not.toContain(magical);
+    }
+  });
+
+  it('penalises Intellect, Wisdom and Sanity tests with madness', () => {
+    expect(madnessD20Penalty(0, 'sanity')).toBe(0);
+    expect(madnessD20Penalty(2, 'sanity')).toBe(-4);
+    expect(madnessD20Penalty(3, 'intellect')).toBe(-6);
+    expect(madnessD20Penalty(3, 'might')).toBe(0);
+    expect(isLostToMadness(5)).toBe(false);
+    expect(isLostToMadness(6)).toBe(true);
+    expect(() => madnessD20Penalty(7, 'wisdom')).toThrow(RangeError);
   });
 
   it('scales exhaustion penalties by level', () => {

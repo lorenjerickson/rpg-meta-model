@@ -24,6 +24,9 @@ of species and grants languages and traits, and `LANGUAGES` lists real languages
 `SKILLS` uses period skills: Natural History, Theology and Legerdemain replace Nature, Religion
 and Sleight of Hand; Etiquette, Streetwise, Mechanics and Bureaucracy are new; and Occult
 (Sanity) and Gambling (Fortune) give the two new attributes skills of their own.
+`CONDITIONS` uses period names (Mesmerised, Calcified and Unseen replace Charmed, Petrified and
+Invisible) and adds Bleeding, Burning, Intoxicated and Madness, a six-level track like
+Exhaustion that failed Sanity saves feed and that penalises Intellect, Wisdom and Sanity tests.
 
 There is no magic, only poorly understood science. Effects that would be spells come from
 apparatus (galvanic gauntlets, mesmeric pendants, Tesla lances) that hold charges, and

@@ -199,7 +199,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         savingThrow: 'wisdom',
         description:
           'A humanoid you can see makes a Wisdom saving throw, with Advantage if you or your ' +
-          'allies are fighting it. On a failure, it is Charmed by you until the effect ends or ' +
+          'allies are fighting it. On a failure, it is Mesmerised by you until the effect ends or ' +
           'you or your allies harm it. Afterwards it knows it was mesmerized.',
         overcharge: 'One more humanoid for each extra charge.',
       },
@@ -235,7 +235,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         duration: sustained(1, 'minute'),
         savingThrow: 'wisdom',
         description:
-          'A humanoid you can see makes a Wisdom saving throw. On a failure, it is Charmed and ' +
+          'A humanoid you can see makes a Wisdom saving throw. On a failure, it is Mesmerised and ' +
           'obeys your spoken commands. It repeats the save each time it takes damage.',
         overcharge: 'The duration becomes 10 minutes for one extra charge, or 1 hour for two.',
       },
@@ -449,7 +449,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         range: SELF,
         duration: sustained(1, 'hour'),
         description:
-          'You have the Invisible condition until the effect ends, or until you make an attack ' +
+          'You have the Unseen condition until the effect ends, or until you make an attack ' +
           'roll, deal damage or use another apparatus.',
       },
       {
@@ -458,7 +458,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         charges: 4,
         range: SELF,
         duration: sustained(1, 'minute'),
-        description: 'You have the Invisible condition until the effect ends.',
+        description: 'You have the Unseen condition until the effect ends.',
       },
     ],
   }),

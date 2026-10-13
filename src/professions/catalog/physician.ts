@@ -80,7 +80,7 @@ export const PHYSICIAN: ProfessionDefinition = {
       actions: [
         action(
           'Calming Words',
-          'A creature within 30 feet that can hear you is no longer Frightened or Charmed, or has ' +
+          'A creature within 30 feet that can hear you is no longer Frightened or Mesmerised, or has ' +
             'Advantage on its next Sanity saving throw.',
           PB_PER_LONG_REST,
         ),
@@ -106,7 +106,7 @@ export const PHYSICIAN: ProfessionDefinition = {
       actions: [
         action(
           'Breakthrough',
-          'A creature within 30 feet is no longer Charmed or Frightened and has Advantage on ' +
+          'A creature within 30 feet is no longer Mesmerised or Frightened and has Advantage on ' +
             'Sanity saving throws for 24 hours.',
           ONCE_PER_LONG_REST,
         ),
