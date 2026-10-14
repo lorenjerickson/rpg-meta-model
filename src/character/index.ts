@@ -11,3 +11,4 @@ export * from './progression';
 export * from './startingEquipment';
 export * from './traits';
 export * from './catalog';
+export * from './rests';

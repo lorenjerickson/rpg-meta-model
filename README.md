@@ -28,6 +28,12 @@ and Sleight of Hand; Etiquette, Streetwise, Mechanics and Bureaucracy are new; a
 Invisible) and adds Bleeding, Burning, Intoxicated and Madness, a six-level track like
 Exhaustion that failed Sanity saves feed and that penalises Intellect, Wisdom and Sanity tests.
 
+`shortRest` and `longRest` apply rests to a character: Hit Points and Hit Dice, Exhaustion,
+Madness recovery, conditions, Heroic Inspiration and apparatus recharge. A Long Rest only
+counts somewhere safe; sleeping rough or being interrupted gives Short Rest benefits. `LODGINGS`
+runs from sleeping rough and doss-houses to hotels and country houses, each with a nightly cost;
+poor lodging recovers less, and good lodging helps with Madness and Exhaustion.
+
 There is no magic, only poorly understood science. Effects that would be spells come from
 apparatus (galvanic gauntlets, mesmeric pendants, Tesla lances) that hold charges, and
 single-use preparations (chloroform bombs, restorative tonics). Charges recharge according to
