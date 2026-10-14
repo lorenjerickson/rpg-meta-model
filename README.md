@@ -59,8 +59,8 @@ ones that draw on Fortune and Sanity.
 Money is British pounds, shillings and pence, held as a number of pence: `lsd(1, 2, 6)` is
 £1 2s 6d, and `formatMoney` and `parseMoney` handle period notation such as "2/6" and "3 gns".
 `ITEMS` holds a first-draft catalog of period weapons, armour, tools, gear, mounts and vehicles,
-along with the science apparatus and preparations. Firearms hold a number of rounds, take an
-action to reload, and older or cheaper guns can misfire and jam; machine guns can fire bursts.
+along with the science apparatus and preparations. Firearms hold a number of rounds, take the
+Reload action to refill, and older or cheaper guns can misfire and jam; machine guns fire bursts.
 
 Something has been experimenting with mutation, grafting and reanimation, and the creatures of
 the world show it. There are no magical creatures: `MONSTERS` holds a first-draft bestiary of
@@ -94,6 +94,10 @@ of +m is a d(2m), so +2 is a d4 and +3 a d6, and negative modifiers subtract the
 Conditions add and subtract dice instead of granting Advantage or Disadvantage; Exhaustion and
 Madness subtract 1d4 per level. Advantage and Disadvantage still apply to the d20 from other
 sources. Ability checks and passive scores still use flat modifiers.
+
+`ACTION_DEFINITIONS` gives the rules for every action. The standard actions are reworded for dice
+pools and fixed defense (Dodge adds 4 to defense and 1d6 to Agility saves; Help adds 1d6), and
+the period adds five: **Operate** an apparatus or preparation, **Reload** a firearm, **Take Cover** (cover counts one step better until your next turn), **Compose Yourself** (a Sanity save to shake off fear or mesmerism), and **Defend** (guard a target until your next turn, and your Reaction automatically attacks the first creature that attacks it; a melee guard stays within reach of the target and measures reach from it).
 
 ## Scripts
 

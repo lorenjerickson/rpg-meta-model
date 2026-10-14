@@ -6,6 +6,7 @@ import {
   damageAfterSoak,
   doubledPool,
   effectiveSoak,
+  improvedCover,
   resolveContest,
   rollContest,
   rollDamage,
@@ -126,5 +127,12 @@ describe('contests', () => {
     expect(coverBonus('half')).toBe(2);
     expect(coverBonus('three-quarters')).toBe(5);
     expect(coverBonus('total')).toBeNull();
+  });
+
+  it('improves cover one step when taking cover', () => {
+    expect(improvedCover('none')).toBe('half');
+    expect(improvedCover('half')).toBe('three-quarters');
+    expect(improvedCover('three-quarters')).toBe('total');
+    expect(improvedCover('total')).toBe('total');
   });
 });

@@ -118,3 +118,9 @@ export function coverBonus(cover: Cover): number | null {
       return null;
   }
 }
+
+/** Cover one step better, for a creature that takes the Take Cover action. */
+export function improvedCover(cover: Cover): Cover {
+  const index = COVER_LEVELS.indexOf(cover);
+  return COVER_LEVELS[Math.min(index + 1, COVER_LEVELS.length - 1)] ?? 'total';
+}

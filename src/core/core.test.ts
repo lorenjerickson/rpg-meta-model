@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { ACTIONS, ACTION_DEFINITIONS } from './actions';
 import { attributeModifier, formatModifier } from './attributes';
 import {
   CONDITIONS,
@@ -232,6 +233,28 @@ describe('damage', () => {
     expect(adjustDamage(15, 'fire', { vulnerabilities: ['fire'] })).toBe(30);
     expect(adjustDamage(15, 'fire', { resistances: ['fire'], vulnerabilities: ['fire'] })).toBe(14);
     expect(adjustDamage(15, 'cold', { resistances: ['fire'] })).toBe(15);
+  });
+});
+
+describe('actions', () => {
+  it('defines every action, with period additions and no Magic action', () => {
+    expect([...ACTIONS].sort()).toEqual([...ACTIONS]);
+    for (const action of ACTIONS) {
+      expect(ACTION_DEFINITIONS[action].effects.length, action).toBeGreaterThan(0);
+    }
+    expect(ACTIONS).toEqual(
+      expect.arrayContaining(['operate', 'reload', 'take-cover', 'compose', 'defend']),
+    );
+    expect(ACTIONS).not.toContain('magic');
+    expect(JSON.stringify(ACTION_DEFINITIONS)).not.toMatch(/Advantage|spell|magic/i);
+  });
+
+  it('raises defense and Agility saves while dodging', () => {
+    const { defense, dice } = ACTION_DEFINITIONS.dodge;
+    expect(defense).toEqual([{ value: 4 }]);
+    expect(applicableDice(dice ?? [], 'Dodge', 'save', { attribute: 'agility' })).toEqual([
+      poolDie(1, 6, 'Dodge'),
+    ]);
   });
 });
 

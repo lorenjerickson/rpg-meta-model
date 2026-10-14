@@ -14,7 +14,7 @@ export type WeaponType = (typeof WEAPON_TYPES)[number];
 /**
  * Firearm properties:
  * - firearm: fires cartridges or powder and ball.
- * - reload: holds `capacity` shots; reloading takes an action.
+ * - reload: holds `capacity` shots; refilling it takes the Reload action.
  * - misfire: on a natural roll at or below `misfireOn`, the shot fails and the weapon jams.
  * - burst-fire: can spray a 10-foot Cube with `BURST_FIRE_ROUNDS` shots instead of one attack.
  */
@@ -123,7 +123,7 @@ export function fire(
   return { firearm: { loaded: state.loaded - rounds, jammed: misfired }, misfired };
 }
 
-/** Reloading takes an action and refills the weapon to capacity. */
+/** The Reload action refills the weapon to capacity. */
 export function reload(weapon: WeaponDefinition, state: FirearmState): FirearmState {
   return { ...state, loaded: weapon.capacity ?? 1 };
 }
