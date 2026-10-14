@@ -76,6 +76,10 @@ and challenge rating, so their dice pools, hit points and rules text stay consis
 
 ## Combat
 
+Rounds have no initiative order: everyone plans 6 seconds in secret, and the plans play out
+together second by second. See [docs/combat-rounds.md](docs/combat-rounds.md) for the design (not
+yet implemented).
+
 Combat is contested and rolled in dice pools. Attributes and proficiency become dice: a modifier
 of +m is a d(2m), so +2 is a d4 and +3 a d6, and negative modifiers subtract the same die.
 
