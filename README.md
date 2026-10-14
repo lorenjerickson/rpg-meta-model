@@ -104,6 +104,7 @@ sources. Ability checks and passive scores still use flat modifiers.
 | `npm test`              | Run tests once with Vitest                         |
 | `npm run test:watch`    | Run Vitest in watch mode                           |
 | `npm run test:coverage` | Run tests with V8 coverage report                  |
+| `npm run simulate`      | Play-test combat and print the results as tables   |
 | `npm run typecheck`     | Type-check with `tsc`                              |
 | `npm run lint`          | Lint with ESLint (`lint:fix` to auto-fix)          |
 | `npm run format`        | Format with Prettier (`format:check` to verify)    |

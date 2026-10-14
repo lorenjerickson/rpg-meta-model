@@ -18,5 +18,5 @@
     "sourceMap": true,
     "outDir": "dist"
   },
-  "include": ["src", "tsdown.config.ts", "vitest.config.ts", "eslint.config.js"]
+  "include": ["src", "tsdown.config.ts", "vitest.config.ts", "eslint.config.js", "scripts"]
 }
