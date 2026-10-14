@@ -2,6 +2,7 @@ import type { ActionCost } from '../core/actions';
 import type { Attribute, AttributeScores } from '../core/attributes';
 import { attributeDice, proficiencyDice, type PoolDie } from '../core/dicePool';
 import type { Feature, Usage } from '../core/features';
+import type { Language } from '../core/languages';
 import type { Skill } from '../core/skills';
 import type { EquipmentOption } from '../character/startingEquipment';
 import type { ArmorCategory } from '../equipment/armor';
@@ -55,6 +56,8 @@ export interface SpecializationDefinition {
   armor?: readonly ArmorCategory[];
   /** Scientific disciplines it grants proficiency in. */
   disciplines?: readonly Discipline[];
+  /** Languages, cants and codes it teaches. */
+  languages?: readonly Language[];
   actions: readonly ProfessionAction[];
 }
 
@@ -75,6 +78,8 @@ export interface ProfessionDefinition {
   toolProficiencies: readonly string[];
   /** Scientific disciplines every member is proficient in. */
   disciplineProficiencies?: readonly Discipline[];
+  /** Languages, cants and codes every member learns. */
+  languages?: readonly Language[];
   startingEquipment?: readonly EquipmentOption[];
   /** Profession-specific titles for ranks, e.g. "Recruit" instead of "Novice". */
   rankTitles?: Partial<Record<Rank, string>>;

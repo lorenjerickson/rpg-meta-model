@@ -32,6 +32,7 @@ export const SCHOLAR: ProfessionDefinition = {
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
   toolProficiencies: ['writing-kit'],
+  languages: ['latin', 'ancient-greek'],
   actions: [bonusAction('Recall Lore', 'You take the Study action.')],
   specializations: [
     specialization('antiquarian', 'apprentice', null, {
@@ -50,6 +51,7 @@ export const SCHOLAR: ProfessionDefinition = {
       name: 'Archaeologist',
       description: 'Excavates ruins and tombs.',
       skills: ['survival'],
+      languages: ['ancient-egyptian'],
       actions: [
         reaction(
           'Sense Trap',
@@ -77,6 +79,7 @@ export const SCHOLAR: ProfessionDefinition = {
       name: 'Occult Researcher',
       description: 'Studies the esoteric, the unexplained and the forbidden.',
       skills: ['occult'],
+      languages: ['sanskrit'],
       disciplines: ['aetherics'],
       actions: [
         bonusAction(
@@ -91,6 +94,7 @@ export const SCHOLAR: ProfessionDefinition = {
       name: 'Occultist',
       description: 'Practises the rites others only read about.',
       skills: ['theology'],
+      languages: ['coptic'],
       disciplines: ['mesmerism'],
       actions: [
         reaction(

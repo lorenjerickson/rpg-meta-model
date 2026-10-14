@@ -37,6 +37,7 @@ export const LABOURER: ProfessionDefinition = {
       name: 'Dockworker',
       description: 'Loads and unloads the ships of the world.',
       skills: ['athletics'],
+      languages: ['rhyming-slang'],
       actions: [
         action(
           'Heave',

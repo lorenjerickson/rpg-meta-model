@@ -25,6 +25,7 @@ export const CLERGY: ProfessionDefinition = {
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
   toolProficiencies: ['writing-kit'],
+  languages: ['latin'],
   actions: [
     action(
       'Blessing',
@@ -102,6 +103,7 @@ export const CLERGY: ProfessionDefinition = {
       name: 'Exorcist',
       description: 'Confronts possession, obsession and things that should not be.',
       skills: ['occult', 'theology'],
+      languages: ['aramaic'],
       disciplines: ['mesmerism'],
       actions: [
         action(

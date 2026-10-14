@@ -10,6 +10,7 @@ import {
 } from './attributeGeneration';
 import {
   characterActions,
+  characterLanguages,
   characterOperatorPool,
   characterProfessionPool,
   characterProficiencyBonus,
@@ -184,6 +185,16 @@ describe('derived character stats', () => {
     expect(actions).toEqual([]);
     expect(bonusActions.map((entry) => entry.id)).toEqual(['recall-lore', 'forbidden-insight']);
     expect(reactions).toEqual([]);
+  });
+
+  it('adds the languages and cants their professions teach', () => {
+    expect(characterLanguages(scholar)).toEqual([
+      'english',
+      'welsh',
+      'latin',
+      'ancient-greek',
+      'sanskrit',
+    ]);
   });
 
   it('tracks remaining hit dice by die size across professions', () => {

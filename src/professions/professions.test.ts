@@ -88,6 +88,7 @@ describe('specialization paths', () => {
   it('collects what a path grants', () => {
     const grants = specializationGrants(SOLDIER, ['rifleman', 'sniper']);
     expect(grants.skills).toEqual(['perception', 'stealth']);
+    expect(grants.languages).toEqual([]);
     expect(grants.actions.map((entry) => entry.id)).toEqual([
       'field-grit',
       'steady-aim',

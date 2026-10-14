@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ACTIONS, ACTION_DEFINITIONS } from './actions';
 import { attributeModifier, formatModifier } from './attributes';
+import { LANGUAGES, LINGUA_FRANCAS, languageCategory } from './languages';
 import {
   CONDITIONS,
   CONDITION_DEFINITIONS,
@@ -233,6 +234,18 @@ describe('damage', () => {
     expect(adjustDamage(15, 'fire', { vulnerabilities: ['fire'] })).toBe(30);
     expect(adjustDamage(15, 'fire', { resistances: ['fire'], vulnerabilities: ['fire'] })).toBe(14);
     expect(adjustDamage(15, 'cold', { resistances: ['fire'] })).toBe(15);
+  });
+});
+
+describe('languages', () => {
+  it('lists every language once, in its category', () => {
+    expect(new Set(LANGUAGES).size).toBe(LANGUAGES.length);
+    expect(languageCategory('english')).toBe('spoken');
+    expect(languageCategory('latin')).toBe('classical');
+    expect(languageCategory('flash-cant')).toBe('cant-or-code');
+    expect(languageCategory('morse-code')).toBe('cant-or-code');
+    expect(languageCategory('plains-sign-talk')).toBe('sign');
+    expect(LINGUA_FRANCAS.every((language) => languageCategory(language) === 'spoken')).toBe(true);
   });
 });
 

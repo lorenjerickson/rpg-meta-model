@@ -20,7 +20,12 @@ union type (`SKILLS` / `Skill`).
 
 The setting is the real world of the late 19th and early 20th centuries, with Victorian,
 steampunk and gothic horror influences. Every character is human; `ETHNICITIES` takes the place
-of species and grants languages and traits, and `LANGUAGES` lists real languages of the period.
+of species and grants spoken languages and traits. `LANGUAGES` lists real languages of the period
+in four categories: spoken languages; classical languages for scholars and the occult (Latin,
+Ancient Greek, Ancient Egyptian, Sanskrit and others); cants and codes learned through a trade
+(thieves' flash, Polari, rhyming slang, Shelta, Morse code, semaphore, shorthand); and sign
+languages. Professions and specializations teach classical languages, cants and codes, and
+`characterLanguages` collects them.
 `SKILLS` uses period skills: Natural History, Theology and Legerdemain replace Nature, Religion
 and Sleight of Hand; Etiquette, Streetwise, Mechanics and Bureaucracy are new; and Occult
 (Sanity) and Gambling (Fortune) give the two new attributes skills of their own.

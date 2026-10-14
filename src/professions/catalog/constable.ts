@@ -45,6 +45,7 @@ export const CONSTABLE: ProfessionDefinition = {
       name: 'Detective',
       description: 'A plain-clothes investigator of crimes.',
       skills: ['investigation'],
+      languages: ['flash-cant'],
       actions: [
         bonusAction(
           'Study Suspect',

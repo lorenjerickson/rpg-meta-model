@@ -24,6 +24,7 @@ export const PHYSICIAN: ProfessionDefinition = {
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
   toolProficiencies: ['physicians-kit'],
+  languages: ['latin'],
   disciplineProficiencies: ['chemistry'],
   rankTitles: { novice: 'Medical Student', apprentice: 'Doctor' },
   actions: [

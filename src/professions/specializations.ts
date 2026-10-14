@@ -1,3 +1,4 @@
+import type { Language } from '../core/languages';
 import type { Skill } from '../core/skills';
 import type { ArmorCategory } from '../equipment/armor';
 import type { WeaponProficiency } from '../equipment/weapons';
@@ -75,13 +76,14 @@ export interface ProfessionGrants {
   weapons: WeaponProficiency[];
   armor: ArmorCategory[];
   disciplines: Discipline[];
+  languages: Language[];
   actions: ProfessionAction[];
 }
 
 /**
  * Everything a profession and a specialization path grant beyond the choices made on entry:
- * the profession's own actions and disciplines, plus every specialization's proficiencies and
- * actions.
+ * the profession's own actions, disciplines and languages, plus every specialization's
+ * proficiencies, languages and actions.
  * Duplicate skills, tools and armor are listed once.
  */
 export function specializationGrants(
@@ -100,6 +102,12 @@ export function specializationGrants(
       ...new Set([
         ...(profession.disciplineProficiencies ?? []),
         ...steps.flatMap((step) => step.disciplines ?? []),
+      ]),
+    ],
+    languages: [
+      ...new Set([
+        ...(profession.languages ?? []),
+        ...steps.flatMap((step) => step.languages ?? []),
       ]),
     ],
     actions: [...profession.actions, ...steps.flatMap((step) => step.actions)],

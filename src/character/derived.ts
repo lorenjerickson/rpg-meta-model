@@ -1,6 +1,7 @@
 import { attributeModifier, type Attribute } from '../core/attributes';
 import type { PoolDie } from '../core/dicePool';
 import { passiveScore } from '../core/d20';
+import type { Language } from '../core/languages';
 import { proficiencyContribution } from '../core/proficiency';
 import { SKILL_DEFINITIONS, type Skill } from '../core/skills';
 import { carryingCapacity } from '../equipment/carrying';
@@ -152,6 +153,25 @@ export function characterActions(
     bonusActions: all.filter((entry) => entry.cost === 'bonus-action'),
     reactions: all.filter((entry) => entry.cost === 'reaction'),
   };
+}
+
+/** The languages the character knows, plus the cants, codes and languages their professions teach. */
+export function characterLanguages(
+  character: Character,
+  catalog: ProfessionCatalog = PROFESSIONS,
+): Language[] {
+  return [
+    ...new Set([
+      ...character.proficiencies.languages,
+      ...character.professions.flatMap(
+        (entry) =>
+          specializationGrants(
+            professionFrom(catalog, entry.professionId),
+            entry.specializationPath,
+          ).languages,
+      ),
+    ]),
+  ];
 }
 
 export function characterCarryingCapacity(character: Character): number {

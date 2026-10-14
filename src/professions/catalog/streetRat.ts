@@ -35,6 +35,7 @@ export const STREET_RAT: ProfessionDefinition = {
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: ['light'],
   toolProficiencies: ['burglars-tools'],
+  languages: ['flash-cant'],
   rankTitles: { novice: 'Urchin' },
   actions: [bonusAction('Slip Away', 'You take the Disengage or Hide action.')],
   specializations: [

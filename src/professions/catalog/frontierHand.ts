@@ -31,6 +31,7 @@ export const FRONTIER_HAND: ProfessionDefinition = {
       name: 'Trapper',
       description: 'Lives off furs and the animals that wear them.',
       skills: ['stealth'],
+      languages: ['plains-sign-talk'],
       actions: [
         action(
           'Set Snare',

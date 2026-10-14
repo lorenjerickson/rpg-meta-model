@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { languageCategory } from '../core/languages';
 import { WORLD_REGIONS } from './ethnicity';
 import { ETHNICITIES, findEthnicity, homelandKnowledge } from './ethnicities';
 import { HUMAN_TRAITS } from './human';
@@ -18,6 +19,14 @@ describe('ethnicities', () => {
     for (const entry of ETHNICITIES) {
       const choices = entry.languageChoice?.from.length ?? 0;
       expect(entry.languages.length + choices, entry.id).toBeGreaterThan(0);
+    }
+  });
+
+  it('only pass on spoken languages, not classical languages, cants or signs', () => {
+    for (const entry of ETHNICITIES) {
+      for (const language of [...entry.languages, ...(entry.languageChoice?.from ?? [])]) {
+        expect(languageCategory(language), `${entry.id} ${language}`).toBe('spoken');
+      }
     }
   });
 

@@ -24,6 +24,7 @@ export const JOURNALIST: ProfessionDefinition = {
   weaponProficiencies: [{ category: 'simple' }],
   armorTraining: [],
   toolProficiencies: ['photographers-kit'],
+  languages: ['shorthand'],
   rankTitles: { novice: 'Copy Boy' },
   actions: [bonusAction('Take Notes', 'You take the Search or Study action.')],
   specializations: [
@@ -71,6 +72,7 @@ export const JOURNALIST: ProfessionDefinition = {
       name: 'Foreign Correspondent',
       description: 'Reports from abroad, often from dangerous places.',
       skills: ['survival'],
+      languages: ['morse-code'],
       actions: [
         reaction(
           'Duck!',
