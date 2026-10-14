@@ -1,13 +1,14 @@
 import type { Attribute } from '../core/attributes';
 import { attributeModifiers } from '../core/attributes';
-import { conditionDice, exhaustionDice, madnessDice } from '../core/conditions';
+import { BASE_DEFENSE } from '../combat/attacks';
+import { conditionDefense, conditionDice, exhaustionDice, madnessDice } from '../core/conditions';
 import type { DamageType } from '../core/damage';
 import type { DiceExpression } from '../core/dice';
 import { attributeDice, proficiencyDice, type PoolDie } from '../core/dicePool';
 import type { RollContext, RollKind } from '../core/rollModifiers';
 import { findItem } from '../equipment/catalog';
 import type { ItemDefinition } from '../equipment/items';
-import { equipmentDice } from '../equipment/protection';
+import { equipmentDefense, equipmentDice } from '../equipment/protection';
 import {
   hasProperty,
   isProficientWithWeapon,
@@ -83,9 +84,16 @@ export function characterDamageRoll(
   return { dice, pool: attributeDice(character.attributeScores[attribute], attribute) };
 }
 
-/** The dice rolled to defend: worn and held equipment, plus or minus conditions. */
-export function characterDefensePool(character: Character, attack: 'melee' | 'ranged'): PoolDie[] {
-  return situationalDice(character, 'defense', { attack });
+/**
+ * The defense an attack must meet: the base defense, plus worn and held equipment the
+ * character is trained in, plus or minus conditions. Add cover separately.
+ */
+export function characterDefense(character: Character, attack: 'melee' | 'ranged'): number {
+  return (
+    BASE_DEFENSE +
+    equipmentDefense(equippedItems(character), attack) +
+    conditionDefense(character.conditions, attack)
+  );
 }
 
 /** The dice rolled to soak a hit's damage: general soak plus soak for that damage type. */

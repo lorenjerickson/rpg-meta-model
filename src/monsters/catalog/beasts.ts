@@ -175,7 +175,7 @@ export const BEASTS: readonly MonsterStatBlock[] = [
         'Corrode',
         'The beetle touches an iron or steel object within 5 feet of it. If the object is worn or ' +
           'carried, its owner can make an Agility saving throw to pull it away. Otherwise ' +
-          "armour's defense dice shrink one size (it is destroyed below a d2), a weapon " +
+          'armour gives 1 less defense (it is destroyed when it gives none), a weapon ' +
           'corrodes as with Corrosive Shell, and an unattended object up to a 5-foot Cube ' +
           'corrodes away.',
       ),

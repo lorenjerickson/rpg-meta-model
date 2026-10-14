@@ -75,7 +75,7 @@ export const JOURNALIST: ProfessionDefinition = {
         reaction(
           'Duck!',
           'you are targeted by a ranged attack',
-          'Add your proficiency dice to your defense roll against the attack.',
+          'Add your proficiency bonus to your defense against the attack.',
           PB_PER_LONG_REST,
         ),
       ],

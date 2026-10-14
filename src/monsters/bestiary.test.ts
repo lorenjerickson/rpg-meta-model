@@ -9,7 +9,7 @@ import { findItem } from '../equipment/catalog';
 import { slotConflicts } from '../equipment/protection';
 import {
   MONSTER_ORIGINS,
-  monsterDefensePool,
+  monsterDefense,
   monsterSavePool,
   monsterSoakPool,
   monsterXp,
@@ -133,12 +133,9 @@ describe('generated stat-block dice', () => {
     expect(breath?.usage).toEqual({ kind: 'recharge', minimum: 5 });
   });
 
-  it('rolls natural armour, initiative and saving throw dice', () => {
+  it('has natural armour defense, initiative and saving throw dice', () => {
     const progenitor = monster('abyssal-progenitor');
-    expect(progenitor.defense).toEqual([
-      poolDie(1, 20, 'Natural armour'),
-      poolDie(1, 6, 'Tough hide'),
-    ]);
+    expect(progenitor.defense).toBe(17);
     expect(progenitor.initiative).toEqual([poolDie(1, 2, 'Agility', -1)]);
     expect(progenitor.passivePerception).toBe(10 + 2 + 2 * 4);
     expect(progenitor.savingThrows?.sanity).toEqual([
@@ -151,11 +148,7 @@ describe('generated stat-block dice', () => {
 
   it('dresses people in catalog clothing and armour', () => {
     const cultist = monster('cultist');
-    expect(cultist.defense).toEqual([
-      poolDie(4, 2, 'Work Clothes'),
-      poolDie(1, 2, 'Flat Cap'),
-      poolDie(1, 4, 'Work Boots'),
-    ]);
+    expect(cultist.defense).toBe(6 + 4 + 1 + 1);
     expect(cultist.gear).toEqual(['work-clothes', 'flat-cap', 'work-boots']);
     const veteran = monster('veteran-soldier');
     expect(monsterSoakPool(veteran, 'piercing')).toEqual([poolDie(1, 4, 'Soak')]);
@@ -171,9 +164,8 @@ describe('generated stat-block dice', () => {
   it('soaks with shells and plating, and applies conditions', () => {
     const juggernaut = monster('steam-juggernaut');
     expect(monsterSoakPool(juggernaut, 'bludgeoning')).toEqual([poolDie(2, 6, 'Soak')]);
-    expect(monsterDefensePool(juggernaut, 'melee', ['restrained'])).toContainEqual(
-      poolDie(1, 6, 'Restrained', -1),
-    );
+    expect(monsterDefense(juggernaut, 'melee')).toBe(18);
+    expect(monsterDefense(juggernaut, 'melee', ['restrained'])).toBe(18 - 3);
   });
 
   it('contests every save against a creature with an effect roll, not a fixed DC', () => {

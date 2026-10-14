@@ -311,7 +311,7 @@ export const FEATS: readonly FeatDefinition[] = [
     category: 'fighting-style',
     repeatable: false,
     prerequisite: { weaponCategory: 'martial' },
-    benefits: [benefit('Defense', 'While wearing armour, add 1d2 to your defense rolls.')],
+    benefits: [benefit('Defense', 'While wearing armour, your defense increases by 1.')],
   }),
   feat('heavy-weapon-fighting', {
     name: 'Heavy Weapon Fighting',

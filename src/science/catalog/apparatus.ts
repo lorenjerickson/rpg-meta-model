@@ -336,7 +336,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         range: SELF,
         duration: lasting(1, 'round'),
         description:
-          'Add 2d8 to your defense rolls until the start of your next turn, including against the ' +
+          'Your defense increases by 5 until the start of your next turn, including against the ' +
           'triggering attack.',
       },
     ],

@@ -4,6 +4,8 @@ import {
   applicableDice,
   bonus as plus,
   penalty as minus,
+  defenseTotal,
+  type DefenseBonus,
   type RollContext,
   type RollKind,
   type RollModifier,
@@ -40,6 +42,8 @@ export interface ConditionDefinition {
   effects: readonly string[];
   /** Dice the condition adds to or subtracts from rolls. */
   dice: readonly RollModifier[];
+  /** Flat changes to the creature's defense. */
+  defense?: readonly DefenseBonus[];
 }
 
 const AUTO_FAIL_PHYSICAL_SAVES = 'You automatically fail Might and Agility saving throws.';
@@ -58,9 +62,10 @@ export const CONDITION_DEFINITIONS: Readonly<Record<Condition, ConditionDefiniti
     name: 'Blinded',
     effects: [
       "You can't see and automatically fail any ability check that requires sight.",
-      'Subtract 1d8 from your attack and defense rolls.',
+      'Subtract 1d8 from your attack rolls, and your defense is reduced by 4.',
     ],
-    dice: [minus('attack', 1, 8), minus('defense', 1, 8)],
+    dice: [minus('attack', 1, 8)],
+    defense: [{ value: -4 }],
   },
   burning: {
     name: 'Burning',
@@ -77,12 +82,13 @@ export const CONDITION_DEFINITIONS: Readonly<Record<Condition, ConditionDefiniti
       'Mineral deposits have hardened your flesh to stone. You have the Incapacitated condition, ' +
         "can't move or speak, and are unaware of your surroundings.",
       'Your weight increases tenfold, and you stop ageing.',
-      'Subtract 1d8 from your defense rolls, and add 2d8 to your soak rolls.',
+      'Your defense is reduced by 4, and you add 2d8 to your soak rolls.',
       AUTO_FAIL_PHYSICAL_SAVES,
       'You are immune to the Poisoned condition.',
       'An antidote that dissolves the mineral ends the condition.',
     ],
-    dice: [minus('defense', 1, 8), plus('soak', 2, 8)],
+    dice: [plus('soak', 2, 8)],
+    defense: [{ value: -4 }],
   },
   deafened: {
     name: 'Deafened',
@@ -162,10 +168,10 @@ export const CONDITION_DEFINITIONS: Readonly<Record<Condition, ConditionDefiniti
     effects: [
       "You have the Incapacitated condition, and your Speed is 0 and can't increase.",
       AUTO_FAIL_PHYSICAL_SAVES,
-      'Subtract 1d10 from your defense rolls. Any hit from within 5 feet of you is a Critical ' +
-        'Hit.',
+      'Your defense is reduced by 5. Any hit from within 5 feet of you is a Critical Hit.',
     ],
-    dice: [minus('defense', 1, 10)],
+    dice: [],
+    defense: [{ value: -5 }],
   },
   poisoned: {
     name: 'Poisoned',
@@ -177,35 +183,34 @@ export const CONDITION_DEFINITIONS: Readonly<Record<Condition, ConditionDefiniti
     effects: [
       'Your only movement options are to crawl, or to spend half your Speed to stand up.',
       'Subtract 1d6 from your attack rolls.',
-      'Subtract 1d6 from your defense rolls against attackers within 5 feet of you, and add 1d6 ' +
-        'against ranged attacks.',
+      'Your defense is reduced by 3 against melee attacks and increased by 3 against ranged ' +
+        'attacks.',
     ],
-    dice: [
-      minus('attack', 1, 6),
-      minus('defense', 1, 6, { attack: 'melee' }),
-      plus('defense', 1, 6, { attack: 'ranged' }),
+    dice: [minus('attack', 1, 6)],
+    defense: [
+      { value: -3, attack: 'melee' },
+      { value: 3, attack: 'ranged' },
     ],
   },
   restrained: {
     name: 'Restrained',
     effects: [
       "Your Speed is 0 and can't increase.",
-      'Subtract 1d6 from your attack rolls, defense rolls and Agility saving throws.',
+      'Subtract 1d6 from your attack rolls and Agility saving throws, and your defense is ' +
+        'reduced by 3.',
     ],
-    dice: [
-      minus('attack', 1, 6),
-      minus('defense', 1, 6),
-      minus('save', 1, 6, { attributes: ['agility'] }),
-    ],
+    dice: [minus('attack', 1, 6), minus('save', 1, 6, { attributes: ['agility'] })],
+    defense: [{ value: -3 }],
   },
   stunned: {
     name: 'Stunned',
     effects: [
       'You have the Incapacitated condition.',
       AUTO_FAIL_PHYSICAL_SAVES,
-      'Subtract 1d8 from your defense rolls.',
+      'Your defense is reduced by 4.',
     ],
-    dice: [minus('defense', 1, 8)],
+    dice: [],
+    defense: [{ value: -4 }],
   },
   unconscious: {
     name: 'Unconscious',
@@ -213,21 +218,22 @@ export const CONDITION_DEFINITIONS: Readonly<Record<Condition, ConditionDefiniti
       'You have the Incapacitated and Prone conditions, and you drop whatever you are holding.',
       "Your Speed is 0 and can't increase.",
       AUTO_FAIL_PHYSICAL_SAVES,
-      'Subtract 1d10 from your defense rolls. Any hit from within 5 feet of you is a Critical ' +
-        'Hit.',
+      'Your defense is reduced by 5. Any hit from within 5 feet of you is a Critical Hit.',
       "You're unaware of your surroundings.",
     ],
-    dice: [minus('defense', 1, 10)],
+    dice: [],
+    defense: [{ value: -5 }],
   },
   unseen: {
     name: 'Unseen',
     effects: [
       'Whether hidden, cloaked by a refraction device or lost in darkness, you cannot be seen.',
       'You are not affected by anything that requires its target to be seen.',
-      'Add 1d6 to your attack, defense and Initiative rolls against creatures that cannot see ' +
-        'you.',
+      'Against creatures that cannot see you, add 1d6 to your attack and Initiative rolls, and ' +
+        'your defense is increased by 3.',
     ],
-    dice: [plus('attack', 1, 6), plus('defense', 1, 6), plus('initiative', 1, 6)],
+    dice: [plus('attack', 1, 6), plus('initiative', 1, 6)],
+    defense: [{ value: 3 }],
   },
 };
 
@@ -261,6 +267,18 @@ export function conditionDice(
     const { name, dice } = CONDITION_DEFINITIONS[condition];
     return applicableDice(dice, name, kind, context);
   });
+}
+
+/** The flat change a set of conditions (and those they imply) makes to defense. */
+export function conditionDefense(
+  conditions: Iterable<Condition>,
+  attack?: 'melee' | 'ranged',
+): number {
+  return [...expandConditions(conditions)].reduce(
+    (total, condition) =>
+      total + defenseTotal(CONDITION_DEFINITIONS[condition].defense ?? [], attack),
+    0,
+  );
 }
 
 /** Exhaustion is cumulative from 1 to 6; a creature dies at level 6. */

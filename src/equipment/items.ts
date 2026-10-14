@@ -1,6 +1,6 @@
 import type { Attribute } from '../core/attributes';
 import type { Money } from '../core/currency';
-import type { RollModifier } from '../core/rollModifiers';
+import type { DefenseBonus, RollModifier } from '../core/rollModifiers';
 import type { ApparatusDefinition, PreparationDefinition } from '../science/apparatus';
 import type { ArmorDefinition } from './armor';
 import type { EquipmentSlot } from './protection';
@@ -37,9 +37,11 @@ export interface ItemBase {
   rarity?: Rarity;
   /** Body slots the item covers when worn. Held items such as weapons and shields have none. */
   slots?: readonly EquipmentSlot[];
+  /** What the item adds to the wearer's defense while worn or held. */
+  defense?: DefenseBonus;
   /**
-   * Dice the item adds to or subtracts from rolls while equipped: defense and soak for
-   * protective wear, attack for weapons and aids such as scopes, and so on.
+   * Dice the item adds to or subtracts from rolls while equipped: soak for protective wear,
+   * attack for weapons and aids such as scopes, and so on.
    */
   modifiers?: readonly RollModifier[];
 }

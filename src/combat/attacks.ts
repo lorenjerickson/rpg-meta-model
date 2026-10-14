@@ -1,20 +1,26 @@
 import { rollD20, type RollMode } from '../core/d20';
 import { adjustDamage, type DamageResponses, type DamageType } from '../core/damage';
-import { rollDice, type DiceExpression, type DieSize, type Rng } from '../core/dice';
-import { poolDie, rollPool, type DicePool, type PoolDie, type PoolRoll } from '../core/dicePool';
+import { rollDice, type DiceExpression, type Rng } from '../core/dice';
+import { rollPool, type DicePool, type PoolDie, type PoolRoll } from '../core/dicePool';
+
+/** Every creature's defense before clothing, armour, conditions and cover. */
+export const BASE_DEFENSE = 6;
+
+/** Beating the defense by at least this much is a solid hit, which ignores soak. */
+export const SOLID_HIT_MARGIN = 3;
 
 /** Beating the defense (or save) by at least this much is a critical. */
 export const CRITICAL_MARGIN = 10;
 
 export interface ContestRoll {
-  /** The d20 that counts, or null for rolls made without one (such as armour defense). */
+  /** The d20 that counts, or null for rolls made without one (such as soak). */
   natural: number | null;
   pool: PoolRoll;
   total: number;
 }
 
 export interface ContestRollOptions {
-  /** Whether the roll includes a d20. Attacks, effects and saves do; defense and soak don't. */
+  /** Whether the roll includes a d20. Attacks, effects and saves do; soak doesn't. */
   d20?: boolean;
   /** Advantage or Disadvantage on the d20, from sources other than conditions. */
   mode?: RollMode;
@@ -35,12 +41,15 @@ export interface ContestOutcome {
   /** How far the attack beat (or fell short of) the defense. */
   margin: number;
   success: boolean;
+  /** Won by `SOLID_HIT_MARGIN` or more: the hit ignores soak. */
+  solid: boolean;
   critical: boolean;
 }
 
 /**
- * Compares an attack (or effect) total with a defense (or save) total. The attacker wins ties,
- * and winning by `CRITICAL_MARGIN` or more is a critical.
+ * Compares an attack (or effect) total with a defense number (or save total). The attacker
+ * wins ties, winning by `SOLID_HIT_MARGIN` or more is a solid hit, and winning by
+ * `CRITICAL_MARGIN` or more is a critical.
  */
 export function resolveContest(attack: number, defense: number): ContestOutcome {
   const margin = attack - defense;
@@ -49,8 +58,14 @@ export function resolveContest(attack: number, defense: number): ContestOutcome 
     defense,
     margin,
     success: margin >= 0,
+    solid: margin >= SOLID_HIT_MARGIN,
     critical: margin >= CRITICAL_MARGIN,
   };
+}
+
+/** The soak that applies to a hit: none for a solid hit, otherwise the soak roll. */
+export function effectiveSoak(soak: number, outcome: ContestOutcome): number {
+  return outcome.solid ? 0 : Math.max(0, soak);
 }
 
 /** Doubles every die in a pool, for critical hits. */
@@ -83,47 +98,22 @@ export function damageAfterSoak(
   return adjustDamage(Math.max(0, damage - Math.max(0, soak)), type, responses);
 }
 
-/** The die added to (or taken from) the natural-armour d20 for a given Armor Class. */
-function naturalArmourDie(armorClass: number): { die: DieSize; sign: 1 | -1 } | null {
-  if (armorClass >= 20) return { die: 10, sign: 1 };
-  if (armorClass >= 18) return { die: 8, sign: 1 };
-  if (armorClass >= 16) return { die: 6, sign: 1 };
-  if (armorClass >= 14) return { die: 4, sign: 1 };
-  if (armorClass >= 12) return { die: 2, sign: 1 };
-  if (armorClass >= 10) return null;
-  if (armorClass >= 8) return { die: 2, sign: -1 };
-  return { die: 4, sign: -1 };
-}
-
-/**
- * A natural-armour defense pool converted from an Armor Class: a d20, plus a die for hides,
- * shells and plating tougher than average (AC 12+), or minus one for soft bodies (below 10).
- */
-export function naturalDefense(armorClass: number): PoolDie[] {
-  const base = poolDie(1, 20, 'Natural armour');
-  const extra = naturalArmourDie(armorClass);
-  if (extra === null) {
-    return [base];
-  }
-  return [base, poolDie(1, extra.die, extra.sign > 0 ? 'Tough hide' : 'Soft body', extra.sign)];
-}
-
 export const COVER_LEVELS = ['none', 'half', 'three-quarters', 'total'] as const;
 
 export type Cover = (typeof COVER_LEVELS)[number];
 
 /**
- * Dice that cover adds to defense rolls and Agility saving throws, or null for total cover,
- * which means the target can't be targeted directly.
+ * What cover adds to defense and to Agility saving throws, or null for total cover, which
+ * means the target can't be targeted directly.
  */
-export function coverDice(cover: Cover): PoolDie[] | null {
+export function coverBonus(cover: Cover): number | null {
   switch (cover) {
     case 'none':
-      return [];
+      return 0;
     case 'half':
-      return [poolDie(1, 4, 'Half cover')];
+      return 2;
     case 'three-quarters':
-      return [poolDie(1, 8, 'Three-quarters cover')];
+      return 5;
     case 'total':
       return null;
   }

@@ -7,7 +7,7 @@ import type { Character, InventoryEntry } from './character';
 import {
   characterAttackPool,
   characterDamageRoll,
-  characterDefensePool,
+  characterDefense,
   characterInitiativePool,
   characterSavePool,
   characterSoakPool,
@@ -87,15 +87,9 @@ describe('character combat pools', () => {
   });
 
   it('defends with every piece worn, plus conditions', () => {
-    expect(characterDefensePool(armed(), 'melee')).toEqual([
-      poolDie(1, 2, 'Bowler Hat'),
-      poolDie(4, 2, 'Work Clothes'),
-      poolDie(1, 2, 'Leather Gloves'),
-      poolDie(1, 4, 'Work Boots'),
-    ]);
-    expect(characterDefensePool(armed({ conditions: ['prone'] }), 'ranged')).toContainEqual(
-      poolDie(1, 6, 'Prone'),
-    );
+    expect(characterDefense(armed(), 'melee')).toBe(6 + 1 + 4 + 1 + 1);
+    expect(characterDefense(armed({ conditions: ['prone'] }), 'ranged')).toBe(13 + 3);
+    expect(characterDefense(armed({ conditions: ['prone'] }), 'melee')).toBe(13 - 3);
   });
 
   it('soaks with gear that covers the damage type', () => {

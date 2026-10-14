@@ -1,5 +1,10 @@
 import type { PoolDie } from '../core/dicePool';
-import { applicableDice, type RollContext, type RollKind } from '../core/rollModifiers';
+import {
+  applicableDice,
+  defenseTotal,
+  type RollContext,
+  type RollKind,
+} from '../core/rollModifiers';
 import type { ItemBase } from './items';
 
 /** The places on the body where clothing and armour are worn. */
@@ -23,6 +28,17 @@ export function slotConflicts(items: readonly ItemBase[]): EquipmentSlot[] {
     (seen.has(slot) ? conflicts : seen).add(slot);
   }
   return [...conflicts];
+}
+
+/** What worn and held items add to defense against an attack. */
+export function equipmentDefense(
+  equipped: readonly ItemBase[],
+  attack?: 'melee' | 'ranged',
+): number {
+  return defenseTotal(
+    equipped.flatMap((item) => (item.defense ? [item.defense] : [])),
+    attack,
+  );
 }
 
 /**

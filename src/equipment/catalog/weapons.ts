@@ -107,7 +107,7 @@ export const WEAPONS: readonly WeaponDefinition[] = [
     damage: { dice: dice(1, 8), type: 'slashing' },
     properties: ['finesse'],
     mastery: 'vex',
-    modifiers: [bonus('defense', 1, 4, { attack: 'melee' })],
+    defense: { value: 1, attack: 'melee' },
     weightLb: 3,
     cost: lsd(2, 10),
   }),

@@ -1,4 +1,4 @@
-import { naturalDefense } from '../../combat/attacks';
+import { BASE_DEFENSE } from '../../combat/attacks';
 import {
   ATTRIBUTE_NAMES,
   ATTRIBUTES,
@@ -23,7 +23,7 @@ import type { RollModifier } from '../../core/rollModifiers';
 import { SKILL_DEFINITIONS, type Skill } from '../../core/skills';
 import { findItem } from '../../equipment/catalog';
 import type { ItemDefinition } from '../../equipment/items';
-import { equipmentDice } from '../../equipment/protection';
+import { equipmentDefense } from '../../equipment/protection';
 import { challengeRatingInfo } from '../challenge';
 import type { MonsterAbility, MonsterDamage, MonsterOrigin, MonsterStatBlock } from '../statBlock';
 
@@ -76,9 +76,9 @@ export interface MonsterInput {
   creatureType: CreatureType;
   tags?: readonly string[];
   alignment: Alignment;
-  /** For natural armour: the Armor Class its defense dice are converted from. */
+  /** Natural armour: the defense an attack must meet. */
   armorClass?: number;
-  /** Item ids of clothing and armour it wears, which set its defense and soak instead. */
+  /** Item ids of clothing and armour it wears, which set its defense (base plus items) and soak. */
   worn?: readonly string[];
   /** Soak from hide, shell or plating. */
   soak?: readonly RollModifier[];
@@ -318,7 +318,7 @@ export function monster(id: string, input: MonsterInput): MonsterStatBlock {
     return item;
   });
   const defense =
-    worn.length > 0 ? equipmentDice(worn, 'defense') : naturalDefense(input.armorClass ?? 10);
+    worn.length > 0 ? BASE_DEFENSE + equipmentDefense(worn) : (input.armorClass ?? 10);
   const soak = [...(input.soak ?? []), ...worn.flatMap(soakModifiers)];
 
   return {

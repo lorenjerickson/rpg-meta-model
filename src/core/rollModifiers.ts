@@ -3,8 +3,11 @@ import type { DamageType } from './damage';
 import type { DieSize } from './dice';
 import { poolDie, type PoolDie } from './dicePool';
 
-/** The rolls that equipment and conditions can add dice to or subtract dice from. */
-export const ROLL_KINDS = ['attack', 'defense', 'soak', 'save', 'check', 'initiative'] as const;
+/**
+ * The rolls that equipment and conditions can add dice to or subtract dice from. Defense is
+ * a fixed number rather than a roll; see `DefenseBonus`.
+ */
+export const ROLL_KINDS = ['attack', 'soak', 'save', 'check', 'initiative'] as const;
 
 export type RollKind = (typeof ROLL_KINDS)[number];
 
@@ -16,10 +19,26 @@ export interface RollModifier {
   sign: 1 | -1;
   /** Saves and checks: only those using these attributes. */
   attributes?: readonly Attribute[];
-  /** Attack and defense: only with, or against, melee or ranged attacks. */
+  /** Attacks: only melee or only ranged attacks. */
   attack?: 'melee' | 'ranged';
   /** Soak: only against these damage types. */
   damageTypes?: readonly DamageType[];
+}
+
+/** A flat change to a defense number, optionally only against melee or ranged attacks. */
+export interface DefenseBonus {
+  value: number;
+  attack?: 'melee' | 'ranged';
+}
+
+/** The total of the defense bonuses that apply against an attack. */
+export function defenseTotal(
+  bonuses: readonly DefenseBonus[],
+  attack?: 'melee' | 'ranged',
+): number {
+  return bonuses
+    .filter((entry) => entry.attack === undefined || entry.attack === attack)
+    .reduce((total, entry) => total + entry.value, 0);
 }
 
 /** What a roll is for, used to decide which modifiers apply. */

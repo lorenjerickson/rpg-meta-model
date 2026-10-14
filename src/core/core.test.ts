@@ -3,6 +3,7 @@ import { attributeModifier, formatModifier } from './attributes';
 import {
   CONDITIONS,
   CONDITION_DEFINITIONS,
+  conditionDefense,
   conditionDice,
   expandConditions,
   exhaustionDice,
@@ -33,7 +34,7 @@ import {
   rollPool,
 } from './dicePool';
 import { proficiencyContribution } from './proficiency';
-import { applicableDice, bonus, penalty } from './rollModifiers';
+import { applicableDice, bonus, defenseTotal, penalty } from './rollModifiers';
 import { SKILLS, SKILL_DEFINITIONS } from './skills';
 import { durationInSeconds } from './time';
 
@@ -169,20 +170,27 @@ describe('dice pools', () => {
 
   it('applies modifiers only to matching rolls', () => {
     const modifiers = [
-      bonus('defense', 1, 8),
-      bonus('defense', 1, 4, { attack: 'melee' }),
+      bonus('attack', 1, 8),
+      bonus('attack', 1, 4, { attack: 'melee' }),
       bonus('soak', 1, 6, { damageTypes: ['fire'] }),
       penalty('save', 1, 6, { attributes: ['agility'] }),
     ];
-    expect(applicableDice(modifiers, 'Cloak', 'defense', { attack: 'ranged' })).toEqual([
+    expect(applicableDice(modifiers, 'Cloak', 'attack', { attack: 'ranged' })).toEqual([
       poolDie(1, 8, 'Cloak'),
     ]);
-    expect(applicableDice(modifiers, 'Cloak', 'defense', { attack: 'melee' })).toHaveLength(2);
+    expect(applicableDice(modifiers, 'Cloak', 'attack', { attack: 'melee' })).toHaveLength(2);
     expect(applicableDice(modifiers, 'Cloak', 'soak', { damageType: 'cold' })).toEqual([]);
     expect(applicableDice(modifiers, 'Cloak', 'soak', { damageType: 'fire' })).toHaveLength(1);
     expect(applicableDice(modifiers, 'Cloak', 'save', { attribute: 'agility' })).toEqual([
       poolDie(1, 6, 'Cloak', -1),
     ]);
+  });
+
+  it('sums flat defense bonuses that apply to the attack', () => {
+    const bonuses = [{ value: 2 }, { value: 1, attack: 'melee' as const }];
+    expect(defenseTotal(bonuses, 'melee')).toBe(3);
+    expect(defenseTotal(bonuses, 'ranged')).toBe(2);
+    expect(defenseTotal([])).toBe(0);
   });
 });
 
@@ -248,23 +256,18 @@ describe('conditions', () => {
 
   it('adds and subtracts dice instead of Advantage and Disadvantage', () => {
     expect(conditionDice(['poisoned'], 'attack')).toEqual([poolDie(1, 6, 'Poisoned', -1)]);
-    expect(conditionDice(['poisoned'], 'defense')).toEqual([]);
-    expect(conditionDice(['unseen'], 'defense')).toEqual([poolDie(1, 6, 'Unseen')]);
+    expect(conditionDice(['poisoned'], 'soak')).toEqual([]);
     expect(conditionDice(['restrained'], 'save', { attribute: 'agility' })).toHaveLength(1);
     expect(conditionDice(['restrained'], 'save', { attribute: 'wisdom' })).toEqual([]);
   });
 
-  it('applies prone defense dice by attack type and includes implied conditions', () => {
-    expect(conditionDice(['prone'], 'defense', { attack: 'melee' })).toEqual([
-      poolDie(1, 6, 'Prone', -1),
-    ]);
-    expect(conditionDice(['prone'], 'defense', { attack: 'ranged' })).toEqual([
-      poolDie(1, 6, 'Prone'),
-    ]);
-    expect(conditionDice(['unconscious'], 'defense', { attack: 'melee' })).toEqual([
-      poolDie(1, 10, 'Unconscious', -1),
-      poolDie(1, 6, 'Prone', -1),
-    ]);
+  it('changes defense by flat values, by attack type, with implied conditions', () => {
+    expect(conditionDefense(['poisoned'], 'melee')).toBe(0);
+    expect(conditionDefense(['unseen'], 'melee')).toBe(3);
+    expect(conditionDefense(['prone'], 'melee')).toBe(-3);
+    expect(conditionDefense(['prone'], 'ranged')).toBe(3);
+    expect(conditionDefense(['unconscious'], 'melee')).toBe(-5 - 3);
+    expect(conditionDefense(['unconscious'], 'ranged')).toBe(-5 + 3);
   });
 
   it('penalises Intellect, Wisdom and Sanity rolls with madness', () => {
@@ -281,7 +284,7 @@ describe('conditions', () => {
   it('scales exhaustion penalties by level', () => {
     expect(exhaustionDice(0, 'attack')).toEqual([]);
     expect(exhaustionDice(3, 'attack')).toEqual([poolDie(3, 4, 'Exhaustion', -1)]);
-    expect(exhaustionDice(3, 'defense')).toEqual([]);
+    expect(exhaustionDice(3, 'soak')).toEqual([]);
     expect(exhaustionSpeedReduction(4)).toBe(20);
     expect(() => exhaustionDice(7, 'save')).toThrow(RangeError);
   });

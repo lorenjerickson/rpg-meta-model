@@ -213,8 +213,8 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
       range: TOUCH,
       duration: lasting(1, 'minute'),
       description:
-        'For the duration, the creature has double Speed, adds 1d4 to its defense rolls and 1d6 ' +
-        'to Agility saving throws, and can take one extra action each turn: a single weapon ' +
+        'For the duration, the creature has double Speed and +2 defense, adds 1d6 to Agility ' +
+        'saving throws, and can take one extra action each turn: a single weapon ' +
         "attack, Dash, Disengage, Hide or Utilize. When it ends, the creature can't move or take " +
         'actions until after its next turn.',
     },

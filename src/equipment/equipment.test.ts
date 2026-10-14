@@ -5,7 +5,7 @@ import { armorSpeedPenalty, type ArmorDefinition } from './armor';
 import { carryingCapacity, dragLiftPushCapacity } from './carrying';
 import { findItem } from './catalog';
 import type { ItemDefinition } from './items';
-import { equipmentDice, slotConflicts } from './protection';
+import { equipmentDefense, equipmentDice, slotConflicts } from './protection';
 import {
   isProficientWithWeapon,
   weaponAttackAttribute,
@@ -59,13 +59,8 @@ function item(id: string): ItemDefinition {
 describe('protective equipment', () => {
   const outfit = ['bowler-hat', 'work-clothes', 'leather-gloves', 'work-boots'].map(item);
 
-  it('rolls a die for every piece worn', () => {
-    expect(equipmentDice(outfit, 'defense')).toEqual([
-      poolDie(1, 2, 'Bowler Hat'),
-      poolDie(4, 2, 'Work Clothes'),
-      poolDie(1, 2, 'Leather Gloves'),
-      poolDie(1, 4, 'Work Boots'),
-    ]);
+  it('adds a little defense for every piece worn', () => {
+    expect(equipmentDefense(outfit)).toBe(1 + 4 + 1 + 1);
   });
 
   it('soaks general damage everywhere and typed damage only of its type', () => {
@@ -89,9 +84,7 @@ describe('protective equipment', () => {
   });
 
   it('counts held shields without a slot', () => {
-    expect(equipmentDice([item('trench-shield')], 'defense')).toEqual([
-      poolDie(1, 8, 'Trench Shield'),
-    ]);
+    expect(equipmentDefense([item('trench-shield')])).toBe(3);
   });
 
   it("counts a weapon's attack dice only for attacks made with it", () => {
@@ -104,9 +97,8 @@ describe('protective equipment', () => {
       poolDie(1, 6, 'Telescopic Sight'),
     ]);
     expect(equipmentDice(equipped, 'attack', { attack: 'melee' }, sabre)).toEqual([]);
-    expect(equipmentDice(equipped, 'defense', { attack: 'melee' })).toEqual([
-      poolDie(1, 4, 'Cavalry Sabre'),
-    ]);
+    expect(equipmentDefense(equipped, 'melee')).toBe(1);
+    expect(equipmentDefense(equipped, 'ranged')).toBe(0);
     expect(equipmentDice([item('musket')], 'attack', { attack: 'ranged' }, item('musket'))).toEqual(
       [poolDie(1, 4, 'Musket', -1)],
     );

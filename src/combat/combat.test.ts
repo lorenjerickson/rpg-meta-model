@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { dice } from '../core/dice';
 import { poolDie } from '../core/dicePool';
 import {
-  coverDice,
+  coverBonus,
   damageAfterSoak,
   doubledPool,
-  naturalDefense,
+  effectiveSoak,
   resolveContest,
   rollContest,
   rollDamage,
@@ -75,27 +75,30 @@ describe('death saves', () => {
 });
 
 describe('contests', () => {
-  it('gives ties to the attacker and criticals for a margin of 10', () => {
+  it('gives ties to the attacker, solid hits for 3 and criticals for 10', () => {
     expect(resolveContest(12, 17)).toEqual({
       attack: 12,
       defense: 17,
       margin: -5,
       success: false,
+      solid: false,
       critical: false,
     });
     expect(resolveContest(15, 15).success).toBe(true);
+    expect(resolveContest(17, 15).solid).toBe(false);
+    expect(resolveContest(18, 15).solid).toBe(true);
     expect(resolveContest(25, 15).critical).toBe(true);
     expect(resolveContest(24, 15).critical).toBe(false);
   });
 
-  it('rolls a d20 plus a pool, or a pool alone for defense', () => {
+  it('rolls a d20 plus a pool, or a pool alone for soak', () => {
     const pool = [poolDie(1, 4, 'Rifle'), poolDie(1, 6, 'Diseased', -1)];
     const attack = rollContest(pool, { rng: () => 0.5 });
     expect(attack.natural).toBe(11);
     expect(attack.total).toBe(11 + 3 - 4);
     const armour = [poolDie(1, 10, 'Chest'), poolDie(1, 4, 'Helmet')];
-    const defense = rollContest(armour, { d20: false, rng: () => 0.999 });
-    expect(defense).toMatchObject({ natural: null, total: 14 });
+    const soak = rollContest(armour, { d20: false, rng: () => 0.999 });
+    expect(soak).toMatchObject({ natural: null, total: 14 });
   });
 
   it('reduces damage by the soak roll, never below 0, before immunity and vulnerability', () => {
@@ -112,20 +115,16 @@ describe('contests', () => {
     expect(doubledPool(pool)).toEqual([poolDie(2, 4, 'Might')]);
   });
 
-  it('converts Armor Class into natural-armour dice', () => {
-    expect(naturalDefense(10)).toEqual([poolDie(1, 20, 'Natural armour')]);
-    expect(naturalDefense(15)).toEqual([
-      poolDie(1, 20, 'Natural armour'),
-      poolDie(1, 4, 'Tough hide'),
-    ]);
-    expect(naturalDefense(21)[1]).toEqual(poolDie(1, 10, 'Tough hide'));
-    expect(naturalDefense(8)[1]).toEqual(poolDie(1, 2, 'Soft body', -1));
+  it('ignores soak on a solid hit', () => {
+    expect(effectiveSoak(6, resolveContest(14, 12))).toBe(6);
+    expect(effectiveSoak(6, resolveContest(15, 12))).toBe(0);
+    expect(effectiveSoak(-2, resolveContest(12, 12))).toBe(0);
   });
 
-  it('adds cover dice to defense', () => {
-    expect(coverDice('none')).toEqual([]);
-    expect(coverDice('half')).toEqual([poolDie(1, 4, 'Half cover')]);
-    expect(coverDice('three-quarters')).toEqual([poolDie(1, 8, 'Three-quarters cover')]);
-    expect(coverDice('total')).toBeNull();
+  it('adds flat cover bonuses to defense', () => {
+    expect(coverBonus('none')).toBe(0);
+    expect(coverBonus('half')).toBe(2);
+    expect(coverBonus('three-quarters')).toBe(5);
+    expect(coverBonus('total')).toBeNull();
   });
 });

@@ -11,7 +11,7 @@ TypeScript domain model and rules helpers for D&D 5th edition, following the 202
 | `src/character`   | Character, human traits, ethnicities, backgrounds and feats (with catalogs), XP and levels, max HP |
 | `src/professions` | Professions, ranks, specialization trees and the profession catalog                                |
 | `src/science`     | Scientific disciplines, apparatus and preparations, charges and malfunctions, and their catalog    |
-| `src/combat`      | Contested attack, defense, damage and soak rolls, cover, hit point state, death saves              |
+| `src/combat`      | Contested attack and soak rolls against fixed defense, cover, hit point state, death saves         |
 | `src/equipment`   | Items, body slots, weapons and firearms, armour, tools, gear, mounts and vehicles, and the catalog |
 | `src/monsters`    | Stat blocks, challenge ratings, encounter XP budgets, and the bestiary                             |
 
@@ -76,15 +76,17 @@ of +m is a d(2m), so +2 is a d4 and +3 a d6, and negative modifiers subtract the
 
 - **Attack:** d20 + attribute dice + proficiency dice, plus or minus dice from the weapon, other
   equipment and conditions.
-- **Defense:** the dice of everything worn in the seven body slots (head, shoulders, arms, chest,
-  hands, legs, feet) and held (shields, a parrying sabre), plus or minus condition dice. Ordinary
-  clothing gives a d2 per slot it covers. Creatures with natural armour roll a d20, plus a die
-  for tough hides or minus one for soft bodies.
-- **Result:** the attacker wins ties; winning by 10 or more is a critical, which doubles the
-  damage dice.
+- **Defense:** a fixed number, not a roll: base 6 plus a small value for everything worn in the
+  seven body slots (head, shoulders, arms, chest, hands, legs, feet) and held (shields, a parrying
+  sabre), plus or minus flat condition values. Ordinary clothing gives 1 per slot it covers, so a
+  fully dressed clerk has 13 and a soldier in trench kit about 18. Cover adds 2 (half) or 5
+  (three-quarters). Creatures with natural armour have a fixed defense instead.
+- **Result:** the attacker wins ties; winning by 3 or more is a solid hit, which ignores soak;
+  winning by 10 or more is a critical, which also doubles the damage dice.
 - **Damage and soak:** weapon dice plus attribute dice, reduced by the defender's soak roll
   (general soak plus soak typed to the damage, from equipment and conditions) to a minimum of 0,
-  then immunity, resistance and vulnerability.
+  then immunity, resistance and vulnerability. Soak makes heavy armour hard to hurt, but a solid
+  hit always gets through.
 - **Saves:** an effect rolls d20 + its attribute and proficiency dice against the target's d20 +
   save attribute dice, proficiency dice if proficient, and condition dice. The effect wins ties.
   Profession and operator DCs are now Profession and operator rolls.

@@ -167,8 +167,8 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
     reactions: [
       feature(
         'Spring-Loaded Shield',
-        'Trigger: The scientist is hit by an attack. Response: The scientist adds 2d8 to its ' +
-          'defense rolls until the start of its next turn, including against the triggering ' +
+        "Trigger: The scientist is hit by an attack. Response: The scientist's defense " +
+          'increases by 5 until the start of its next turn, including against the triggering ' +
           'attack.',
         { kind: 'per-day', uses: 3 },
       ),

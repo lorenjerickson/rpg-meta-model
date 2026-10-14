@@ -1,6 +1,6 @@
 import { attributeDice, type DicePool, type PoolDie } from '../core/dicePool';
 import type { Attribute, AttributeScores } from '../core/attributes';
-import { conditionDice, type Condition } from '../core/conditions';
+import { conditionDefense, conditionDice, type Condition } from '../core/conditions';
 import type { Alignment, CreatureType, Senses, Size, Speed } from '../core/creatures';
 import type { DamageType } from '../core/damage';
 import type { DiceExpression } from '../core/dice';
@@ -76,8 +76,8 @@ export interface MonsterStatBlock {
   /** Descriptive tags such as "Cultist" or "Soldier". */
   tags?: readonly string[];
   alignment: Alignment;
-  /** Dice rolled to defend: natural armour (a d20 and more), or what the creature wears. */
-  defense: DicePool;
+  /** The defense an attack must meet: natural armour, or base defense plus what it wears. */
+  defense: number;
   /** Soak dice from hide, shell, plating or worn gear. */
   soak: readonly RollModifier[];
   /** Dice rolled with a d20 for Initiative. */
@@ -120,13 +120,13 @@ export function monsterXp(monster: MonsterStatBlock, inLair = false): number {
   return challengeRatingInfo(monster.challengeRating).xp;
 }
 
-/** The dice a monster rolls to defend, with any conditions it has. */
-export function monsterDefensePool(
+/** A monster's defense against an attack, with any conditions it has. Add cover separately. */
+export function monsterDefense(
   monster: MonsterStatBlock,
   attack: 'melee' | 'ranged',
   conditions: readonly Condition[] = [],
-): PoolDie[] {
-  return [...monster.defense, ...conditionDice(conditions, 'defense', { attack })];
+): number {
+  return monster.defense + conditionDefense(conditions, attack);
 }
 
 /** The dice a monster rolls to soak damage of a type, with any conditions it has. */

@@ -12,7 +12,7 @@ export interface PoolDie {
 
 /**
  * A collection of dice rolled together and summed, e.g. an attack's attribute and proficiency
- * dice, or a defense roll's armour dice. The d20 of a contested roll is rolled separately.
+ * dice, or a soak roll's armour dice. The d20 of a contested roll is rolled separately.
  */
 export type DicePool = readonly PoolDie[];
 
