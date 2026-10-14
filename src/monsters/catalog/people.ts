@@ -17,7 +17,7 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
     creatureType: 'humanoid',
     tags: ['Cultist'],
     alignment: 'neutral-evil',
-    armorClass: 12,
+    worn: ['work-clothes', 'flat-cap', 'work-boots'],
     hitDice: '2d8',
     speed: { walk: 30 },
     scores: [11, 12, 10, 10, 11, 10, 10, 8],
@@ -36,7 +36,7 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
     creatureType: 'humanoid',
     tags: ['Cultist'],
     alignment: 'neutral-evil',
-    armorClass: 13,
+    worn: ['travelling-clothes', 'bowler-hat', 'dress-shoes', 'leather-gloves'],
     hitDice: '6d8',
     speed: { walk: 30 },
     scores: [11, 14, 12, 10, 13, 14, 10, 6],
@@ -64,7 +64,7 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
     size: 'medium',
     creatureType: 'humanoid',
     alignment: 'neutral',
-    armorClass: 11,
+    worn: ['work-clothes', 'flat-cap', 'work-boots', 'leather-gloves'],
     hitDice: '5d8+10',
     speed: { walk: 30 },
     scores: [15, 11, 14, 10, 10, 11, 10, 10],
@@ -90,7 +90,7 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
     size: 'medium',
     creatureType: 'humanoid',
     alignment: 'lawful-neutral',
-    armorClass: 12,
+    worn: ['travelling-clothes', 'bowler-hat', 'work-boots', 'leather-gloves'],
     hitDice: '3d8+3',
     speed: { walk: 30 },
     scores: [13, 12, 12, 10, 11, 10, 10, 10],
@@ -113,7 +113,7 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
     size: 'medium',
     creatureType: 'humanoid',
     alignment: 'neutral',
-    armorClass: 14,
+    worn: ['reinforced-greatcoat', 'leather-chaps', 'steel-helmet', 'work-boots', 'leather-gloves'],
     hitDice: '9d8+18',
     speed: { walk: 30 },
     scores: [16, 13, 14, 10, 11, 10, 10, 10],
@@ -140,7 +140,7 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
     creatureType: 'humanoid',
     tags: ['Scientist'],
     alignment: 'chaotic-neutral',
-    armorClass: 12,
+    worn: ['travelling-clothes', 'gas-mask', 'leather-gloves', 'dress-shoes'],
     hitDice: '18d8',
     speed: { walk: 30 },
     scores: [9, 14, 11, 20, 12, 11, 10, 6],
@@ -167,8 +167,9 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
     reactions: [
       feature(
         'Spring-Loaded Shield',
-        'Trigger: The scientist is hit by an attack roll. Response: The scientist gains a +5 ' +
-          'bonus to AC until the start of its next turn, including against the triggering attack.',
+        'Trigger: The scientist is hit by an attack. Response: The scientist adds 2d8 to its ' +
+          'defense rolls until the start of its next turn, including against the triggering ' +
+          'attack.',
         { kind: 'per-day', uses: 3 },
       ),
     ],
@@ -207,7 +208,7 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
         reach: 5,
         damage: [['1d4', 'slashing']],
         extra:
-          'The target must succeed on a DC 10 Hardiness saving throw or have the Paralyzed ' +
+          'The target must succeed on a Hardiness saving throw against {effect:hardiness} or have the Paralyzed ' +
           'condition until the end of its next turn.',
       }),
     ],
@@ -272,7 +273,7 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
         reach: 5,
         damage: [['1d8', 'piercing']],
         extra:
-          'A humanoid target must succeed on a DC 12 Hardiness saving throw or contract the ' +
+          'A humanoid target must succeed on a Hardiness saving throw against {effect:hardiness} or contract the ' +
           'wolf-change.',
       }),
       attack('Claw', { reach: 5, damage: [['2d4', 'slashing']] }),

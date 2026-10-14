@@ -1,5 +1,6 @@
 import { lsd } from '../../core/currency';
 import { dice } from '../../core/dice';
+import { bonus, penalty } from '../../core/rollModifiers';
 import type { AmmunitionDefinition } from '../items';
 import type { WeaponDefinition } from '../weapons';
 
@@ -100,12 +101,13 @@ export const WEAPONS: readonly WeaponDefinition[] = [
   // Martial melee
   weapon('cavalry-sabre', {
     name: 'Cavalry Sabre',
-    description: 'A curved, single-edged sword carried by cavalry officers.',
+    description: 'A curved, single-edged sword carried by cavalry officers, good for parrying.',
     weaponCategory: 'martial',
     weaponType: 'melee',
     damage: { dice: dice(1, 8), type: 'slashing' },
     properties: ['finesse'],
     mastery: 'vex',
+    modifiers: [bonus('defense', 1, 4, { attack: 'melee' })],
     weightLb: 3,
     cost: lsd(2, 10),
   }),
@@ -236,6 +238,7 @@ export const WEAPONS: readonly WeaponDefinition[] = [
     ammunition: 'powder-and-ball',
     misfireOn: 2,
     mastery: 'slow',
+    modifiers: [penalty('attack', 1, 4)],
     weightLb: 10,
     cost: lsd(0, 15),
   }),
@@ -294,6 +297,7 @@ export const WEAPONS: readonly WeaponDefinition[] = [
     ammunition: 'rifle-cartridges',
     capacity: 10,
     mastery: 'slow',
+    modifiers: [bonus('attack', 1, 4)],
     weightLb: 9,
     cost: lsd(5),
   }),

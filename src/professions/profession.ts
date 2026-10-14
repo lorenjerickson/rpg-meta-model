@@ -1,5 +1,6 @@
 import type { ActionCost } from '../core/actions';
 import type { Attribute, AttributeScores } from '../core/attributes';
+import { attributeDice, proficiencyDice, type PoolDie } from '../core/dicePool';
 import type { Feature, Usage } from '../core/features';
 import type { Skill } from '../core/skills';
 import type { EquipmentOption } from '../character/startingEquipment';
@@ -83,11 +84,15 @@ export interface ProfessionDefinition {
 }
 
 /**
- * The DC for saving throws against a profession's actions ("your Profession DC"):
- * 8 + proficiency bonus + the modifier of the profession's primary attribute.
+ * The dice rolled, with a d20, against saving throws for a profession's actions ("your
+ * Profession roll"): the primary attribute's dice plus proficiency dice.
  */
-export function professionDc(proficiencyBonus: number, primaryAttributeModifier: number): number {
-  return 8 + proficiencyBonus + primaryAttributeModifier;
+export function professionPool(
+  attributeScore: number,
+  attribute: Attribute,
+  proficiencyBonus: number,
+): PoolDie[] {
+  return [...attributeDice(attributeScore, attribute), ...proficiencyDice(proficiencyBonus)];
 }
 
 /** Profession levels at which a character gains a General feat, as classes do in 2024. */

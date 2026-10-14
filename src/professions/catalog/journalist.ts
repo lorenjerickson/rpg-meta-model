@@ -35,7 +35,7 @@ export const JOURNALIST: ProfessionDefinition = {
         action(
           'Leading Question',
           'A creature within 30 feet that can hear and understand you makes a Wisdom saving ' +
-            'throw against your Profession DC. On a failure, it truthfully answers one question ' +
+            'throw against your Profession roll. On a failure, it truthfully answers one question ' +
             "and doesn't realize it said too much.",
           PB_PER_LONG_REST,
         ),
@@ -75,7 +75,7 @@ export const JOURNALIST: ProfessionDefinition = {
         reaction(
           'Duck!',
           'you are targeted by a ranged attack',
-          'Add your Proficiency Bonus to your AC against the attack.',
+          'Add your proficiency dice to your defense roll against the attack.',
           PB_PER_LONG_REST,
         ),
       ],

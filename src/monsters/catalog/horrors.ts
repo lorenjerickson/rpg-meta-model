@@ -1,3 +1,4 @@
+import { bonus } from '../../core/rollModifiers';
 import type { MonsterStatBlock } from '../statBlock';
 import {
   RECHARGE_5,
@@ -249,6 +250,7 @@ export const HORRORS: readonly MonsterStatBlock[] = [
     creatureType: 'aberration',
     alignment: 'chaotic-evil',
     armorClass: 16,
+    soak: [bonus('soak', 1, 6)],
     hitDice: '11d10+33',
     speed: { walk: 30, swim: 30 },
     scores: [19, 10, 16, 5, 11, 5, 10, 10],
@@ -304,7 +306,7 @@ export const HORRORS: readonly MonsterStatBlock[] = [
         reach: 5,
         damage: [['2d8', 'piercing']],
         extra:
-          'The target must succeed on a DC 15 Hardiness saving throw or have the Poisoned ' +
+          'The target must succeed on a Hardiness saving throw against {effect:hardiness} or have the Poisoned ' +
           'condition until it finishes a Long Rest.',
       }),
       attack('Tentacle', {
@@ -341,8 +343,9 @@ export const HORRORS: readonly MonsterStatBlock[] = [
       horrifyingPresence('charisma'),
       feature(
         'Transforming Mucus',
-        'A creature that touches it or is hit by its Tentacle must succeed on a DC 14 Hardiness ' +
-          'saving throw or begin to change: over 1 minute its skin turns translucent and slimy, ' +
+        'A creature that touches it or is hit by its Tentacle must succeed on a Hardiness ' +
+          'saving throw against {effect:hardiness} or begin to change: over 1 minute its skin ' +
+          'turns translucent and slimy, ' +
           'and it can breathe only water until cured.',
       ),
     ],
@@ -385,6 +388,7 @@ export const HORRORS: readonly MonsterStatBlock[] = [
     creatureType: 'aberration',
     alignment: 'chaotic-evil',
     armorClass: 18,
+    soak: [bonus('soak', 1, 10)],
     hitDice: '25d20+175',
     speed: { walk: 30, swim: 120 },
     scores: [30, 11, 25, 22, 18, 20, 10, 24],

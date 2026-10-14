@@ -12,7 +12,7 @@ function preparation(id: string, input: PreparationInput): PreparationDefinition
   return { id, category: 'preparation', ...rest, effect: { id: slug(effect.name), ...effect } };
 }
 
-/** Single-use preparations. Saving throws use the user's operator DC. */
+/** Single-use preparations. Saving throws are contested by the user's operator roll. */
 export const PREPARATIONS: readonly PreparationDefinition[] = [
   preparation('smelling-salts', {
     name: 'Smelling Salts',
@@ -213,8 +213,8 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
       range: TOUCH,
       duration: lasting(1, 'minute'),
       description:
-        'For the duration, the creature has double Speed, a +2 bonus to AC and Advantage on ' +
-        'Agility saving throws, and can take one extra action each turn: a single weapon ' +
+        'For the duration, the creature has double Speed, adds 1d4 to its defense rolls and 1d6 ' +
+        'to Agility saving throws, and can take one extra action each turn: a single weapon ' +
         "attack, Dash, Disengage, Hide or Utilize. When it ends, the creature can't move or take " +
         'actions until after its next turn.',
     },

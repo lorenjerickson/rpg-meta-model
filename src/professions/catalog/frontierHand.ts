@@ -35,7 +35,7 @@ export const FRONTIER_HAND: ProfessionDefinition = {
         action(
           'Set Snare',
           'Set a snare in a 5-foot square within 5 feet of you. The first creature to enter it ' +
-            'makes an Agility saving throw against your Profession DC or is Restrained. It can ' +
+            'makes an Agility saving throw against your Profession roll or is Restrained. It can ' +
             'escape with a successful Might (Athletics) check against the same DC.',
         ),
       ],
@@ -72,7 +72,7 @@ export const FRONTIER_HAND: ProfessionDefinition = {
       actions: [
         action(
           'Lasso',
-          'A creature within 30 feet makes an Agility saving throw against your Profession DC. ' +
+          'A creature within 30 feet makes an Agility saving throw against your Profession roll. ' +
             'On a failure, it is Restrained and you can pull it up to 10 feet toward you.',
         ),
       ],

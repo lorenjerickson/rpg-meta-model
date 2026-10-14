@@ -2,6 +2,7 @@ import type { ActionCost, RestType } from '../core/actions';
 import type { Attribute } from '../core/attributes';
 import type { DamageType } from '../core/damage';
 import { rollDice, type DiceExpression, type Rng } from '../core/dice';
+import { attributeDice, proficiencyDice, type PoolDie } from '../core/dicePool';
 import type { AreaOfEffect, EffectRange } from '../core/targeting';
 import type { Duration } from '../core/time';
 import type { ItemBase } from '../equipment/items';
@@ -84,22 +85,20 @@ export interface ApparatusState {
 /** DC to repair a malfunctioning apparatus with the Utilize action and the right tools. */
 export const REPAIR_DC = 15;
 
-/** Save DC for an operator's effects: 8 + discipline attribute modifier + PB if proficient. */
-export function operatorDc(
+/**
+ * The dice an operator rolls, with a d20, for a discipline's attacks and effects ("your
+ * operator roll"): the discipline attribute's dice, plus proficiency dice if proficient.
+ */
+export function operatorPool(
+  attributeScore: number,
+  attribute: Attribute,
   proficiencyBonus: number,
-  attributeModifier: number,
   proficient: boolean,
-): number {
-  return 8 + attributeModifier + (proficient ? proficiencyBonus : 0);
-}
-
-/** Attack bonus for an operator's effects: discipline attribute modifier + PB if proficient. */
-export function operatorAttackBonus(
-  proficiencyBonus: number,
-  attributeModifier: number,
-  proficient: boolean,
-): number {
-  return attributeModifier + (proficient ? proficiencyBonus : 0);
+): PoolDie[] {
+  return [
+    ...attributeDice(attributeScore, attribute),
+    ...(proficient ? proficiencyDice(proficiencyBonus) : []),
+  ];
 }
 
 export function freshApparatusState(apparatus: ApparatusDefinition): ApparatusState {

@@ -1,18 +1,19 @@
 import { attributeModifier, type Attribute } from '../core/attributes';
+import type { PoolDie } from '../core/dicePool';
 import { passiveScore } from '../core/d20';
 import { proficiencyContribution } from '../core/proficiency';
 import { SKILL_DEFINITIONS, type Skill } from '../core/skills';
 import { carryingCapacity } from '../equipment/carrying';
 import { PROFESSIONS } from '../professions/catalog';
 import {
-  professionDc,
+  professionPool,
   type HitDie,
   type ProfessionAction,
   type ProfessionDefinition,
 } from '../professions/profession';
 import { rankForLevel, type Rank } from '../professions/ranks';
 import { specializationGrants } from '../professions/specializations';
-import { operatorAttackBonus, operatorDc } from '../science/apparatus';
+import { operatorPool } from '../science/apparatus';
 import { DISCIPLINE_DEFINITIONS, type Discipline } from '../science/disciplines';
 import type { Character, ProfessionLevel } from './character';
 import { proficiencyBonusForLevel } from './progression';
@@ -111,19 +112,23 @@ export function hitDiceRemaining(
 }
 
 /**
- * The save DC for one of the character's professions. With several primary attributes, the
- * highest modifier among them is used.
+ * The dice the character rolls, with a d20, for one of their professions' actions ("your
+ * Profession roll"). With several primary attributes, the highest score is used.
  */
-export function characterProfessionDc(
+export function characterProfessionPool(
   character: Character,
   professionId: string,
   catalog: ProfessionCatalog = PROFESSIONS,
-): number {
+): PoolDie[] {
   const { primaryAttributes } = professionFrom(catalog, professionId);
-  const best = Math.max(
-    ...primaryAttributes.map((attribute) => characterAttributeModifier(character, attribute)),
+  const best = primaryAttributes.reduce((top, attribute) =>
+    character.attributeScores[attribute] > character.attributeScores[top] ? attribute : top,
   );
-  return professionDc(characterProficiencyBonus(character), best);
+  return professionPool(
+    character.attributeScores[best],
+    best,
+    characterProficiencyBonus(character),
+  );
 }
 
 export interface CharacterActions {
@@ -157,24 +162,16 @@ export function isProficientInDiscipline(character: Character, discipline: Disci
   return character.proficiencies.disciplines.includes(discipline);
 }
 
-function disciplineModifier(character: Character, discipline: Discipline): number {
-  return characterAttributeModifier(character, DISCIPLINE_DEFINITIONS[discipline].attribute);
-}
-
-/** Save DC for apparatus and preparations of a discipline that this character operates. */
-export function characterOperatorDc(character: Character, discipline: Discipline): number {
-  return operatorDc(
+/**
+ * The dice the character rolls, with a d20, for attacks and effects of apparatus and
+ * preparations in a discipline ("your operator roll").
+ */
+export function characterOperatorPool(character: Character, discipline: Discipline): PoolDie[] {
+  const { attribute } = DISCIPLINE_DEFINITIONS[discipline];
+  return operatorPool(
+    character.attributeScores[attribute],
+    attribute,
     characterProficiencyBonus(character),
-    disciplineModifier(character, discipline),
-    isProficientInDiscipline(character, discipline),
-  );
-}
-
-/** Attack bonus for apparatus of a discipline that this character operates. */
-export function characterOperatorAttackBonus(character: Character, discipline: Discipline): number {
-  return operatorAttackBonus(
-    characterProficiencyBonus(character),
-    disciplineModifier(character, discipline),
     isProficientInDiscipline(character, discipline),
   );
 }

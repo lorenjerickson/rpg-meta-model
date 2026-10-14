@@ -163,7 +163,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         description:
           'You project the image of an object no larger than a 5-foot Cube, or play a recorded ' +
           'sound. A creature that studies it can see through it with an Intellect ' +
-          '(Investigation) check against your operator DC.',
+          '(Investigation) check against your operator roll.',
       },
       {
         name: 'Phantasmagoria',
@@ -175,7 +175,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         description:
           'You project a moving image of a creature, object or scene within the Cube, with sound ' +
           'and smoke. A creature that studies it can see through it with an Intellect ' +
-          '(Investigation) check against your operator DC.',
+          '(Investigation) check against your operator roll.',
       },
     ],
   }),
@@ -336,7 +336,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         range: SELF,
         duration: lasting(1, 'round'),
         description:
-          'You gain a +5 bonus to AC until the start of your next turn, including against the ' +
+          'Add 2d8 to your defense rolls until the start of your next turn, including against the ' +
           'triggering attack.',
       },
     ],

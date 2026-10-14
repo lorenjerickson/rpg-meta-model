@@ -7,12 +7,12 @@ TypeScript domain model and rules helpers for D&D 5th edition, following the 202
 
 | Folder            | Contents                                                                                           |
 | ----------------- | -------------------------------------------------------------------------------------------------- |
-| `src/core`        | Attributes, skills, dice, D20 Tests, damage types, conditions, sizes, languages, currency, time    |
+| `src/core`        | Attributes, skills, dice and dice pools, roll modifiers, damage types, conditions, currency, time  |
 | `src/character`   | Character, human traits, ethnicities, backgrounds and feats (with catalogs), XP and levels, max HP |
 | `src/professions` | Professions, ranks, specialization trees and the profession catalog                                |
 | `src/science`     | Scientific disciplines, apparatus and preparations, charges and malfunctions, and their catalog    |
-| `src/combat`      | Hit point state, death saves, attack resolution, cover                                             |
-| `src/equipment`   | Items, weapons and firearms, armour and AC, tools, gear, mounts and vehicles, and the item catalog |
+| `src/combat`      | Contested attack, defense, damage and soak rolls, cover, hit point state, death saves              |
+| `src/equipment`   | Items, body slots, weapons and firearms, armour, tools, gear, mounts and vehicles, and the catalog |
 | `src/monsters`    | Stat blocks, challenge ratings, encounter XP budgets, and the bestiary                             |
 
 Closed sets such as attributes, skills and conditions are `as const` arrays with a derived
@@ -67,7 +67,31 @@ the world show it. There are no magical creatures: `MONSTERS` holds a first-draf
 mutated beasts and people, hybrids, the galvanically reanimated, automata, aberrations from the
 deep, and anomalies (self-sustaining phenomena such as plasma held together by electromagnetic
 forces). Each stat block records its `origin`. The stat blocks are built from attribute scores
-and challenge rating, so attack bonuses, save DCs, hit points and rules text stay consistent.
+and challenge rating, so their dice pools, hit points and rules text stay consistent.
+
+## Combat
+
+Combat is contested and rolled in dice pools. Attributes and proficiency become dice: a modifier
+of +m is a d(2m), so +2 is a d4 and +3 a d6, and negative modifiers subtract the same die.
+
+- **Attack:** d20 + attribute dice + proficiency dice, plus or minus dice from the weapon, other
+  equipment and conditions.
+- **Defense:** the dice of everything worn in the seven body slots (head, shoulders, arms, chest,
+  hands, legs, feet) and held (shields, a parrying sabre), plus or minus condition dice. Ordinary
+  clothing gives a d2 per slot it covers. Creatures with natural armour roll a d20, plus a die
+  for tough hides or minus one for soft bodies.
+- **Result:** the attacker wins ties; winning by 10 or more is a critical, which doubles the
+  damage dice.
+- **Damage and soak:** weapon dice plus attribute dice, reduced by the defender's soak roll
+  (general soak plus soak typed to the damage, from equipment and conditions) to a minimum of 0,
+  then immunity, resistance and vulnerability.
+- **Saves:** an effect rolls d20 + its attribute and proficiency dice against the target's d20 +
+  save attribute dice, proficiency dice if proficient, and condition dice. The effect wins ties.
+  Profession and operator DCs are now Profession and operator rolls.
+
+Conditions add and subtract dice instead of granting Advantage or Disadvantage; Exhaustion and
+Madness subtract 1d4 per level. Advantage and Disadvantage still apply to the d20 from other
+sources. Ability checks and passive scores still use flat modifiers.
 
 ## Scripts
 

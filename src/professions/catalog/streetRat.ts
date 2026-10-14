@@ -72,7 +72,7 @@ export const STREET_RAT: ProfessionDefinition = {
         action(
           'Make an Example',
           'A creature you can see within 60 feet makes a Wisdom saving throw against your ' +
-            'Profession DC. On a failure, it is Frightened of you for 1 minute, and every other ' +
+            'Profession roll. On a failure, it is Frightened of you for 1 minute, and every other ' +
             'creature of your choice that sees this has Disadvantage on attack rolls against you ' +
             'until the end of your next turn.',
           ONCE_PER_LONG_REST,

@@ -1,5 +1,11 @@
 import { lsd } from '../../core/currency';
+import { bonus } from '../../core/rollModifiers';
 import type { GearDefinition } from '../items';
+import type { EquipmentSlot } from '../protection';
+import { defense, soak } from './armor';
+
+/** Shoulders, chest, arms and legs: what an outfit of clothes covers. */
+const OUTFIT: readonly EquipmentSlot[] = ['shoulders', 'chest', 'arms', 'legs'];
 
 function gear(id: string, input: Omit<GearDefinition, 'id' | 'category'>): GearDefinition {
   return { id, category: 'adventuring-gear', ...input };
@@ -152,6 +158,8 @@ export const GEAR: readonly GearDefinition[] = [
   }),
   gear('gas-mask', {
     name: 'Gas Mask',
+    slots: ['head'],
+    modifiers: [defense(1, 2)],
     description:
       'A rubberised hood with eyepieces and a filter. Grants Advantage on saving throws against ' +
       'inhaled gases for 1 hour per filter.',
@@ -204,20 +212,81 @@ export const GEAR: readonly GearDefinition[] = [
   }),
   gear('work-clothes', {
     name: 'Work Clothes',
-    description: 'Durable working dress: boots, trousers or skirts, shirt and cap.',
+    description: 'Durable working dress: trousers or skirts, shirt and jacket.',
+    slots: OUTFIT,
+    modifiers: [defense(4, 2)],
     weightLb: 4,
     cost: lsd(0, 10),
   }),
   gear('travelling-clothes', {
     name: 'Travelling Clothes',
-    description: 'A respectable suit or dress, coat and hat.',
+    description: 'A respectable suit or dress with a coat.',
+    slots: OUTFIT,
+    modifiers: [defense(4, 2)],
     weightLb: 4,
     cost: lsd(1, 10),
   }),
   gear('evening-dress', {
     name: 'Evening Dress',
-    description: 'Formal dress for society: tailcoat or gown, gloves and the rest.',
+    description: 'Formal dress for society: tailcoat or gown and the rest.',
+    slots: OUTFIT,
+    modifiers: [defense(4, 2)],
     weightLb: 6,
     cost: lsd(8),
+  }),
+  gear('bowler-hat', {
+    name: 'Bowler Hat',
+    description: 'A hard felt hat, first made for gamekeepers to turn aside low branches.',
+    slots: ['head'],
+    modifiers: [defense(1, 2)],
+    weightLb: 0.5,
+    cost: lsd(0, 6),
+  }),
+  gear('flat-cap', {
+    name: 'Flat Cap',
+    slots: ['head'],
+    modifiers: [defense(1, 2)],
+    weightLb: 0.25,
+    cost: lsd(0, 1),
+  }),
+  gear('oilskin-cape', {
+    name: 'Oilskin Cape',
+    description: 'A short waterproof cape of oiled cloth.',
+    slots: ['shoulders'],
+    modifiers: [defense(1, 2), soak(1, 2)],
+    weightLb: 2,
+    cost: lsd(0, 7),
+  }),
+  gear('leather-gloves', {
+    name: 'Leather Gloves',
+    slots: ['hands'],
+    modifiers: [defense(1, 2), soak(1, 2, ['fire'])],
+    weightLb: 0.25,
+    cost: lsd(0, 3),
+  }),
+  gear('work-boots', {
+    name: 'Work Boots',
+    description: 'Heavy hobnailed boots.',
+    slots: ['feet'],
+    modifiers: [defense(1, 4)],
+    weightLb: 3,
+    cost: lsd(0, 8),
+  }),
+  gear('dress-shoes', {
+    name: 'Dress Shoes',
+    slots: ['feet'],
+    modifiers: [defense(1, 2)],
+    weightLb: 1,
+    cost: lsd(0, 12),
+  }),
+
+  // Aids
+  gear('telescopic-sight', {
+    name: 'Telescopic Sight',
+    description: 'A brass rifle scope. While fitted to the weapon you carry, it steadies your aim.',
+    modifiers: [bonus('attack', 1, 6, { attack: 'ranged' })],
+    weightLb: 1,
+    cost: lsd(4),
+    rarity: 'uncommon',
   }),
 ];

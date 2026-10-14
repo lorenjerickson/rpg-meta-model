@@ -1,8 +1,8 @@
+import { naturalDefense } from '../../combat/attacks';
 import {
   ATTRIBUTE_NAMES,
   ATTRIBUTES,
   attributeModifier,
-  formatModifier,
   type Attribute,
   type AttributeScores,
 } from '../../core/attributes';
@@ -10,9 +10,20 @@ import type { Condition } from '../../core/conditions';
 import type { Alignment, CreatureType, Senses, Size, Speed } from '../../core/creatures';
 import type { DamageType } from '../../core/damage';
 import { averageRoll, formatDice, parseDice, type DiceExpression } from '../../core/dice';
+import {
+  attributeDice,
+  formatPool,
+  proficiencyDice,
+  type DicePool,
+  type PoolDie,
+} from '../../core/dicePool';
 import type { Usage } from '../../core/features';
 import { proficiencyContribution } from '../../core/proficiency';
+import type { RollModifier } from '../../core/rollModifiers';
 import { SKILL_DEFINITIONS, type Skill } from '../../core/skills';
+import { findItem } from '../../equipment/catalog';
+import type { ItemDefinition } from '../../equipment/items';
+import { equipmentDice } from '../../equipment/protection';
 import { challengeRatingInfo } from '../challenge';
 import type { MonsterAbility, MonsterDamage, MonsterOrigin, MonsterStatBlock } from '../statBlock';
 
@@ -33,7 +44,7 @@ export interface AttackSpec extends AbilityBase {
   attribute?: Attribute;
   reach?: number;
   range?: { normal: number; long?: number };
-  /** The first entry adds the attribute modifier. */
+  /** The first entry adds the attribute's dice. */
   damage: readonly DamageSpec[];
   extra?: string;
 }
@@ -41,7 +52,7 @@ export interface AttackSpec extends AbilityBase {
 export interface SaveSpec extends AbilityBase {
   kind: 'save';
   save: Attribute;
-  /** The attribute that sets the DC (8 + PB + its modifier). */
+  /** The attribute whose dice the effect rolls, with a d20 and proficiency dice. */
   dcAttribute: Attribute;
   target: string;
   damage?: readonly DamageSpec[];
@@ -65,7 +76,12 @@ export interface MonsterInput {
   creatureType: CreatureType;
   tags?: readonly string[];
   alignment: Alignment;
-  armorClass: number;
+  /** For natural armour: the Armor Class its defense dice are converted from. */
+  armorClass?: number;
+  /** Item ids of clothing and armour it wears, which set its defense and soak instead. */
+  worn?: readonly string[];
+  /** Soak from hide, shell or plating. */
+  soak?: readonly RollModifier[];
   hitDice: string;
   speed: Speed;
   scores: Scores;
@@ -139,17 +155,21 @@ function toScores(scores: Scores): AttributeScores {
   return { might, agility, hardiness, intellect, wisdom, charisma, fortune, sanity };
 }
 
-function toDamage(spec: DamageSpec, modifier: number): MonsterDamage {
-  const parsed = parseDice(spec[0]);
-  return { dice: { ...parsed, modifier: parsed.modifier + modifier }, type: spec[1] };
+function toDamage(spec: DamageSpec, pool: DicePool = []): MonsterDamage {
+  return { dice: parseDice(spec[0]), ...(pool.length > 0 && { pool }), type: spec[1] };
 }
 
 function describeDamage(damage: readonly MonsterDamage[]): string {
   return damage
     .map((entry) => {
       const text = formatDice(entry.dice);
-      const average = String(averageRoll(entry.dice));
-      const amount = entry.dice.terms.length === 0 ? average : `${average} (${text})`;
+      let amount: string;
+      if (entry.pool) {
+        amount = formatPool(entry.pool, text);
+      } else {
+        const average = String(averageRoll(entry.dice));
+        amount = entry.dice.terms.length === 0 ? average : `${average} (${text})`;
+      }
       return `${amount} ${capitalize(entry.type)} damage`;
     })
     .join(' plus ');
@@ -178,9 +198,40 @@ interface Stats {
   proficiencyBonus: number;
 }
 
+const EFFECT_ROLL = /\{effect:(\w+)\}/g;
+
+/**
+ * Expands `{effect:attribute}` in rules text into the creature's effect roll for that
+ * attribute (a d20 plus its attribute and proficiency dice), for saves against secondary
+ * effects such as a poisoned bite.
+ */
+function expandEffectRolls(text: string, stats: Stats): string {
+  return text.replace(EFFECT_ROLL, (_match, name: string) => {
+    if (!(ATTRIBUTES as readonly string[]).includes(name)) {
+      throw new Error(`Unknown attribute "${name}" in: ${text}`);
+    }
+    const attribute = name as Attribute;
+    return formatPool(
+      [
+        ...attributeDice(stats.scores[attribute], attribute),
+        ...proficiencyDice(stats.proficiencyBonus),
+      ],
+      'd20',
+    );
+  });
+}
+
 function resolveAbility(spec: AbilitySpec, stats: Stats): MonsterAbility {
+  const ability = resolveAbilityNumbers(spec, stats);
+  return { ...ability, description: expandEffectRolls(ability.description, stats) };
+}
+
+function resolveAbilityNumbers(spec: AbilitySpec, stats: Stats): MonsterAbility {
   const base = { id: slug(spec.name), name: spec.name, ...(spec.usage && { usage: spec.usage }) };
-  const modifierOf = (attribute: Attribute) => attributeModifier(stats.scores[attribute]);
+  const effectPool = (attribute: Attribute): PoolDie[] => [
+    ...attributeDice(stats.scores[attribute], attribute),
+    ...proficiencyDice(stats.proficiencyBonus),
+  ];
 
   if (spec.kind === 'feature') {
     return { ...base, description: spec.description };
@@ -188,18 +239,20 @@ function resolveAbility(spec: AbilitySpec, stats: Stats): MonsterAbility {
 
   if (spec.kind === 'attack') {
     const attribute = spec.attribute ?? (spec.attack === 'ranged' ? 'agility' : 'might');
-    const modifier = modifierOf(attribute);
-    const bonus = modifier + stats.proficiencyBonus;
-    const damage = spec.damage.map((entry, index) => toDamage(entry, index === 0 ? modifier : 0));
+    const pool = effectPool(attribute);
+    const attributePool = attributeDice(stats.scores[attribute], attribute);
+    const damage = spec.damage.map((entry, index) =>
+      toDamage(entry, index === 0 ? attributePool : []),
+    );
     const extra = spec.extra === undefined ? '' : ` ${spec.extra}`;
     return {
       ...base,
       description:
-        `${ATTACK_LABELS[spec.attack]} Attack Roll: ${formatModifier(bonus)}, ` +
+        `${ATTACK_LABELS[spec.attack]} Attack: ${formatPool(pool, 'd20')}, ` +
         `${describeReach(spec)} Hit: ${describeDamage(damage)}.${extra}`,
       attack: {
         kind: spec.attack,
-        bonus,
+        pool,
         ...(spec.reach !== undefined && { reach: spec.reach }),
         ...(spec.range && { range: spec.range }),
         damage,
@@ -207,18 +260,23 @@ function resolveAbility(spec: AbilitySpec, stats: Stats): MonsterAbility {
     };
   }
 
-  const dc = 8 + stats.proficiencyBonus + modifierOf(spec.dcAttribute);
-  const damage = spec.damage?.map((entry) => toDamage(entry, 0));
+  const pool = effectPool(spec.dcAttribute);
+  const damage = spec.damage?.map((entry) => toDamage(entry));
   const failureParts = [damage ? `${describeDamage(damage)}.` : '', spec.failure ?? ''];
   const success = spec.success ?? (damage ? 'Half damage.' : '');
   return {
     ...base,
     description:
-      `${ATTRIBUTE_NAMES[spec.save]} Saving Throw: DC ${String(dc)}, ${spec.target}. ` +
+      `${ATTRIBUTE_NAMES[spec.save]} Saving Throw against ${formatPool(pool, 'd20')}, ` +
+      `${spec.target}. ` +
       `Failure: ${failureParts.filter((part) => part !== '').join(' ')}` +
       (success === '' ? '' : ` Success: ${success}`),
-    savingThrow: { attribute: spec.save, dc, ...(damage && { damage }) },
+    savingThrow: { attribute: spec.save, pool, ...(damage && { damage }) },
   };
+}
+
+function soakModifiers(item: ItemDefinition): RollModifier[] {
+  return (item.modifiers ?? []).filter((modifier) => modifier.kind === 'soak');
 }
 
 function hitPoints(hitDice: string): { average: number; formula: DiceExpression } {
@@ -238,7 +296,7 @@ export function monster(id: string, input: MonsterInput): MonsterStatBlock {
     ? Object.fromEntries(
         ATTRIBUTES.filter((attribute) => input.saves?.includes(attribute)).map((attribute) => [
           attribute,
-          modifierOf(attribute) + proficiencyBonus,
+          [...attributeDice(scores[attribute], attribute), ...proficiencyDice(proficiencyBonus)],
         ]),
       )
     : undefined;
@@ -252,7 +310,16 @@ export function monster(id: string, input: MonsterInput): MonsterStatBlock {
       )
     : undefined;
   const perception = skills?.perception ?? modifierOf('wisdom');
-  const initiative = modifierOf('agility');
+  const worn = (input.worn ?? []).map((itemId) => {
+    const item = findItem(itemId);
+    if (item === undefined) {
+      throw new Error(`${input.name} wears unknown item ${itemId}`);
+    }
+    return item;
+  });
+  const defense =
+    worn.length > 0 ? equipmentDice(worn, 'defense') : naturalDefense(input.armorClass ?? 10);
+  const soak = [...(input.soak ?? []), ...worn.flatMap(soakModifiers)];
 
   return {
     id,
@@ -263,8 +330,9 @@ export function monster(id: string, input: MonsterInput): MonsterStatBlock {
     creatureType: input.creatureType,
     ...(input.tags && { tags: input.tags }),
     alignment: input.alignment,
-    armorClass: input.armorClass,
-    initiative: { modifier: initiative, score: 10 + initiative },
+    defense,
+    soak,
+    initiative: attributeDice(scores.agility, 'agility'),
     hitPoints: hitPoints(input.hitDice),
     speed: input.speed,
     attributeScores: scores,
@@ -274,6 +342,7 @@ export function monster(id: string, input: MonsterInput): MonsterStatBlock {
     ...(input.resistances && { resistances: input.resistances }),
     ...(input.damageImmunities && { damageImmunities: input.damageImmunities }),
     ...(input.conditionImmunities && { conditionImmunities: input.conditionImmunities }),
+    ...(input.worn && { gear: input.worn }),
     senses: input.senses ?? {},
     passivePerception: 10 + perception,
     languages: input.languages ?? [],

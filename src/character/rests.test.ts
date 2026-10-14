@@ -84,8 +84,9 @@ describe('long rest', () => {
   });
 
   it('lets a Sanity save recover one level of Madness', () => {
-    const recovered = longRest(weary(), { lodging: lodging('hotel'), rng: HIGH });
-    expect(recovered.madnessRecovery).toEqual({ natural: 20, total: 23, success: true });
+    const recovered = longRest(weary({ exhaustion: 0 }), { lodging: lodging('hotel'), rng: HIGH });
+    // d20 (20) + proficiency d6 (6) − Madness 2d4 (8).
+    expect(recovered.madnessRecovery).toEqual({ natural: 20, total: 18, success: true });
     expect(recovered.character.madness).toBe(1);
 
     const relapsed = longRest(weary(), { lodging: lodging('lodging-house'), rng: LOW });

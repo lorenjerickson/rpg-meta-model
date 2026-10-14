@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ATTRIBUTES } from '../core/attributes';
+import { poolDie } from '../core/dicePool';
 import {
   POINT_BUY_BUDGET,
   STANDARD_ARRAY,
@@ -9,9 +10,8 @@ import {
 } from './attributeGeneration';
 import {
   characterActions,
-  characterOperatorAttackBonus,
-  characterOperatorDc,
-  characterProfessionDc,
+  characterOperatorPool,
+  characterProfessionPool,
   characterProficiencyBonus,
   hitDiceRemaining,
   passivePerception,
@@ -162,16 +162,21 @@ describe('derived character stats', () => {
     expect(passivePerception(scholar)).toBe(14);
   });
 
-  it('computes operator DCs per discipline, with proficiency and attribute', () => {
-    expect(characterOperatorDc(scholar, 'aetherics')).toBe(14);
-    expect(characterOperatorDc(scholar, 'galvanism')).toBe(11);
-    expect(characterOperatorDc(scholar, 'mesmerism')).toBe(8);
-    expect(characterOperatorAttackBonus(scholar, 'aetherics')).toBe(6);
+  it('builds operator rolls per discipline from attribute and proficiency dice', () => {
+    expect(characterOperatorPool(scholar, 'aetherics')).toEqual([
+      poolDie(1, 6, 'Intellect'),
+      poolDie(1, 6, 'Proficiency'),
+    ]);
+    expect(characterOperatorPool(scholar, 'galvanism')).toEqual([poolDie(1, 6, 'Intellect')]);
+    expect(characterOperatorPool(scholar, 'mesmerism')).toEqual([]);
   });
 
-  it('computes the profession DC from the best primary attribute', () => {
-    expect(characterProfessionDc(scholar, 'scholar')).toBe(14);
-    expect(() => characterProfessionDc(scholar, 'alchemist')).toThrow(/Unknown profession/);
+  it('builds the Profession roll from the best primary attribute', () => {
+    expect(characterProfessionPool(scholar, 'scholar')).toEqual([
+      poolDie(1, 6, 'Intellect'),
+      poolDie(1, 6, 'Proficiency'),
+    ]);
+    expect(() => characterProfessionPool(scholar, 'alchemist')).toThrow(/Unknown profession/);
   });
 
   it('collects actions from the profession and specialization path', () => {

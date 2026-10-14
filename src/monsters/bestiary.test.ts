@@ -1,11 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { attributeModifier } from '../core/attributes';
 import { CREATURE_TYPES } from '../core/creatures';
 import { averageRoll } from '../core/dice';
 import { MONSTERS, findMonster } from './catalog';
 import { challengeRatingInfo } from './challenge';
 import { rateEncounter } from './encounters';
-import { MONSTER_ORIGINS, monsterProficiencyBonus, monsterXp } from './statBlock';
+import { poolDie } from '../core/dicePool';
+import { findItem } from '../equipment/catalog';
+import { slotConflicts } from '../equipment/protection';
+import {
+  MONSTER_ORIGINS,
+  monsterDefensePool,
+  monsterSavePool,
+  monsterSoakPool,
+  monsterXp,
+} from './statBlock';
 
 function monster(id: string) {
   const found = findMonster(id);
@@ -100,34 +108,79 @@ describe('bestiary', () => {
   });
 });
 
-describe('generated stat-block numbers', () => {
-  it('derives attack bonuses and damage from attributes and proficiency', () => {
-    const wolf = monster('wolf');
-    const bite = wolf.actions.find((entry) => entry.id === 'bite');
-    expect(bite?.attack?.bonus).toBe(attributeModifier(14) + monsterProficiencyBonus(wolf));
+describe('generated stat-block dice', () => {
+  it('builds attacks from attribute and proficiency dice', () => {
+    const bite = monster('wolf').actions.find((entry) => entry.id === 'bite');
+    expect(bite?.attack?.pool).toEqual([poolDie(1, 4, 'Might'), poolDie(1, 4, 'Proficiency')]);
     expect(bite?.description).toBe(
-      'Melee Attack Roll: +4, reach 5 ft. Hit: 5 (1d6 + 2) Piercing damage. If the target is ' +
-        'Medium or smaller, it has the Prone condition.',
+      'Melee Attack: d20 + d4 (Might) + d4 (Proficiency), reach 5 ft. Hit: 1d6 + d4 (Might) ' +
+        'Piercing damage. If the target is Medium or smaller, it has the Prone condition.',
     );
   });
 
-  it('derives save DCs and describes failure and success', () => {
-    const hound = monster('incendiary-hound');
-    const breath = hound.actions.find((entry) => entry.id === 'naphtha-breath');
-    expect(breath?.savingThrow).toMatchObject({ attribute: 'agility', dc: 12 });
+  it('contests saving throws with an effect roll', () => {
+    const breath = monster('incendiary-hound').actions.find(
+      (entry) => entry.id === 'naphtha-breath',
+    );
+    expect(breath?.savingThrow).toMatchObject({
+      attribute: 'agility',
+      pool: [poolDie(1, 4, 'Hardiness'), poolDie(1, 4, 'Proficiency')],
+    });
     expect(breath?.description).toBe(
-      'Agility Saving Throw: DC 12, each creature in a 15-foot Cone. Failure: 17 (5d6) Fire ' +
-        'damage. Success: Half damage.',
+      'Agility Saving Throw against d20 + d4 (Hardiness) + d4 (Proficiency), each creature in ' +
+        'a 15-foot Cone. Failure: 17 (5d6) Fire damage. Success: Half damage.',
     );
     expect(breath?.usage).toEqual({ kind: 'recharge', minimum: 5 });
   });
 
-  it('derives initiative, passive Perception and saving throws', () => {
+  it('rolls natural armour, initiative and saving throw dice', () => {
     const progenitor = monster('abyssal-progenitor');
-    expect(progenitor.initiative).toEqual({ modifier: -1, score: 9 });
+    expect(progenitor.defense).toEqual([
+      poolDie(1, 20, 'Natural armour'),
+      poolDie(1, 6, 'Tough hide'),
+    ]);
+    expect(progenitor.initiative).toEqual([poolDie(1, 2, 'Agility', -1)]);
     expect(progenitor.passivePerception).toBe(10 + 2 + 2 * 4);
-    expect(progenitor.savingThrows).toEqual({ hardiness: 6, intellect: 8, wisdom: 6, sanity: 9 });
+    expect(progenitor.savingThrows?.sanity).toEqual([
+      poolDie(1, 10, 'Sanity'),
+      poolDie(1, 8, 'Proficiency'),
+    ]);
+    expect(monsterSavePool(progenitor, 'might')).toEqual([poolDie(1, 10, 'Might')]);
     expect(progenitor.legendaryActions?.usesInLair).toBe(4);
+  });
+
+  it('dresses people in catalog clothing and armour', () => {
+    const cultist = monster('cultist');
+    expect(cultist.defense).toEqual([
+      poolDie(4, 2, 'Work Clothes'),
+      poolDie(1, 2, 'Flat Cap'),
+      poolDie(1, 4, 'Work Boots'),
+    ]);
+    expect(cultist.gear).toEqual(['work-clothes', 'flat-cap', 'work-boots']);
+    const veteran = monster('veteran-soldier');
+    expect(monsterSoakPool(veteran, 'piercing')).toEqual([poolDie(1, 4, 'Soak')]);
+    expect(monsterSoakPool(veteran, 'cold')).toEqual([poolDie(1, 4, 'Soak')]);
+    for (const entry of MONSTERS.filter((block) => block.gear)) {
+      const items = (entry.gear ?? [])
+        .map((id) => findItem(id))
+        .filter((item) => item !== undefined);
+      expect(slotConflicts(items), entry.id).toEqual([]);
+    }
+  });
+
+  it('soaks with shells and plating, and applies conditions', () => {
+    const juggernaut = monster('steam-juggernaut');
+    expect(monsterSoakPool(juggernaut, 'bludgeoning')).toEqual([poolDie(2, 6, 'Soak')]);
+    expect(monsterDefensePool(juggernaut, 'melee', ['restrained'])).toContainEqual(
+      poolDie(1, 6, 'Restrained', -1),
+    );
+  });
+
+  it('contests every save against a creature with an effect roll, not a fixed DC', () => {
+    const text = JSON.stringify(MONSTERS);
+    expect(text).not.toMatch(/DC \d+ [A-Z][a-z]+ saving throw/);
+    expect(text).not.toContain('{effect:');
+    expect(text).toContain('Hardiness saving throw against d20 +');
   });
 
   it('feeds encounter building', () => {

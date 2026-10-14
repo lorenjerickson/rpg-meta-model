@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { dice } from '../core/dice';
-import { armorSpeedPenalty, calculateArmorClass, type ArmorDefinition } from './armor';
+import { poolDie } from '../core/dicePool';
+import { armorSpeedPenalty, type ArmorDefinition } from './armor';
 import { carryingCapacity, dragLiftPushCapacity } from './carrying';
+import { findItem } from './catalog';
+import type { ItemDefinition } from './items';
+import { equipmentDice, slotConflicts } from './protection';
 import {
   isProficientWithWeapon,
   weaponAttackAttribute,
@@ -18,37 +22,6 @@ const modifiers = {
   charisma: -1,
   fortune: 0,
   sanity: 0,
-};
-
-const halfPlate: ArmorDefinition = {
-  id: 'half-plate',
-  name: 'Half Plate Armor',
-  category: 'armor',
-  weightLb: 40,
-  armorCategory: 'medium',
-  armorClass: { base: 15, agilityCap: 2 },
-  stealthDisadvantage: true,
-};
-
-const plate: ArmorDefinition = {
-  id: 'plate',
-  name: 'Plate Armor',
-  category: 'armor',
-  weightLb: 65,
-  armorCategory: 'heavy',
-  armorClass: { base: 18, agilityCap: 0 },
-  mightRequirement: 15,
-  stealthDisadvantage: true,
-};
-
-const shield: ArmorDefinition = {
-  id: 'shield',
-  name: 'Shield',
-  category: 'armor',
-  weightLb: 6,
-  armorCategory: 'shield',
-  armorClass: { base: 2, agilityCap: 0 },
-  stealthDisadvantage: false,
 };
 
 const rapier: WeaponDefinition = {
@@ -75,39 +48,75 @@ const glaive: WeaponDefinition = {
   mastery: 'graze',
 };
 
-describe('armor class', () => {
-  it('uses 10 + Agility unarmored, with optional Unarmored Defense', () => {
-    expect(calculateArmorClass({ attributeModifiers: modifiers })).toBe(13);
-    expect(
-      calculateArmorClass({ attributeModifiers: modifiers, unarmoredDefenseAttribute: 'wisdom' }),
-    ).toBe(15);
+function item(id: string): ItemDefinition {
+  const found = findItem(id);
+  if (found === undefined) {
+    throw new Error(`Missing ${id}`);
+  }
+  return found;
+}
+
+describe('protective equipment', () => {
+  const outfit = ['bowler-hat', 'work-clothes', 'leather-gloves', 'work-boots'].map(item);
+
+  it('rolls a die for every piece worn', () => {
+    expect(equipmentDice(outfit, 'defense')).toEqual([
+      poolDie(1, 2, 'Bowler Hat'),
+      poolDie(4, 2, 'Work Clothes'),
+      poolDie(1, 2, 'Leather Gloves'),
+      poolDie(1, 4, 'Work Boots'),
+    ]);
   });
 
-  it('caps Agility for medium and ignores it for heavy armor', () => {
-    expect(calculateArmorClass({ attributeModifiers: modifiers, armor: halfPlate })).toBe(17);
-    expect(calculateArmorClass({ attributeModifiers: modifiers, armor: plate, shield })).toBe(20);
+  it('soaks general damage everywhere and typed damage only of its type', () => {
+    const worn = [item('leather-duster'), item('leather-gloves')];
+    expect(equipmentDice(worn, 'soak', { damageType: 'slashing' })).toEqual([
+      poolDie(1, 2, 'Leather Duster'),
+    ]);
+    expect(equipmentDice(worn, 'soak', { damageType: 'cold' })).toEqual([
+      poolDie(1, 2, 'Leather Duster'),
+      poolDie(1, 4, 'Leather Duster'),
+    ]);
+    expect(equipmentDice(worn, 'soak', { damageType: 'fire' })).toEqual([
+      poolDie(1, 2, 'Leather Duster'),
+      poolDie(1, 2, 'Leather Gloves'),
+    ]);
   });
 
-  it('adds quality and flat bonuses', () => {
-    const finePlate: ArmorDefinition = {
-      ...plate,
-      qualityBonus: 1,
-    };
-    expect(calculateArmorClass({ attributeModifiers: modifiers, armor: finePlate, bonus: 1 })).toBe(
-      20,
-    );
+  it('finds pieces that share a slot', () => {
+    expect(slotConflicts(outfit)).toEqual([]);
+    expect(slotConflicts([item('work-clothes'), item('cavalry-cuirass')])).toEqual(['chest']);
   });
 
-  it('rejects a shield worn as armor', () => {
-    expect(() => calculateArmorClass({ attributeModifiers: modifiers, armor: shield })).toThrow(
-      /is a shield/,
+  it('counts held shields without a slot', () => {
+    expect(equipmentDice([item('trench-shield')], 'defense')).toEqual([
+      poolDie(1, 8, 'Trench Shield'),
+    ]);
+  });
+
+  it("counts a weapon's attack dice only for attacks made with it", () => {
+    const rifle = item('bolt-action-rifle');
+    const sabre = item('cavalry-sabre');
+    const sight = item('telescopic-sight');
+    const equipped = [rifle, sabre, sight];
+    expect(equipmentDice(equipped, 'attack', { attack: 'ranged' }, rifle)).toEqual([
+      poolDie(1, 4, 'Bolt-Action Rifle'),
+      poolDie(1, 6, 'Telescopic Sight'),
+    ]);
+    expect(equipmentDice(equipped, 'attack', { attack: 'melee' }, sabre)).toEqual([]);
+    expect(equipmentDice(equipped, 'defense', { attack: 'melee' })).toEqual([
+      poolDie(1, 4, 'Cavalry Sabre'),
+    ]);
+    expect(equipmentDice([item('musket')], 'attack', { attack: 'ranged' }, item('musket'))).toEqual(
+      [poolDie(1, 4, 'Musket', -1)],
     );
   });
 
   it('slows wearers who lack the Might requirement', () => {
-    expect(armorSpeedPenalty(plate, 14)).toBe(10);
-    expect(armorSpeedPenalty(plate, 15)).toBe(0);
-    expect(armorSpeedPenalty(halfPlate, 8)).toBe(0);
+    const suit = item('boilerplate-suit') as ArmorDefinition;
+    expect(armorSpeedPenalty(suit, 14)).toBe(10);
+    expect(armorSpeedPenalty(suit, 15)).toBe(0);
+    expect(armorSpeedPenalty(item('mail-vest') as ArmorDefinition, 8)).toBe(0);
   });
 });
 

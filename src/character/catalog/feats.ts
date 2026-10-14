@@ -27,7 +27,7 @@ export const FEATS: readonly FeatDefinition[] = [
     category: 'origin',
     repeatable: false,
     benefits: [
-      benefit('Initiative Proficiency', 'Add your Proficiency Bonus to Initiative rolls.'),
+      benefit('Initiative Proficiency', 'Add your proficiency dice to Initiative rolls.'),
       benefit(
         'Initiative Swap',
         'Immediately after you roll Initiative, you can swap your Initiative with one willing ' +
@@ -303,7 +303,7 @@ export const FEATS: readonly FeatDefinition[] = [
     category: 'fighting-style',
     repeatable: false,
     prerequisite: { weaponCategory: 'martial' },
-    benefits: [benefit('Marksmanship', 'You gain a +2 bonus to ranged weapon attack rolls.')],
+    benefits: [benefit('Marksmanship', 'Add 1d4 to your ranged weapon attack rolls.')],
   }),
   feat('defense', {
     name: 'Defense',
@@ -311,7 +311,7 @@ export const FEATS: readonly FeatDefinition[] = [
     category: 'fighting-style',
     repeatable: false,
     prerequisite: { weaponCategory: 'martial' },
-    benefits: [benefit('Defense', 'While wearing armour, you gain a +1 bonus to AC.')],
+    benefits: [benefit('Defense', 'While wearing armour, add 1d2 to your defense rolls.')],
   }),
   feat('heavy-weapon-fighting', {
     name: 'Heavy Weapon Fighting',

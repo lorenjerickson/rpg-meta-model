@@ -1,4 +1,4 @@
-export const DIE_SIZES = [4, 6, 8, 10, 12, 20, 100] as const;
+export const DIE_SIZES = [2, 4, 6, 8, 10, 12, 20, 100] as const;
 
 export type DieSize = (typeof DIE_SIZES)[number];
 

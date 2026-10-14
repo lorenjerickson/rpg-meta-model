@@ -1,3 +1,4 @@
+import type { DicePool } from '../core/dicePool';
 import type { ItemBase } from './items';
 
 export interface MountDefinition extends ItemBase {
@@ -37,7 +38,8 @@ export interface VehicleDefinition extends ItemBase {
   crew: number;
   passengers: number;
   cargoTons: number;
-  armorClass?: number;
+  /** Dice rolled to defend against attacks on the vehicle. */
+  defense?: DicePool;
   hitPoints?: number;
   /** Damage below this from a single hit is ignored. */
   damageThreshold?: number;

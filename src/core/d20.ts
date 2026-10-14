@@ -52,28 +52,13 @@ export function passiveScore(modifier: number, mode: RollMode = 'normal'): numbe
 export interface D20TestOutcome {
   total: number;
   success: boolean;
-  /** Only attack rolls can be critical (a natural 20). */
-  critical: boolean;
 }
 
 /**
- * Resolves a D20 Test against a DC or AC. A natural 20 always hits and a natural 1 always
- * misses, but only for attack rolls; attribute checks and saving throws just compare totals.
+ * Resolves a d20 roll against a fixed DC, such as an ability check or a save against a hazard.
+ * Attacks, and saves against creatures' effects, are contested instead: see `resolveContest`.
  */
-export function resolveD20Test(
-  test: D20Test,
-  natural: number,
-  modifier: number,
-  target: number,
-): D20TestOutcome {
+export function resolveD20Test(natural: number, modifier: number, target: number): D20TestOutcome {
   const total = natural + modifier;
-  if (test === 'attack-roll') {
-    if (natural === 20) {
-      return { total, success: true, critical: true };
-    }
-    if (natural === 1) {
-      return { total, success: false, critical: false };
-    }
-  }
-  return { total, success: total >= target, critical: false };
+  return { total, success: total >= target };
 }

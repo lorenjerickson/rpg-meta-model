@@ -2,6 +2,7 @@ import type { RestType } from '../core/actions';
 import { guineas, lsd, type Money } from '../core/currency';
 import { rollD20, type RollMode } from '../core/d20';
 import { rollDie, type Rng } from '../core/dice';
+import { rollPool } from '../core/dicePool';
 import { MADNESS_RECOVERY_DC } from '../core/conditions';
 import { NO_DEATH_SAVES } from '../combat/deathSaves';
 import { heal } from '../combat/hitPoints';
@@ -10,12 +11,8 @@ import { PROFESSIONS } from '../professions/catalog';
 import type { HitDie } from '../professions/profession';
 import { recharge } from '../science/apparatus';
 import type { Character, InventoryEntry } from './character';
-import {
-  characterAttributeModifier,
-  hitDiceTotal,
-  savingThrowModifier,
-  type ProfessionCatalog,
-} from './derived';
+import { characterSavePool } from './combat';
+import { characterAttributeModifier, hitDiceTotal, type ProfessionCatalog } from './derived';
 
 export interface LodgingDefinition {
   id: string;
@@ -249,7 +246,8 @@ export function longRest(character: Character, options: LongRestOptions): RestRe
   let madnessRecovery: MadnessRecovery | null = null;
   if (madness > 0) {
     const { natural } = rollD20(lodging.madnessSave, rng);
-    const total = natural + savingThrowModifier(character, 'sanity');
+    const total =
+      natural + rollPool(characterSavePool({ ...character, exhaustion }, 'sanity'), rng).total;
     madnessRecovery = { natural, total, success: total >= MADNESS_RECOVERY_DC };
     if (madnessRecovery.success) {
       madness -= 1;

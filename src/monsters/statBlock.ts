@@ -1,20 +1,25 @@
+import { attributeDice, type DicePool, type PoolDie } from '../core/dicePool';
 import type { Attribute, AttributeScores } from '../core/attributes';
-import type { Condition } from '../core/conditions';
+import { conditionDice, type Condition } from '../core/conditions';
 import type { Alignment, CreatureType, Senses, Size, Speed } from '../core/creatures';
 import type { DamageType } from '../core/damage';
 import type { DiceExpression } from '../core/dice';
 import type { Feature, Usage } from '../core/features';
+import { applicableDice, type RollModifier } from '../core/rollModifiers';
 import type { Skill } from '../core/skills';
 import { challengeRatingInfo } from './challenge';
 
 export interface MonsterDamage {
   dice: DiceExpression;
+  /** Dice added to the damage, such as the attack attribute's dice. */
+  pool?: DicePool;
   type: DamageType;
 }
 
 export interface MonsterAttack {
   kind: 'melee' | 'ranged' | 'melee-or-ranged';
-  bonus: number;
+  /** Dice rolled with a d20 for the attack. */
+  pool: DicePool;
   /** Melee reach in feet. */
   reach?: number;
   /** Ranged normal and long range in feet. */
@@ -24,7 +29,8 @@ export interface MonsterAttack {
 
 export interface MonsterSavingThrowEffect {
   attribute: Attribute;
-  dc: number;
+  /** Dice rolled with a d20 for the effect, contested by the target's saving throw. */
+  pool: DicePool;
   damage?: readonly MonsterDamage[];
 }
 
@@ -70,19 +76,23 @@ export interface MonsterStatBlock {
   /** Descriptive tags such as "Cultist" or "Soldier". */
   tags?: readonly string[];
   alignment: Alignment;
-  armorClass: number;
-  initiative: { modifier: number; score: number };
+  /** Dice rolled to defend: natural armour (a d20 and more), or what the creature wears. */
+  defense: DicePool;
+  /** Soak dice from hide, shell, plating or worn gear. */
+  soak: readonly RollModifier[];
+  /** Dice rolled with a d20 for Initiative. */
+  initiative: DicePool;
   hitPoints: { average: number; formula: DiceExpression };
   speed: Speed;
   attributeScores: AttributeScores;
-  /** Saving throw bonuses where they differ from the attribute modifier. */
-  savingThrows?: Partial<Record<Attribute, number>>;
+  /** Saving throw pools for attributes it is proficient in. */
+  savingThrows?: Partial<Record<Attribute, DicePool>>;
   skills?: Partial<Record<Skill, number>>;
   vulnerabilities?: readonly DamageType[];
   resistances?: readonly DamageType[];
   damageImmunities?: readonly DamageType[];
   conditionImmunities?: readonly Condition[];
-  /** Item ids of gear the monster carries and can drop. */
+  /** Item ids of gear the monster wears or carries and can drop. */
   gear?: readonly string[];
   senses: Senses;
   passivePerception: number;
@@ -108,4 +118,38 @@ export function monsterXp(monster: MonsterStatBlock, inLair = false): number {
     return monster.xpInLair;
   }
   return challengeRatingInfo(monster.challengeRating).xp;
+}
+
+/** The dice a monster rolls to defend, with any conditions it has. */
+export function monsterDefensePool(
+  monster: MonsterStatBlock,
+  attack: 'melee' | 'ranged',
+  conditions: readonly Condition[] = [],
+): PoolDie[] {
+  return [...monster.defense, ...conditionDice(conditions, 'defense', { attack })];
+}
+
+/** The dice a monster rolls to soak damage of a type, with any conditions it has. */
+export function monsterSoakPool(
+  monster: MonsterStatBlock,
+  damageType: DamageType,
+  conditions: readonly Condition[] = [],
+): PoolDie[] {
+  return [
+    ...applicableDice(monster.soak, 'Soak', 'soak', { damageType }),
+    ...conditionDice(conditions, 'soak', { damageType }),
+  ];
+}
+
+/** The dice a monster adds to a saving throw's d20, with any conditions it has. */
+export function monsterSavePool(
+  monster: MonsterStatBlock,
+  attribute: Attribute,
+  conditions: readonly Condition[] = [],
+): PoolDie[] {
+  return [
+    ...(monster.savingThrows?.[attribute] ??
+      attributeDice(monster.attributeScores[attribute], attribute)),
+    ...conditionDice(conditions, 'save', { attribute }),
+  ];
 }

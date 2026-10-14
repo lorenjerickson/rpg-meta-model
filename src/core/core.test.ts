@@ -3,11 +3,12 @@ import { attributeModifier, formatModifier } from './attributes';
 import {
   CONDITIONS,
   CONDITION_DEFINITIONS,
+  conditionDice,
   expandConditions,
-  exhaustionD20Penalty,
+  exhaustionDice,
   exhaustionSpeedReduction,
   isLostToMadness,
-  madnessD20Penalty,
+  madnessDice,
 } from './conditions';
 import { COINS, formatMoney, guineas, lsd, parseMoney, toLsd } from './currency';
 import { passiveScore, resolveD20Test, resolveRollMode, rollD20 } from './d20';
@@ -22,7 +23,17 @@ import {
   rollDice,
   type Rng,
 } from './dice';
+import {
+  attributeDice,
+  formatPool,
+  modifierDice,
+  poolAverage,
+  poolDie,
+  proficiencyDice,
+  rollPool,
+} from './dicePool';
 import { proficiencyContribution } from './proficiency';
+import { applicableDice, bonus, penalty } from './rollModifiers';
 import { SKILLS, SKILL_DEFINITIONS } from './skills';
 import { durationInSeconds } from './time';
 
@@ -123,15 +134,55 @@ describe('d20 tests', () => {
     expect(passiveScore(3, 'disadvantage')).toBe(8);
   });
 
-  it('treats natural 20 and 1 specially only for attack rolls', () => {
-    expect(resolveD20Test('attack-roll', 20, -5, 30)).toEqual({
-      total: 15,
-      success: true,
-      critical: true,
-    });
-    expect(resolveD20Test('attack-roll', 1, 20, 10).success).toBe(false);
-    expect(resolveD20Test('saving-throw', 20, -5, 16).success).toBe(false);
-    expect(resolveD20Test('attribute-check', 1, 12, 10).success).toBe(true);
+  it('resolves rolls against a fixed DC, with no special natural 20 or 1', () => {
+    expect(resolveD20Test(12, 3, 15)).toEqual({ total: 15, success: true });
+    expect(resolveD20Test(20, -5, 16)).toEqual({ total: 15, success: false });
+    expect(resolveD20Test(1, 12, 10).success).toBe(true);
+  });
+});
+
+describe('dice pools', () => {
+  it('turns modifiers into dice twice their size', () => {
+    expect(modifierDice(0, 'X')).toEqual([]);
+    expect(modifierDice(1, 'X')).toEqual([poolDie(1, 2, 'X')]);
+    expect(modifierDice(3, 'X')).toEqual([poolDie(1, 6, 'X')]);
+    expect(modifierDice(-2, 'X')).toEqual([poolDie(1, 4, 'X', -1)]);
+    expect(modifierDice(8, 'X')).toEqual([poolDie(1, 12, 'X'), poolDie(1, 4, 'X')]);
+  });
+
+  it('gives attribute and proficiency dice', () => {
+    expect(attributeDice(14, 'agility')).toEqual([poolDie(1, 4, 'Agility')]);
+    expect(attributeDice(8, 'might')).toEqual([poolDie(1, 2, 'Might', -1)]);
+    expect(attributeDice(10, 'wisdom')).toEqual([]);
+    expect(proficiencyDice(2)).toEqual([poolDie(1, 4, 'Proficiency')]);
+    expect(proficiencyDice(6)).toEqual([poolDie(1, 12, 'Proficiency')]);
+  });
+
+  it('rolls, averages and formats pools', () => {
+    const pool = [poolDie(1, 4, 'Agility'), poolDie(2, 6, 'Armour'), poolDie(1, 6, 'Poisoned', -1)];
+    expect(rollPool(pool, () => 0.999).total).toBe(4 + 12 - 6);
+    expect(poolAverage(pool)).toBe(2.5 + 7 - 3.5);
+    expect(formatPool(pool, 'd20')).toBe('d20 + d4 (Agility) + 2d6 (Armour) − d6 (Poisoned)');
+    expect(formatPool([poolDie(1, 2, 'Might', -1)])).toBe('−d2 (Might)');
+    expect(formatPool([])).toBe('0');
+  });
+
+  it('applies modifiers only to matching rolls', () => {
+    const modifiers = [
+      bonus('defense', 1, 8),
+      bonus('defense', 1, 4, { attack: 'melee' }),
+      bonus('soak', 1, 6, { damageTypes: ['fire'] }),
+      penalty('save', 1, 6, { attributes: ['agility'] }),
+    ];
+    expect(applicableDice(modifiers, 'Cloak', 'defense', { attack: 'ranged' })).toEqual([
+      poolDie(1, 8, 'Cloak'),
+    ]);
+    expect(applicableDice(modifiers, 'Cloak', 'defense', { attack: 'melee' })).toHaveLength(2);
+    expect(applicableDice(modifiers, 'Cloak', 'soak', { damageType: 'cold' })).toEqual([]);
+    expect(applicableDice(modifiers, 'Cloak', 'soak', { damageType: 'fire' })).toHaveLength(1);
+    expect(applicableDice(modifiers, 'Cloak', 'save', { attribute: 'agility' })).toEqual([
+      poolDie(1, 6, 'Cloak', -1),
+    ]);
   });
 });
 
@@ -195,21 +246,44 @@ describe('conditions', () => {
     }
   });
 
-  it('penalises Intellect, Wisdom and Sanity tests with madness', () => {
-    expect(madnessD20Penalty(0, 'sanity')).toBe(0);
-    expect(madnessD20Penalty(2, 'sanity')).toBe(-4);
-    expect(madnessD20Penalty(3, 'intellect')).toBe(-6);
-    expect(madnessD20Penalty(3, 'might')).toBe(0);
+  it('adds and subtracts dice instead of Advantage and Disadvantage', () => {
+    expect(conditionDice(['poisoned'], 'attack')).toEqual([poolDie(1, 6, 'Poisoned', -1)]);
+    expect(conditionDice(['poisoned'], 'defense')).toEqual([]);
+    expect(conditionDice(['unseen'], 'defense')).toEqual([poolDie(1, 6, 'Unseen')]);
+    expect(conditionDice(['restrained'], 'save', { attribute: 'agility' })).toHaveLength(1);
+    expect(conditionDice(['restrained'], 'save', { attribute: 'wisdom' })).toEqual([]);
+  });
+
+  it('applies prone defense dice by attack type and includes implied conditions', () => {
+    expect(conditionDice(['prone'], 'defense', { attack: 'melee' })).toEqual([
+      poolDie(1, 6, 'Prone', -1),
+    ]);
+    expect(conditionDice(['prone'], 'defense', { attack: 'ranged' })).toEqual([
+      poolDie(1, 6, 'Prone'),
+    ]);
+    expect(conditionDice(['unconscious'], 'defense', { attack: 'melee' })).toEqual([
+      poolDie(1, 10, 'Unconscious', -1),
+      poolDie(1, 6, 'Prone', -1),
+    ]);
+  });
+
+  it('penalises Intellect, Wisdom and Sanity rolls with madness', () => {
+    expect(madnessDice(0, 'save', 'sanity')).toEqual([]);
+    expect(madnessDice(2, 'save', 'sanity')).toEqual([poolDie(2, 4, 'Madness', -1)]);
+    expect(madnessDice(3, 'check', 'intellect')).toEqual([poolDie(3, 4, 'Madness', -1)]);
+    expect(madnessDice(3, 'save', 'might')).toEqual([]);
+    expect(madnessDice(3, 'attack', 'sanity')).toEqual([]);
     expect(isLostToMadness(5)).toBe(false);
     expect(isLostToMadness(6)).toBe(true);
-    expect(() => madnessD20Penalty(7, 'wisdom')).toThrow(RangeError);
+    expect(() => madnessDice(7, 'save', 'wisdom')).toThrow(RangeError);
   });
 
   it('scales exhaustion penalties by level', () => {
-    expect(exhaustionD20Penalty(0)).toBe(0);
-    expect(exhaustionD20Penalty(3)).toBe(-6);
+    expect(exhaustionDice(0, 'attack')).toEqual([]);
+    expect(exhaustionDice(3, 'attack')).toEqual([poolDie(3, 4, 'Exhaustion', -1)]);
+    expect(exhaustionDice(3, 'defense')).toEqual([]);
     expect(exhaustionSpeedReduction(4)).toBe(20);
-    expect(() => exhaustionD20Penalty(7)).toThrow(RangeError);
+    expect(() => exhaustionDice(7, 'save')).toThrow(RangeError);
   });
 });
 

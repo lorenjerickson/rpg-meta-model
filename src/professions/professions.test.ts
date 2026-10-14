@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { ATTRIBUTES } from '../core/attributes';
 import { HOSPITALITY, PROFESSIONS, SOLDIER, STREET_RAT, findProfession } from './catalog';
-import { meetsProfessionPrerequisite, professionDc } from './profession';
+import { poolDie } from '../core/dicePool';
+import { meetsProfessionPrerequisite, professionPool } from './profession';
 import { RANKS, compareRanks, hasReachedRank, rankForLevel } from './ranks';
 import {
   childSpecializations,
@@ -96,8 +97,11 @@ describe('specialization paths', () => {
 });
 
 describe('profession rules', () => {
-  it('computes the profession DC', () => {
-    expect(professionDc(3, 2)).toBe(13);
+  it('builds the Profession roll from attribute and proficiency dice', () => {
+    expect(professionPool(14, 'might', 3)).toEqual([
+      poolDie(1, 4, 'Might'),
+      poolDie(1, 6, 'Proficiency'),
+    ]);
   });
 
   it('checks prerequisites for a second profession', () => {

@@ -94,7 +94,7 @@ export const SOLDIER: ProfessionDefinition = {
         action(
           'Grenade',
           'Throw a grenade at a point up to 60 feet away. Each creature in a 10-foot-radius ' +
-            'Sphere there makes an Agility saving throw against your Profession DC, taking 3d6 ' +
+            'Sphere there makes an Agility saving throw against your Profession roll, taking 3d6 ' +
             'Piercing damage on a failure or half as much on a success.',
           PB_PER_LONG_REST,
         ),
@@ -115,7 +115,7 @@ export const SOLDIER: ProfessionDefinition = {
           'Detonate',
           'a creature you can see moves within 10 feet of a charge you set',
           'The charge explodes. Each creature within 10 feet of it makes an Agility saving ' +
-            'throw against your Profession DC, taking 6d6 Thunder damage on a failure or half as ' +
+            'throw against your Profession roll, taking 6d6 Thunder damage on a failure or half as ' +
             'much on a success. Objects in the area take double damage.',
         ),
       ],
@@ -129,7 +129,7 @@ export const SOLDIER: ProfessionDefinition = {
           'Barrage',
           'While you can signal an artillery battery, choose a point you can see within 1 mile. ' +
             'Each creature in a 30-foot-radius Sphere there makes an Agility saving throw against ' +
-            'your Profession DC, taking 8d6 Thunder damage on a failure or half as much on a ' +
+            'your Profession roll, taking 8d6 Thunder damage on a failure or half as much on a ' +
             'success.',
           ONCE_PER_LONG_REST,
         ),

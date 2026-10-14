@@ -1,7 +1,9 @@
 import type { Attribute } from '../core/attributes';
 import type { Money } from '../core/currency';
+import type { RollModifier } from '../core/rollModifiers';
 import type { ApparatusDefinition, PreparationDefinition } from '../science/apparatus';
 import type { ArmorDefinition } from './armor';
+import type { EquipmentSlot } from './protection';
 import type { MountDefinition, VehicleDefinition } from './transport';
 import type { WeaponDefinition } from './weapons';
 
@@ -33,11 +35,13 @@ export interface ItemBase {
   cost?: Money;
   description?: string;
   rarity?: Rarity;
+  /** Body slots the item covers when worn. Held items such as weapons and shields have none. */
+  slots?: readonly EquipmentSlot[];
   /**
-   * Bonus from exceptional craftsmanship or engineering, e.g. +1: to attack and damage rolls
-   * for weapons, or to AC for armor.
+   * Dice the item adds to or subtracts from rolls while equipped: defense and soak for
+   * protective wear, attack for weapons and aids such as scopes, and so on.
    */
-  qualityBonus?: number;
+  modifiers?: readonly RollModifier[];
 }
 
 export const TOOL_CATEGORIES = [

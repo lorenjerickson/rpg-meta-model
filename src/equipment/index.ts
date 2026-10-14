@@ -4,3 +4,4 @@ export * from './items';
 export * from './weapons';
 export * from './transport';
 export * from './catalog';
+export * from './protection';

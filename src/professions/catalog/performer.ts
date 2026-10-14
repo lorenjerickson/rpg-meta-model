@@ -63,7 +63,7 @@ export const PERFORMER: ProfessionDefinition = {
         action(
           'Showstopper',
           'Creatures of your choice within 60 feet that can see you make a Wisdom saving throw ' +
-            'against your Profession DC. On a failure, a creature is Incapacitated until the end ' +
+            'against your Profession roll. On a failure, a creature is Incapacitated until the end ' +
             'of your next turn, watching you.',
           ONCE_PER_SHORT_REST,
         ),

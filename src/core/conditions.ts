@@ -1,4 +1,13 @@
 import type { Attribute } from './attributes';
+import { poolDie, type PoolDie } from './dicePool';
+import {
+  applicableDice,
+  bonus as plus,
+  penalty as minus,
+  type RollContext,
+  type RollKind,
+  type RollModifier,
+} from './rollModifiers';
 import { assertIntegerInRange } from './validation';
 
 export const CONDITIONS = [
@@ -29,7 +38,11 @@ export interface ConditionDefinition {
   name: string;
   /** The rules, one effect per entry. */
   effects: readonly string[];
+  /** Dice the condition adds to or subtracts from rolls. */
+  dice: readonly RollModifier[];
 }
+
+const AUTO_FAIL_PHYSICAL_SAVES = 'You automatically fail Might and Agility saving throws.';
 
 export const CONDITION_DEFINITIONS: Readonly<Record<Condition, ConditionDefinition>> = {
   bleeding: {
@@ -39,13 +52,15 @@ export const CONDITION_DEFINITIONS: Readonly<Record<Condition, ConditionDefiniti
       'The condition ends when you regain Hit Points, or when someone within 5 feet takes the ' +
         'Utilize action to bind the wound with a first-aid kit or a DC 10 Wisdom (Medicine) check.',
     ],
+    dice: [],
   },
   blinded: {
     name: 'Blinded',
     effects: [
       "You can't see and automatically fail any ability check that requires sight.",
-      'Attack rolls against you have Advantage, and your attack rolls have Disadvantage.',
+      'Subtract 1d8 from your attack and defense rolls.',
     ],
+    dice: [minus('attack', 1, 8), minus('defense', 1, 8)],
   },
   burning: {
     name: 'Burning',
@@ -54,6 +69,7 @@ export const CONDITION_DEFINITIONS: Readonly<Record<Condition, ConditionDefiniti
       'The condition ends when you or a creature within 5 feet takes an action to put out the ' +
         'flames, or when you are doused or immersed in water.',
     ],
+    dice: [],
   },
   calcified: {
     name: 'Calcified',
@@ -61,68 +77,77 @@ export const CONDITION_DEFINITIONS: Readonly<Record<Condition, ConditionDefiniti
       'Mineral deposits have hardened your flesh to stone. You have the Incapacitated condition, ' +
         "can't move or speak, and are unaware of your surroundings.",
       'Your weight increases tenfold, and you stop ageing.',
-      'Attack rolls against you have Advantage. You automatically fail Might and Agility saving ' +
-        'throws.',
-      'You have Resistance to all damage and Immunity to the Poisoned condition.',
+      'Subtract 1d8 from your defense rolls, and add 2d8 to your soak rolls.',
+      AUTO_FAIL_PHYSICAL_SAVES,
+      'You are immune to the Poisoned condition.',
       'An antidote that dissolves the mineral ends the condition.',
     ],
+    dice: [minus('defense', 1, 8), plus('soak', 2, 8)],
   },
   deafened: {
     name: 'Deafened',
     effects: ["You can't hear and automatically fail any ability check that requires hearing."],
+    dice: [],
   },
   exhaustion: {
     name: 'Exhaustion',
     effects: [
       'This condition is cumulative, from level 1 to 6. You die at level 6.',
-      'Your D20 Tests are reduced by 2 times your Exhaustion level.',
+      'Subtract 1d4 per Exhaustion level from your attack, save, check and Initiative rolls.',
       'Your Speed is reduced by 5 feet times your Exhaustion level.',
       'Finishing a Long Rest removes 1 level.',
     ],
+    dice: [],
   },
   frightened: {
     name: 'Frightened',
     effects: [
-      'You have Disadvantage on ability checks and attack rolls while the source of your fear ' +
-        'is within line of sight.',
+      'While the source of your fear is within line of sight, subtract 1d4 from your attack ' +
+        'rolls and ability checks.',
       "You can't willingly move closer to the source of your fear.",
     ],
+    dice: [minus('attack', 1, 4), minus('check', 1, 4)],
   },
   grappled: {
     name: 'Grappled',
     effects: [
       "Your Speed is 0 and can't increase.",
-      'You have Disadvantage on attack rolls against any target other than the grappler.',
+      'Subtract 1d4 from attack rolls against any target other than the grappler.',
       'The grappler can drag or carry you when it moves, at the cost of extra movement.',
     ],
+    dice: [minus('attack', 1, 4)],
   },
   incapacitated: {
     name: 'Incapacitated',
     effects: [
       "You can't take any action, Bonus Action or Reaction.",
       "Your Concentration is broken, and you can't speak.",
-      'If you are Incapacitated when you roll Initiative, you have Disadvantage on the roll.',
+      'Subtract 1d6 from your Initiative rolls.',
     ],
+    dice: [minus('initiative', 1, 6)],
   },
   intoxicated: {
     name: 'Intoxicated',
     effects: [
       'Gin, absinthe, laudanum or ether has you under its influence.',
-      'You have Disadvantage on attack rolls and ability checks.',
-      'You have Advantage on saving throws to avoid or end the Frightened condition.',
+      'Subtract 1d6 from your attack rolls and ability checks.',
+      'Add 1d6 to saving throws to avoid or end the Frightened condition.',
       'The condition ends after 1 hour, or when you finish a Short or Long Rest.',
     ],
+    dice: [minus('attack', 1, 6), minus('check', 1, 6)],
   },
   madness: {
     name: 'Madness',
     effects: [
       'This condition is cumulative, from level 1 to 6, and is usually gained by failing ' +
         'Sanity saving throws against horrors.',
-      'Your D20 Tests using Intellect, Wisdom or Sanity are reduced by 2 times your Madness level.',
+      'Subtract 1d4 per Madness level from your saves and checks using Intellect, Wisdom or ' +
+        'Sanity.',
       "At level 6 you are lost to madness, and the character leaves the player's control.",
       'Finishing a Long Rest in a safe place removes 1 level if you succeed on a DC 15 Sanity ' +
         'saving throw. Treatment by an alienist gives you Advantage on the save.',
     ],
+    dice: [],
   },
   mesmerised: {
     name: 'Mesmerised',
@@ -130,65 +155,79 @@ export const CONDITION_DEFINITIONS: Readonly<Record<Condition, ConditionDefiniti
       "You can't attack the mesmerist or target it with damaging abilities or harmful effects.",
       'The mesmerist has Advantage on any ability check to interact with you socially.',
     ],
+    dice: [],
   },
   paralyzed: {
     name: 'Paralyzed',
     effects: [
       "You have the Incapacitated condition, and your Speed is 0 and can't increase.",
-      'You automatically fail Might and Agility saving throws.',
-      'Attack rolls against you have Advantage, and any attack that hits you is a Critical Hit ' +
-        'if the attacker is within 5 feet of you.',
+      AUTO_FAIL_PHYSICAL_SAVES,
+      'Subtract 1d10 from your defense rolls. Any hit from within 5 feet of you is a Critical ' +
+        'Hit.',
     ],
+    dice: [minus('defense', 1, 10)],
   },
   poisoned: {
     name: 'Poisoned',
-    effects: ['You have Disadvantage on attack rolls and ability checks.'],
+    effects: ['Subtract 1d6 from your attack rolls and ability checks.'],
+    dice: [minus('attack', 1, 6), minus('check', 1, 6)],
   },
   prone: {
     name: 'Prone',
     effects: [
       'Your only movement options are to crawl, or to spend half your Speed to stand up.',
-      'You have Disadvantage on attack rolls.',
-      'Attack rolls against you have Advantage if the attacker is within 5 feet of you, and ' +
-        'Disadvantage otherwise.',
+      'Subtract 1d6 from your attack rolls.',
+      'Subtract 1d6 from your defense rolls against attackers within 5 feet of you, and add 1d6 ' +
+        'against ranged attacks.',
+    ],
+    dice: [
+      minus('attack', 1, 6),
+      minus('defense', 1, 6, { attack: 'melee' }),
+      plus('defense', 1, 6, { attack: 'ranged' }),
     ],
   },
   restrained: {
     name: 'Restrained',
     effects: [
       "Your Speed is 0 and can't increase.",
-      'Attack rolls against you have Advantage, and your attack rolls have Disadvantage.',
-      'You have Disadvantage on Agility saving throws.',
+      'Subtract 1d6 from your attack rolls, defense rolls and Agility saving throws.',
+    ],
+    dice: [
+      minus('attack', 1, 6),
+      minus('defense', 1, 6),
+      minus('save', 1, 6, { attributes: ['agility'] }),
     ],
   },
   stunned: {
     name: 'Stunned',
     effects: [
       'You have the Incapacitated condition.',
-      'You automatically fail Might and Agility saving throws.',
-      'Attack rolls against you have Advantage.',
+      AUTO_FAIL_PHYSICAL_SAVES,
+      'Subtract 1d8 from your defense rolls.',
     ],
+    dice: [minus('defense', 1, 8)],
   },
   unconscious: {
     name: 'Unconscious',
     effects: [
       'You have the Incapacitated and Prone conditions, and you drop whatever you are holding.',
       "Your Speed is 0 and can't increase.",
-      'You automatically fail Might and Agility saving throws.',
-      'Attack rolls against you have Advantage, and any attack that hits you is a Critical Hit ' +
-        'if the attacker is within 5 feet of you.',
+      AUTO_FAIL_PHYSICAL_SAVES,
+      'Subtract 1d10 from your defense rolls. Any hit from within 5 feet of you is a Critical ' +
+        'Hit.',
       "You're unaware of your surroundings.",
     ],
+    dice: [minus('defense', 1, 10)],
   },
   unseen: {
     name: 'Unseen',
     effects: [
       'Whether hidden, cloaked by a refraction device or lost in darkness, you cannot be seen.',
       'You are not affected by anything that requires its target to be seen.',
-      'You have Advantage on Initiative rolls.',
-      'Attack rolls against you have Disadvantage, and your attack rolls have Advantage, ' +
-        'unless the other creature can somehow see you.',
+      'Add 1d6 to your attack, defense and Initiative rolls against creatures that cannot see ' +
+        'you.',
     ],
+    dice: [plus('attack', 1, 6), plus('defense', 1, 6), plus('initiative', 1, 6)],
   },
 };
 
@@ -212,13 +251,28 @@ export function expandConditions(conditions: Iterable<Condition>): Set<Condition
   return result;
 }
 
+/** The dice a set of conditions (and the conditions they imply) adds to one kind of roll. */
+export function conditionDice(
+  conditions: Iterable<Condition>,
+  kind: RollKind,
+  context: RollContext = {},
+): PoolDie[] {
+  return [...expandConditions(conditions)].flatMap((condition) => {
+    const { name, dice } = CONDITION_DEFINITIONS[condition];
+    return applicableDice(dice, name, kind, context);
+  });
+}
+
 /** Exhaustion is cumulative from 1 to 6; a creature dies at level 6. */
 export const MAX_EXHAUSTION_LEVEL = 6;
 
-/** D20 Tests are reduced by 2 per exhaustion level. */
-export function exhaustionD20Penalty(level: number): number {
+/** The rolls exhaustion penalises. */
+export const EXHAUSTION_ROLLS: readonly RollKind[] = ['attack', 'save', 'check', 'initiative'];
+
+/** Exhaustion subtracts 1d4 per level from attack, save, check and Initiative rolls. */
+export function exhaustionDice(level: number, kind: RollKind): PoolDie[] {
   assertIntegerInRange(level, 0, MAX_EXHAUSTION_LEVEL, 'Exhaustion level');
-  return 0 - 2 * level;
+  return level > 0 && EXHAUSTION_ROLLS.includes(kind) ? [poolDie(level, 4, 'Exhaustion', -1)] : [];
 }
 
 /** Speed is reduced by 5 feet per exhaustion level. */
@@ -234,16 +288,17 @@ export function diesFromExhaustion(level: number): boolean {
 /** Madness is cumulative from 1 to 6; a character is lost to madness at level 6. */
 export const MAX_MADNESS_LEVEL = 6;
 
-/** The attributes whose D20 Tests madness penalises. */
+/** The attributes whose saves and checks madness penalises. */
 export const MADNESS_ATTRIBUTES: readonly Attribute[] = ['intellect', 'wisdom', 'sanity'];
 
 /** DC of the Sanity save to recover one madness level on a Long Rest in a safe place. */
 export const MADNESS_RECOVERY_DC = 15;
 
-/** D20 Tests using Intellect, Wisdom or Sanity are reduced by 2 per madness level. */
-export function madnessD20Penalty(level: number, attribute: Attribute): number {
+/** Madness subtracts 1d4 per level from saves and checks using Intellect, Wisdom or Sanity. */
+export function madnessDice(level: number, kind: RollKind, attribute: Attribute): PoolDie[] {
   assertIntegerInRange(level, 0, MAX_MADNESS_LEVEL, 'Madness level');
-  return MADNESS_ATTRIBUTES.includes(attribute) ? 0 - 2 * level : 0;
+  const applies = (kind === 'save' || kind === 'check') && MADNESS_ATTRIBUTES.includes(attribute);
+  return level > 0 && applies ? [poolDie(level, 4, 'Madness', -1)] : [];
 }
 
 export function isLostToMadness(level: number): boolean {

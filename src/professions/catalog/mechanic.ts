@@ -76,7 +76,7 @@ export const MECHANIC: ProfessionDefinition = {
           'Gadget',
           'Throw a gadget up to 30 feet. Choose smoke (a 10-foot-radius Sphere is Heavily ' +
             'Obscured until the end of your next turn) or flash (each creature within 10 feet of ' +
-            'it makes a Hardiness saving throw against your Profession DC or is Blinded until the ' +
+            'it makes a Hardiness saving throw against your Profession roll or is Blinded until the ' +
             'end of its next turn).',
           PB_PER_LONG_REST,
         ),
@@ -90,8 +90,8 @@ export const MECHANIC: ProfessionDefinition = {
       actions: [
         bonusAction(
           'Field Modification',
-          'A weapon you touch gains a +1 bonus to attack rolls until the end of your next Long ' +
-            'Rest. Only one weapon can have this bonus at a time.',
+          'A weapon you touch adds 1d2 to attack rolls made with it until the end of your next ' +
+            'Long Rest. Only one weapon can have this at a time.',
         ),
       ],
     }),
@@ -104,7 +104,7 @@ export const MECHANIC: ProfessionDefinition = {
         action(
           'Lightning Coil',
           'Each creature in a 60-foot-long, 5-foot-wide Line makes an Agility saving throw ' +
-            'against your Profession DC, taking 6d6 Lightning damage on a failure or half as much ' +
+            'against your Profession roll, taking 6d6 Lightning damage on a failure or half as much ' +
             'on a success.',
           ONCE_PER_LONG_REST,
         ),

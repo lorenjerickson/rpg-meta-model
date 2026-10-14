@@ -1,3 +1,4 @@
+import { bonus } from '../../core/rollModifiers';
 import type { MonsterStatBlock } from '../statBlock';
 import { RECHARGE_5, attack, feature, monster, multiattack, save } from './builders';
 
@@ -112,7 +113,7 @@ export const BEASTS: readonly MonsterStatBlock[] = [
         reach: 5,
         damage: [['2d4', 'piercing']],
         extra:
-          'The target must succeed on a DC 10 Hardiness saving throw or have the Poisoned ' +
+          'The target must succeed on a Hardiness saving throw against {effect:hardiness} or have the Poisoned ' +
           'condition until the end of its next turn.',
       }),
     ],
@@ -151,6 +152,7 @@ export const BEASTS: readonly MonsterStatBlock[] = [
     creatureType: 'monstrosity',
     alignment: 'unaligned',
     armorClass: 14,
+    soak: [bonus('soak', 1, 4)],
     hitDice: '5d8+5',
     speed: { walk: 40 },
     scores: [13, 12, 13, 2, 13, 6, 10, 10],
@@ -163,9 +165,8 @@ export const BEASTS: readonly MonsterStatBlock[] = [
       ),
       feature(
         'Corrosive Shell',
-        'An iron or steel weapon that hits the beetle takes a cumulative -1 penalty to damage ' +
-          'rolls, and is destroyed when the penalty reaches -5. Ammunition that hits it is ' +
-          'destroyed.',
+        'An iron or steel weapon that hits the beetle corrodes, and is destroyed after five ' +
+          'such hits. Ammunition that hits it is destroyed.',
       ),
     ],
     actions: [
@@ -173,9 +174,10 @@ export const BEASTS: readonly MonsterStatBlock[] = [
       feature(
         'Corrode',
         'The beetle touches an iron or steel object within 5 feet of it. If the object is worn or ' +
-          'carried, its owner can make a DC 11 Agility saving throw to pull it away. Otherwise ' +
-          'armor loses 1 AC (destroyed at 10 or lower), a weapon takes the Corrosive Shell ' +
-          'penalty, and an unattended object up to a 5-foot Cube corrodes away.',
+          'carried, its owner can make an Agility saving throw to pull it away. Otherwise ' +
+          "armour's defense dice shrink one size (it is destroyed below a d2), a weapon " +
+          'corrodes as with Corrosive Shell, and an unattended object up to a 5-foot Cube ' +
+          'corrodes away.',
       ),
     ],
   }),
@@ -214,7 +216,7 @@ export const BEASTS: readonly MonsterStatBlock[] = [
         dcAttribute: 'hardiness',
         target: 'one creature the spider can see within 60 feet',
         failure:
-          'The target has the Restrained condition until the web is destroyed (AC 10, 5 Hit ' +
+          'The target has the Restrained condition until the web is destroyed (5 Hit ' +
           'Points, Vulnerable to Fire) or it escapes with a DC 12 Might (Athletics) check.',
         success: 'Nothing happens.',
         usage: RECHARGE_5,
@@ -537,6 +539,7 @@ export const BEASTS: readonly MonsterStatBlock[] = [
     creatureType: 'monstrosity',
     alignment: 'unaligned',
     armorClass: 18,
+    soak: [bonus('soak', 1, 8)],
     hitDice: '16d20+80',
     speed: { walk: 50, burrow: 50 },
     scores: [28, 7, 22, 1, 8, 4, 10, 10],

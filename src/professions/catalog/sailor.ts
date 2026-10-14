@@ -77,7 +77,7 @@ export const SAILOR: ProfessionDefinition = {
         action(
           'Command the Deck',
           'For 1 minute, allies within 30 feet of you have Advantage on saving throws against ' +
-            'being Frightened and add your Proficiency Bonus to their initiative rolls.',
+            'being Frightened and add your proficiency dice to their Initiative rolls.',
           ONCE_PER_LONG_REST,
         ),
       ],
@@ -90,7 +90,7 @@ export const SAILOR: ProfessionDefinition = {
         action(
           'Hidden Compartment',
           'Conceal an object no larger than a rifle on your person or in a vehicle. Finding it ' +
-            'takes a successful Intellect (Investigation) check against your Profession DC.',
+            'takes a successful Intellect (Investigation) check against your Profession roll.',
         ),
       ],
     }),
@@ -115,7 +115,7 @@ export const SAILOR: ProfessionDefinition = {
         action(
           'Look the Other Way',
           'A guard or official within 30 feet that can hear you makes a Wisdom saving throw ' +
-            'against your Profession DC. On a failure, it ignores you, your companions and your ' +
+            'against your Profession roll. On a failure, it ignores you, your companions and your ' +
             'cargo for 1 hour.',
           ONCE_PER_LONG_REST,
         ),

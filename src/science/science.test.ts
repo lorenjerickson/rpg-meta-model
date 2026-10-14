@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
+import { poolDie } from '../core/dicePool';
 import { ITEM_CATEGORIES } from '../equipment/items';
 import {
   activate,
   canActivate,
   chargeCost,
   freshApparatusState,
-  operatorAttackBonus,
-  operatorDc,
+  operatorPool,
   overchargeMalfunctions,
   recharge,
 } from './apparatus';
@@ -27,11 +27,12 @@ const horn = apparatus('concussion-horn');
 const lance = apparatus('tesla-lance');
 
 describe('operator rules', () => {
-  it('adds the proficiency bonus only when proficient', () => {
-    expect(operatorDc(3, 2, true)).toBe(13);
-    expect(operatorDc(3, 2, false)).toBe(10);
-    expect(operatorAttackBonus(3, 2, true)).toBe(5);
-    expect(operatorAttackBonus(3, 2, false)).toBe(2);
+  it('adds proficiency dice only when proficient', () => {
+    expect(operatorPool(14, 'intellect', 3, true)).toEqual([
+      poolDie(1, 4, 'Intellect'),
+      poolDie(1, 6, 'Proficiency'),
+    ]);
+    expect(operatorPool(14, 'intellect', 3, false)).toEqual([poolDie(1, 4, 'Intellect')]);
   });
 });
 

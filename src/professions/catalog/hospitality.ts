@@ -48,7 +48,7 @@ export const HOSPITALITY: ProfessionDefinition = {
         reaction(
           'Settle Down',
           'a creature you can see within 30 feet makes an attack roll',
-          'The attacker makes a Wisdom saving throw against your Profession DC. On a failure, ' +
+          'The attacker makes a Wisdom saving throw against your Profession roll. On a failure, ' +
             'it has Disadvantage on the attack roll.',
           PB_PER_LONG_REST,
         ),
@@ -75,7 +75,7 @@ export const HOSPITALITY: ProfessionDefinition = {
         action(
           'Eviction Notice',
           'A creature within 30 feet that can hear you makes a Wisdom saving throw against your ' +
-            'Profession DC. On a failure, it is Frightened of you for 1 minute. It repeats the ' +
+            'Profession roll. On a failure, it is Frightened of you for 1 minute. It repeats the ' +
             'save at the end of each of its turns.',
           PB_PER_LONG_REST,
         ),

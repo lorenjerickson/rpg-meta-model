@@ -12,3 +12,4 @@ export * from './startingEquipment';
 export * from './traits';
 export * from './catalog';
 export * from './rests';
+export * from './combat';

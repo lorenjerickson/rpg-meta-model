@@ -1,4 +1,5 @@
 import type { Condition } from '../../core/conditions';
+import { bonus } from '../../core/rollModifiers';
 import type { MonsterStatBlock } from '../statBlock';
 import { RECHARGE_5, RECHARGE_6, attack, feature, monster, multiattack, save } from './builders';
 
@@ -109,7 +110,7 @@ export const MACHINES: readonly MonsterStatBlock[] = [
           ['3d6', 'decay'],
         ],
         extra:
-          "The target must succeed on a DC 12 Hardiness saving throw or contract embalmer's rot: " +
+          "The target must succeed on a Hardiness saving throw against {effect:hardiness} or contract embalmer's rot: " +
           'its Hit Point maximum cannot be restored until the rot is treated.',
       }),
       save('Dreadful Glare', {
@@ -183,7 +184,7 @@ export const MACHINES: readonly MonsterStatBlock[] = [
         reach: 5,
         damage: [['1', 'piercing']],
         extra:
-          'The target must succeed on a DC 10 Hardiness saving throw or have the Poisoned ' +
+          'The target must succeed on a Hardiness saving throw against {effect:hardiness} or have the Poisoned ' +
           'condition for 1 minute. If it fails by 5 or more, it is also Unconscious until it ' +
           'takes damage or the minute ends.',
       }),
@@ -219,6 +220,7 @@ export const MACHINES: readonly MonsterStatBlock[] = [
     creatureType: 'construct',
     alignment: 'unaligned',
     armorClass: 18,
+    soak: [bonus('soak', 1, 6)],
     hitDice: '6d8+6',
     speed: { walk: 25 },
     scores: [14, 11, 13, 1, 3, 1, 10, 10],
@@ -247,6 +249,7 @@ export const MACHINES: readonly MonsterStatBlock[] = [
     creatureType: 'construct',
     alignment: 'unaligned',
     armorClass: 18,
+    soak: [bonus('soak', 2, 6)],
     hitDice: '17d10+85',
     speed: { walk: 30 },
     scores: [22, 9, 20, 3, 11, 1, 10, 10],
@@ -381,6 +384,7 @@ export const MACHINES: readonly MonsterStatBlock[] = [
     creatureType: 'anomaly',
     alignment: 'unaligned',
     armorClass: 17,
+    soak: [bonus('soak', 1, 6)],
     hitDice: '12d10+60',
     speed: { walk: 30, burrow: 30 },
     scores: [20, 8, 20, 5, 10, 5, 10, 10],
