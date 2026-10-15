@@ -79,6 +79,8 @@ export interface WeaponDefinition extends ItemBase {
   capacity?: number;
   /** The highest natural roll that misfires; present with the Misfire property. */
   misfireOn?: number;
+  /** Seconds to reload to capacity; present with the Reload or Loading property. */
+  reloadSeconds?: number;
 }
 
 /** Shots spent and save DC for a burst of automatic fire into a 10-foot Cube. */

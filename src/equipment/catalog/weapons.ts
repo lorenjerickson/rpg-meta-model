@@ -196,6 +196,7 @@ export const WEAPONS: readonly WeaponDefinition[] = [
     mastery: 'vex',
     weightLb: 0.5,
     cost: lsd(1, 10),
+    reloadSeconds: 2,
   }),
   weapon('pocket-revolver', {
     name: 'Pocket Revolver',
@@ -210,6 +211,7 @@ export const WEAPONS: readonly WeaponDefinition[] = [
     mastery: 'vex',
     weightLb: 1,
     cost: lsd(1, 15),
+    reloadSeconds: 3,
   }),
   weapon('shotgun', {
     name: 'Double-Barrelled Shotgun',
@@ -224,6 +226,7 @@ export const WEAPONS: readonly WeaponDefinition[] = [
     mastery: 'push',
     weightLb: 7,
     cost: lsd(6),
+    reloadSeconds: 2,
   }),
 
   // Martial ranged
@@ -241,6 +244,7 @@ export const WEAPONS: readonly WeaponDefinition[] = [
     modifiers: [penalty('attack', 1, 4)],
     weightLb: 10,
     cost: lsd(0, 15),
+    reloadSeconds: 6,
   }),
   weapon('service-revolver', {
     name: 'Service Revolver',
@@ -255,6 +259,7 @@ export const WEAPONS: readonly WeaponDefinition[] = [
     mastery: 'vex',
     weightLb: 2.5,
     cost: lsd(3, 10),
+    reloadSeconds: 3,
   }),
   weapon('automatic-pistol', {
     name: 'Automatic Pistol',
@@ -271,6 +276,7 @@ export const WEAPONS: readonly WeaponDefinition[] = [
     weightLb: 2.5,
     cost: lsd(6),
     rarity: 'uncommon',
+    reloadSeconds: 1,
   }),
   weapon('lever-action-rifle', {
     name: 'Lever-Action Rifle',
@@ -285,6 +291,7 @@ export const WEAPONS: readonly WeaponDefinition[] = [
     mastery: 'slow',
     weightLb: 8,
     cost: lsd(4),
+    reloadSeconds: 4,
   }),
   weapon('bolt-action-rifle', {
     name: 'Bolt-Action Rifle',
@@ -300,6 +307,7 @@ export const WEAPONS: readonly WeaponDefinition[] = [
     modifiers: [bonus('attack', 1, 4)],
     weightLb: 9,
     cost: lsd(5),
+    reloadSeconds: 2,
   }),
   weapon('elephant-gun', {
     name: 'Elephant Gun',
@@ -315,6 +323,7 @@ export const WEAPONS: readonly WeaponDefinition[] = [
     weightLb: 15,
     cost: lsd(60),
     rarity: 'rare',
+    reloadSeconds: 2,
   }),
   weapon('machine-gun', {
     name: 'Machine Gun',
@@ -332,6 +341,7 @@ export const WEAPONS: readonly WeaponDefinition[] = [
     weightLb: 60,
     cost: lsd(250),
     rarity: 'rare',
+    reloadSeconds: 6,
   }),
 ];
 

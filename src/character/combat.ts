@@ -1,6 +1,7 @@
 import type { Attribute } from '../core/attributes';
 import { attributeModifiers } from '../core/attributes';
 import { BASE_DEFENSE } from '../combat/attacks';
+import { FIRING_MODE_DEFINITIONS, type FiringMode } from '../combat/timing';
 import { conditionDefense, conditionDice, exhaustionDice, madnessDice } from '../core/conditions';
 import type { DamageType } from '../core/damage';
 import type { DiceExpression } from '../core/dice';
@@ -51,14 +52,20 @@ function situationalDice(
 /**
  * The dice added to the d20 when attacking with a weapon: the attack attribute's dice,
  * proficiency dice if proficient, and dice from the weapon, other equipment and conditions.
+ * Ranged attacks also add their firing mode's dice.
  */
-export function characterAttackPool(character: Character, weapon: WeaponDefinition): PoolDie[] {
+export function characterAttackPool(
+  character: Character,
+  weapon: WeaponDefinition,
+  firingMode: FiringMode = 'standard',
+): PoolDie[] {
   const attribute = weaponAttackAttribute(weapon, attributeModifiers(character.attributeScores));
   const proficient = isProficientWithWeapon(weapon, character.proficiencies.weapons);
   return [
     ...attributeDice(character.attributeScores[attribute], attribute),
     ...(proficient ? proficiencyDice(characterProficiencyBonus(character)) : []),
     ...situationalDice(character, 'attack', { attack: weapon.weaponType }, weapon),
+    ...(weapon.weaponType === 'ranged' ? FIRING_MODE_DEFINITIONS[firingMode].dice : []),
   ];
 }
 

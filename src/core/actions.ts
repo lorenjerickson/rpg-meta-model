@@ -29,6 +29,8 @@ export interface ActionDefinition {
   name: string;
   /** The rules, one effect per entry. */
   effects: readonly string[];
+  /** Seconds the action takes in a round, if not the default of 1. */
+  seconds?: number;
   /** Dice the action grants until the end of the round. */
   dice?: readonly RollModifier[];
   /** Flat changes to your defense until the end of the round. */
@@ -43,6 +45,9 @@ export const ACTION_DEFINITIONS: Readonly<Record<ActionId, ActionDefinition>> = 
         "target's defense.",
       'Firing a firearm spends its rounds; a natural roll at or below its misfire number jams it.',
       'You can draw or stow one weapon as part of each attack.',
+      'A melee attack takes 1 second, or 2 with a heavy or two-handed weapon. A ranged attack ' +
+        'is a snap shot (1 second, subtract 1d4), a shot (2 seconds) or an aimed shot (3 ' +
+        'seconds, add 1d6).',
     ],
   },
   compose: {
@@ -105,6 +110,7 @@ export const ACTION_DEFINITIONS: Readonly<Record<ActionId, ActionDefinition>> = 
   },
   influence: {
     name: 'Influence',
+    seconds: 2,
     effects: [
       'Urge a creature to do something with a Charisma (Deception, Etiquette, Intimidation, ' +
         'Performance, Persuasion or Streetwise) check, or calm an animal with a Wisdom (Animal ' +
@@ -135,12 +141,14 @@ export const ACTION_DEFINITIONS: Readonly<Record<ActionId, ActionDefinition>> = 
   reload: {
     name: 'Reload',
     effects: [
-      'Reload one firearm or other weapon with the Reload property to capacity.',
+      'Reload one firearm or other weapon with the Reload property to capacity. It takes as ' +
+        'many seconds as the weapon says: 3 for a revolver, 6 for a musket.',
       'A jammed weapon must be cleared with the Utilize action before it can be reloaded.',
     ],
   },
   search: {
     name: 'Search',
+    seconds: 2,
     effects: [
       'Look for something with a Wisdom (Insight, Medicine, Perception or Survival) check: a ' +
         'lie, an ailment, a hidden foe or a trail.',
@@ -148,6 +156,7 @@ export const ACTION_DEFINITIONS: Readonly<Record<ActionId, ActionDefinition>> = 
   },
   study: {
     name: 'Study',
+    seconds: 2,
     effects: [
       'Recall or work out something with an Intellect (Bureaucracy, History, Investigation, ' +
         'Mechanics, Natural History, Science or Theology) check.',
@@ -168,6 +177,7 @@ export const ACTION_DEFINITIONS: Readonly<Record<ActionId, ActionDefinition>> = 
     effects: [
       'Use a nonweapon object or mechanism: pick a lock, bind a wound, clear a jammed firearm, ' +
         'throw a lever or stoke a boiler.',
+      'Clearing a jammed firearm takes 2 seconds.',
     ],
   },
 };

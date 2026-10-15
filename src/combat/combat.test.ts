@@ -13,6 +13,17 @@ import {
 } from './attacks';
 import { NO_DEATH_SAVES, damageWhileDying, rollDeathSave } from './deathSaves';
 import { grantTemporaryHitPoints, heal, isBloodied, takeDamage } from './hitPoints';
+import {
+  FIRING_MODE_DEFINITIONS,
+  actionSeconds,
+  effectSeconds,
+  movementSeconds,
+  reloadSeconds,
+  weaponAttackSeconds,
+} from './timing';
+import { findItem } from '../equipment/catalog';
+import { APPARATUS } from '../science/catalog/apparatus';
+import { PREPARATIONS } from '../science/catalog/preparations';
 
 describe('hit points', () => {
   const full = { current: 20, max: 20, temporary: 5 };
@@ -134,5 +145,52 @@ describe('contests', () => {
     expect(improvedCover('half')).toBe('three-quarters');
     expect(improvedCover('three-quarters')).toBe('total');
     expect(improvedCover('total')).toBe('total');
+  });
+});
+
+describe('step timing', () => {
+  const weapon = (id: string) => {
+    const found = findItem(id);
+    if (found?.category !== 'weapon') {
+      throw new Error(`${id} is not a weapon`);
+    }
+    return found;
+  };
+
+  it('times melee attacks by weight and ranged attacks by firing mode', () => {
+    expect(weaponAttackSeconds(weapon('cavalry-sabre'))).toBe(1);
+    expect(weaponAttackSeconds(weapon('sledgehammer'))).toBe(2);
+    expect(weaponAttackSeconds(weapon('fire-axe'))).toBe(1);
+    expect(weaponAttackSeconds(weapon('fire-axe'), { twoHanded: true })).toBe(2);
+    const rifle = weapon('bolt-action-rifle');
+    expect(weaponAttackSeconds(rifle)).toBe(2);
+    expect(weaponAttackSeconds(rifle, { firingMode: 'snap' })).toBe(1);
+    expect(weaponAttackSeconds(rifle, { firingMode: 'aimed' })).toBe(3);
+    expect(FIRING_MODE_DEFINITIONS.aimed.dice).toEqual([poolDie(1, 6, 'Aimed shot')]);
+  });
+
+  it('times reloading by weapon and actions by their definitions', () => {
+    expect(reloadSeconds(weapon('service-revolver'))).toBe(3);
+    expect(reloadSeconds(weapon('musket'))).toBe(6);
+    expect(actionSeconds('dodge')).toBe(1);
+    expect(actionSeconds('study')).toBe(2);
+  });
+
+  it('times apparatus effects by their cost', () => {
+    const effects = [
+      ...APPARATUS.flatMap((entry) => entry.effects),
+      ...PREPARATIONS.map((entry) => entry.effect),
+    ];
+    for (const effect of effects) {
+      expect(effectSeconds(effect), effect.id).toBe(effect.cost === 'action' ? 2 : 1);
+    }
+  });
+
+  it('times movement as its share of the round, rounded up', () => {
+    expect(movementSeconds(15, 30)).toBe(3);
+    expect(movementSeconds(15, 20)).toBe(5);
+    expect(movementSeconds(15, 60)).toBe(2);
+    expect(movementSeconds(60, 30, true)).toBe(6);
+    expect(() => movementSeconds(5, 0)).toThrow(RangeError);
   });
 });

@@ -38,6 +38,8 @@ export interface ScientificEffect {
   id: string;
   name: string;
   cost: Exclude<ActionCost, 'free'>;
+  /** Seconds it takes in a round, if not 2 for an action or 1 otherwise. */
+  seconds?: number;
   /** Minutes of setup needed before the effect starts, for slow apparatus. */
   setupMinutes?: number;
   /** For reactions: what lets you use it. */
