@@ -9,6 +9,7 @@ with [pnpm](https://pnpm.io).
 | Folder            | Package              | Contents                                                      |
 | ----------------- | -------------------- | ------------------------------------------------------------- |
 | `apps/web`        | `@dnd-domain/web`    | Next.js 16 app (React 19, React Compiler)                     |
+| `apps/api`        | `@dnd-domain/api`    | NestJS 12 API serving the system's catalogs                   |
 | `packages/system` | `@dnd-domain/system` | The game system: domain model, rules and catalogs             |
 | `packages/ai`     | `@dnd-domain/ai`     | AI features (empty for now)                                   |
 | `packages/ui`     | `@dnd-domain/ui`     | Shared React components                                       |
@@ -32,7 +33,8 @@ pnpm install
 pnpm dev
 ```
 
-`pnpm dev` builds the packages, then runs the web app and rebuilds packages as they change.
+`pnpm dev` builds the packages, then runs the web app (port 3000) and the API (port 3001), and
+rebuilds packages as they change.
 
 ## Scripts
 
@@ -41,8 +43,8 @@ dependencies first and caching results.
 
 | Command              | Description                                          |
 | -------------------- | ---------------------------------------------------- |
-| `pnpm build`         | Build every package and the web app                  |
-| `pnpm dev`           | Run the web app and rebuild packages on change       |
+| `pnpm build`         | Build every package and app                          |
+| `pnpm dev`           | Run the apps and rebuild packages on change          |
 | `pnpm test`          | Run every package's tests                            |
 | `pnpm test:coverage` | Run tests with V8 coverage                           |
 | `pnpm typecheck`     | Type-check everything                                |

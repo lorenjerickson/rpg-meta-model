@@ -10,9 +10,11 @@
     "./tsconfig/library.json": "./tsconfig/library.json",
     "./tsconfig/react-library.json": "./tsconfig/react-library.json",
     "./tsconfig/nextjs.json": "./tsconfig/nextjs.json",
+    "./tsconfig/nest.json": "./tsconfig/nest.json",
     "./eslint": "./eslint/base.js",
     "./eslint/react": "./eslint/react.js",
     "./eslint/next": "./eslint/next.js",
+    "./eslint/nest": "./eslint/nest.js",
     "./prettier": "./prettier.json",
     "./tsdown": {
       "types": "./tsdown.d.ts",
