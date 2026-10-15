@@ -113,8 +113,8 @@ export const BEASTS: readonly MonsterStatBlock[] = [
         reach: 5,
         damage: [['2d4', 'piercing']],
         extra:
-          'The target must succeed on a Hardiness saving throw against {effect:hardiness} or have the Poisoned ' +
-          'condition until the end of its next turn.',
+          'The target must succeed on a Hardiness saving throw against {effect:hardiness} or ' +
+          'have the Poisoned condition until the end of the next round.',
       }),
     ],
   }),
@@ -137,8 +137,8 @@ export const BEASTS: readonly MonsterStatBlock[] = [
         reach: 5,
         damage: [['1d4', 'piercing']],
         extra:
-          'The bloodfly attaches to the target and drains 5 (1d4 + 3) Hit Points at the start ' +
-          'of each of its turns until it is pulled off (no check) or has drained 10 Hit Points.',
+          'The bloodfly attaches to the target and drains 5 (1d4 + 3) Hit Points at the start of ' +
+          'each round until it is pulled off (no check) or has drained 10 Hit Points.',
       }),
     ],
   }),
@@ -173,11 +173,10 @@ export const BEASTS: readonly MonsterStatBlock[] = [
       attack('Bite', { reach: 5, damage: [['1d8', 'piercing']] }),
       feature(
         'Corrode',
-        'The beetle touches an iron or steel object within 5 feet of it. If the object is worn or ' +
-          'carried, its owner can make an Agility saving throw to pull it away. Otherwise ' +
-          'armour gives 1 less defense (it is destroyed when it gives none), a weapon ' +
-          'corrodes as with Corrosive Shell, and an unattended object up to a 5-foot Cube ' +
-          'corrodes away.',
+        'The beetle touches an iron or steel object within 5 feet of it. If the object is worn ' +
+          'or carried, its owner can make an Agility saving throw to pull it away. Otherwise ' +
+          'armour gives 1 less defense (it is destroyed when it gives none), a weapon corrodes ' +
+          'as with Corrosive Shell, and an unattended object up to a 5-foot Cube corrodes away.',
       ),
     ],
   }),
@@ -271,9 +270,9 @@ export const BEASTS: readonly MonsterStatBlock[] = [
         dcAttribute: 'charisma',
         target: 'each humanoid within 300 feet that can hear the song',
         failure:
-          'The target has the Mesmerised condition until the song ends, and on its turns moves ' +
+          'The target has the Mesmerised condition until the song ends, and each round moves ' +
           'toward the harpy by the most direct route. It repeats the save whenever it takes ' +
-          'damage. The harpy can keep singing as a Bonus Action on later turns.',
+          'damage. The harpy can keep singing as a Bonus Action in later rounds.',
         success: "The target is immune to this harpy's song for 24 hours.",
       }),
     ],
@@ -361,7 +360,7 @@ export const BEASTS: readonly MonsterStatBlock[] = [
         target: 'each creature in a 15-foot Cone',
         failure:
           'The target has the Restrained condition as its flesh stiffens, and repeats the save ' +
-          'at the end of its next turn. On a second failure, it has the Calcified condition ' +
+          'at the end of the next round. On a second failure, it has the Calcified condition ' +
           'until an antidote dissolves the mineral.',
         success: 'Nothing happens.',
         usage: RECHARGE_5,
@@ -451,7 +450,8 @@ export const BEASTS: readonly MonsterStatBlock[] = [
     challengeRating: 6,
     actions: [
       multiattack(
-        'The chimera makes one Ram, one Bite and one Claw attack. It can replace the Bite with Fire Breath if available.',
+        'The chimera makes one Ram, one Bite and one Claw attack. It can replace the Bite with ' +
+          'Fire Breath if available.',
       ),
       attack('Bite', { reach: 5, damage: [['2d6', 'piercing']] }),
       attack('Claw', { reach: 5, damage: [['2d6', 'slashing']] }),
@@ -494,7 +494,7 @@ export const BEASTS: readonly MonsterStatBlock[] = [
           ['2d6', 'piercing'],
           ['7d6', 'poison'],
         ],
-        extra: 'The target has the Poisoned condition until the end of its next turn.',
+        extra: 'The target has the Poisoned condition until the end of the next round.',
       }),
     ],
   }),
@@ -518,10 +518,10 @@ export const BEASTS: readonly MonsterStatBlock[] = [
       feature('Hold Breath', 'It can hold its breath for 1 hour.'),
       feature(
         'Hyper-Regeneration',
-        'The serpent has five heads. Whenever it takes 25 or more damage on a single turn, one ' +
-          'head dies. At the end of its turn, it grows two heads for each head that died since ' +
-          'its last turn, unless it has taken Fire or Acid damage since then. It dies if all its ' +
-          'heads are dead.',
+        'The serpent has five heads. Whenever it takes 25 or more damage in a single round, one ' +
+          'head dies. At the end of each round, it grows two heads for each head that died ' +
+          'during the round, unless it has taken Fire or Acid damage since then. It dies if all ' +
+          'its heads are dead.',
       ),
     ],
     actions: [
@@ -559,8 +559,7 @@ export const BEASTS: readonly MonsterStatBlock[] = [
         damage: [['3d8', 'piercing']],
         extra:
           'If the target is Large or smaller, it is swallowed: it has the Blinded and Restrained ' +
-          "conditions and takes 15 (6d4) Acid damage at the start of each of the leviathan's " +
-          'turns.',
+          'conditions and takes 15 (6d4) Acid damage at the start of each round.',
       }),
       attack('Tail Stinger', {
         reach: 10,

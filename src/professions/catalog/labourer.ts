@@ -28,7 +28,7 @@ export const LABOURER: ProfessionDefinition = {
   actions: [
     bonusAction(
       'Put Your Back Into It',
-      'Until the end of your turn, you have Advantage on Might checks and Might saving throws.',
+      'Until the end of the round, you have Advantage on Might checks and Might saving throws.',
       PB_PER_LONG_REST,
     ),
   ],
@@ -68,8 +68,8 @@ export const LABOURER: ProfessionDefinition = {
         action(
           'Solidarity',
           'Allies of your choice within 60 feet that can hear you gain Temporary Hit Points ' +
-            'equal to 2d8 plus your Charisma modifier and have Advantage on saving throws against ' +
-            'being Frightened for 1 minute.',
+            'equal to 2d8 plus your Charisma modifier and have Advantage on saving throws ' +
+            'against being Frightened for 1 minute.',
           ONCE_PER_LONG_REST,
         ),
       ],

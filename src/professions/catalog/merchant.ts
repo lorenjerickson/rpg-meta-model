@@ -85,7 +85,7 @@ export const MERCHANT: ProfessionDefinition = {
       actions: [
         bonusAction(
           'Calculated Risk',
-          'You have Advantage on your next D20 Test this turn. If that test fails, you have ' +
+          'You have Advantage on your next D20 Test this round. If that test fails, you have ' +
             'Disadvantage on the next D20 Test you make.',
           PB_PER_LONG_REST,
         ),

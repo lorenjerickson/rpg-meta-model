@@ -64,8 +64,8 @@ export const PERFORMER: ProfessionDefinition = {
         action(
           'Showstopper',
           'Creatures of your choice within 60 feet that can see you make a Wisdom saving throw ' +
-            'against your Profession roll. On a failure, a creature is Incapacitated until the end ' +
-            'of your next turn, watching you.',
+            'against your Profession roll. On a failure, a creature is Incapacitated until the ' +
+            'end of the next round, watching you.',
           ONCE_PER_SHORT_REST,
         ),
       ],
@@ -106,7 +106,7 @@ export const PERFORMER: ProfessionDefinition = {
         action(
           'Stage Illusion',
           'With smoke and props, you make a 10-foot Cube within 30 feet Heavily Obscured until ' +
-            'the end of your next turn.',
+            'the end of the next round.',
           PB_PER_LONG_REST,
         ),
       ],

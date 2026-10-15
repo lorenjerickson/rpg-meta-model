@@ -88,7 +88,7 @@ export const CONSTABLE: ProfessionDefinition = {
         bonusAction(
           'Stop, Police!',
           'A creature within 30 feet that can hear you makes a Wisdom saving throw against your ' +
-            'Profession roll. On a failure, its Speed is 0 until the end of its next turn.',
+            'Profession roll. On a failure, its Speed is 0 until the end of the next round.',
           PB_PER_LONG_REST,
         ),
       ],

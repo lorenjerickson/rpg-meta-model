@@ -52,7 +52,7 @@ export const CONDITION_DEFINITIONS: Readonly<Record<Condition, ConditionDefiniti
   bleeding: {
     name: 'Bleeding',
     effects: [
-      'You lose 1d4 Hit Points at the start of each of your turns.',
+      'You lose 1d4 Hit Points at the start of each round.',
       'The condition ends when you regain Hit Points, or when someone within 5 feet takes the ' +
         'Utilize action to bind the wound with a first-aid kit or a DC 10 Wisdom (Medicine) check.',
     ],
@@ -70,7 +70,7 @@ export const CONDITION_DEFINITIONS: Readonly<Record<Condition, ConditionDefiniti
   burning: {
     name: 'Burning',
     effects: [
-      'You take 1d4 Fire damage at the start of each of your turns.',
+      'You take 1d4 Fire damage at the start of each round.',
       'The condition ends when you or a creature within 5 feet takes an action to put out the ' +
         'flames, or when you are doused or immersed in water.',
     ],

@@ -101,7 +101,7 @@ export const FEATS: readonly FeatDefinition[] = [
     benefits: [
       benefit(
         'Hard Hitter',
-        'Once per turn when you hit with a weapon, you can roll its damage dice twice and use ' +
+        'Once per round when you hit with a weapon, you can roll its damage dice twice and use ' +
           'either roll.',
       ),
     ],
@@ -216,7 +216,7 @@ export const FEATS: readonly FeatDefinition[] = [
       benefit(
         'Punch and Grab',
         'When you hit with an Unarmed Strike as part of the Attack action, you can both deal ' +
-          'damage and Grapple, once per turn.',
+          'damage and Grapple, once per round.',
       ),
       benefit(
         'Attack Advantage',
@@ -322,8 +322,8 @@ export const FEATS: readonly FeatDefinition[] = [
     benefits: [
       benefit(
         'Heavy Blows',
-        'When you roll damage for a melee weapon you are holding with two hands, treat any 1 or 2 ' +
-          'on a damage die as a 3.',
+        'When you roll damage for a melee weapon you are holding with two hands, treat any 1 or ' +
+          '2 on a damage die as a 3.',
       ),
     ],
   }),
@@ -352,7 +352,7 @@ export const FEATS: readonly FeatDefinition[] = [
     benefits: [
       benefit(
         'Peerless Aim',
-        'Once per turn, when you miss with an attack roll, you can hit instead.',
+        'Once per round, when you miss with an attack roll, you can hit instead.',
       ),
     ],
   }),
@@ -427,7 +427,8 @@ export const FEATS: readonly FeatDefinition[] = [
       benefit(
         'Shadow Walker',
         'While in Dim Light or Darkness, you can take the Hide action as a Bonus Action, and ' +
-          "attack rolls against you have Disadvantage if you haven't attacked since your last turn.",
+          "attack rolls against you have Disadvantage if you haven't attacked this round or the " +
+          'previous one.',
       ),
     ],
   }),

@@ -113,7 +113,7 @@ export const SCHOLAR: ProfessionDefinition = {
         action(
           'Unspeakable Truth',
           'A creature within 60 feet that can hear you makes a Sanity saving throw against your ' +
-            'Profession roll. On a failure, it is Stunned until the end of your next turn, ' +
+            'Profession roll. On a failure, it is Stunned until the end of the next round, ' +
             'Frightened of you for 1 minute, and gains 1 level of Madness.',
           ONCE_PER_LONG_REST,
         ),

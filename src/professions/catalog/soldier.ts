@@ -54,8 +54,8 @@ export const SOLDIER: ProfessionDefinition = {
       actions: [
         bonusAction(
           'Steady Aim',
-          "If you haven't moved this turn, you have Advantage on your next ranged weapon attack " +
-            'this turn. Your Speed is 0 until the end of the turn.',
+          "If you haven't moved this round, you have Advantage on your next ranged weapon attack " +
+            'this round. Your Speed is 0 until the end of the round.',
         ),
       ],
     }),
@@ -114,8 +114,8 @@ export const SOLDIER: ProfessionDefinition = {
         reaction(
           'Detonate',
           'a creature you can see moves within 10 feet of a charge you set',
-          'The charge explodes. Each creature within 10 feet of it makes an Agility saving ' +
-            'throw against your Profession roll, taking 6d6 Thunder damage on a failure or half as ' +
+          'The charge explodes. Each creature within 10 feet of it makes an Agility saving throw ' +
+            'against your Profession roll, taking 6d6 Thunder damage on a failure or half as ' +
             'much on a success. Objects in the area take double damage.',
         ),
       ],
@@ -128,9 +128,9 @@ export const SOLDIER: ProfessionDefinition = {
         action(
           'Barrage',
           'While you can signal an artillery battery, choose a point you can see within 1 mile. ' +
-            'Each creature in a 30-foot-radius Sphere there makes an Agility saving throw against ' +
-            'your Profession roll, taking 8d6 Thunder damage on a failure or half as much on a ' +
-            'success.',
+            'Each creature in a 30-foot-radius Sphere there makes an Agility saving throw ' +
+            'against your Profession roll, taking 8d6 Thunder damage on a failure or half as ' +
+            'much on a success.',
           ONCE_PER_LONG_REST,
         ),
       ],

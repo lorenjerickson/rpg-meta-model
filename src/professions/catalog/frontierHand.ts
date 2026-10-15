@@ -86,7 +86,7 @@ export const FRONTIER_HAND: ProfessionDefinition = {
         bonusAction(
           "Keep 'Em Moving",
           'Allies within 30 feet that can hear you have their Speed increased by 10 feet until ' +
-            'the end of their next turns.',
+            'the end of the next round.',
           ONCE_PER_SHORT_REST,
         ),
       ],

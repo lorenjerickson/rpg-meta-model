@@ -4,7 +4,7 @@ import { RECHARGE_5, RECHARGE_6, attack, feature, monster, multiattack, save } f
 const SUNLIGHT_HYPERSENSITIVITY = feature(
   'Sunlight Hypersensitivity',
   'Its blood cannot tolerate daylight. While in sunlight it has Disadvantage on attack rolls and ' +
-    'ability checks, and it takes 20 Radiation damage if it starts its turn there.',
+    'ability checks, and it takes 20 Radiation damage if it starts a round there.',
 );
 
 /** Ordinary people, and people who have been changed. */
@@ -52,7 +52,7 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
         dcAttribute: 'charisma',
         target: 'one creature within 30 feet that can hear the zealot',
         damage: [['3d6', 'psychic']],
-        failure: 'The target has the Frightened condition until the end of its next turn.',
+        failure: 'The target has the Frightened condition until the end of the next round.',
         usage: RECHARGE_5,
       }),
     ],
@@ -168,7 +168,7 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
       feature(
         'Spring-Loaded Shield',
         "Trigger: The scientist is hit by an attack. Response: The scientist's defense " +
-          'increases by 5 until the start of its next turn, including against the triggering ' +
+          'increases by 5 until the end of the round, including against the triggering ' +
           'attack.',
         { kind: 'per-day', uses: 3 },
       ),
@@ -208,8 +208,8 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
         reach: 5,
         damage: [['1d4', 'slashing']],
         extra:
-          'The target must succeed on a Hardiness saving throw against {effect:hardiness} or have the Paralyzed ' +
-          'condition until the end of its next turn.',
+          'The target must succeed on a Hardiness saving throw against {effect:hardiness} or ' +
+          'have the Paralyzed condition until the end of the next round.',
       }),
     ],
   }),
@@ -273,8 +273,8 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
         reach: 5,
         damage: [['1d8', 'piercing']],
         extra:
-          'A humanoid target must succeed on a Hardiness saving throw against {effect:hardiness} or contract the ' +
-          'wolf-change.',
+          'A humanoid target must succeed on a Hardiness saving throw against {effect:hardiness} ' +
+          'or contract the wolf-change.',
       }),
       attack('Claw', { reach: 5, damage: [['2d4', 'slashing']] }),
     ],
@@ -310,7 +310,7 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
         save: 'sanity',
         dcAttribute: 'charisma',
         target: 'each creature within 15 feet that can see the doppelganger',
-        failure: 'The target has the Frightened condition until the end of its next turn.',
+        failure: 'The target has the Frightened condition until the end of the next round.',
         success: 'Nothing happens.',
         usage: RECHARGE_6,
       }),
@@ -346,8 +346,8 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
     traits: [
       feature(
         'Regeneration',
-        'It regains 10 Hit Points at the start of each of its turns unless it took Fire or ' +
-          'Radiation damage since its last turn or is in sunlight.',
+        'It regains 10 Hit Points at the start of each round unless it took Fire or ' +
+          'Radiation damage during the previous round or is in sunlight.',
       ),
       feature(
         'Spider Climb',
@@ -400,8 +400,8 @@ export const PEOPLE: readonly MonsterStatBlock[] = [
       ),
       feature(
         'Regeneration',
-        'It regains 20 Hit Points at the start of each of its turns unless it took Fire or ' +
-          'Radiation damage since its last turn or is in sunlight.',
+        'It regains 20 Hit Points at the start of each round unless it took Fire or ' +
+          'Radiation damage during the previous round or is in sunlight.',
       ),
       feature(
         'Spider Climb',

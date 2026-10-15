@@ -45,7 +45,7 @@ export const HORRORS: readonly MonsterStatBlock[] = [
         damage: [['3d6', 'acid']],
         failure:
           "The target is engulfed: it has the Restrained condition, can't breathe, and takes " +
-          "the Acid damage again at the start of each of the mass's turns.",
+          'the Acid damage again at the start of each round.',
         success: 'The target is pushed 5 feet out of the way.',
       }),
     ],
@@ -190,7 +190,7 @@ export const HORRORS: readonly MonsterStatBlock[] = [
       save('Gibbering', {
         save: 'sanity',
         dcAttribute: 'hardiness',
-        target: 'each creature that starts its turn within 20 feet and can hear it',
+        target: 'each creature that starts a round within 20 feet and can hear it',
         failure:
           "The target can't take Reactions and rolls a d8: on 1–4 it does nothing, on 5–6 it " +
           'moves in a random direction, and on 7–8 it attacks a random creature within reach.',
@@ -209,7 +209,7 @@ export const HORRORS: readonly MonsterStatBlock[] = [
         dcAttribute: 'hardiness',
         target: 'each creature in a 5-foot-radius Sphere within 30 feet',
         damage: [['2d6', 'acid']],
-        failure: "The target has the Blinded condition until the end of the mass's next turn.",
+        failure: 'The target has the Blinded condition until the end of the next round.',
         usage: RECHARGE_5,
       }),
     ],
@@ -279,7 +279,7 @@ export const HORRORS: readonly MonsterStatBlock[] = [
         target: 'one creature Grappled by the horror',
         failure:
           'The target has the Poisoned condition, and is Paralyzed while Poisoned, for 1 minute. ' +
-          'It repeats the save at the end of each of its turns.',
+          'It repeats the save at the end of each round.',
         success: 'Nothing happens.',
       }),
     ],
@@ -306,8 +306,8 @@ export const HORRORS: readonly MonsterStatBlock[] = [
         reach: 5,
         damage: [['2d8', 'piercing']],
         extra:
-          'The target must succeed on a Hardiness saving throw against {effect:hardiness} or have the Poisoned ' +
-          'condition until it finishes a Long Rest.',
+          'The target must succeed on a Hardiness saving throw against {effect:hardiness} or ' +
+          'have the Poisoned condition until it finishes a Long Rest.',
       }),
       attack('Tentacle', {
         reach: 10,
@@ -357,8 +357,9 @@ export const HORRORS: readonly MonsterStatBlock[] = [
         dcAttribute: 'charisma',
         target: 'one creature the progenitor can see within 30 feet',
         failure:
-          'The target has the Mesmerised condition until the progenitor dies or is more than a mile ' +
-          'away, and obeys its silent commands. It repeats the save whenever it takes damage.',
+          'The target has the Mesmerised condition until the progenitor dies or is more than a ' +
+          'mile away, and obeys its silent commands. It repeats the save whenever it takes ' +
+          'damage.',
         success: 'Nothing happens.',
         usage: RECHARGE_5,
       }),
@@ -410,8 +411,7 @@ export const HORRORS: readonly MonsterStatBlock[] = [
         damage: [['3d8', 'piercing']],
         extra:
           'If the target is Large or smaller, it is swallowed: it has the Blinded and Restrained ' +
-          "conditions and takes 42 (12d6) Acid damage at the start of each of the leviathan's " +
-          'turns.',
+          'conditions and takes 42 (12d6) Acid damage at the start of each round.',
       }),
       attack('Tentacle', {
         reach: 30,
@@ -491,14 +491,14 @@ export const HORRORS: readonly MonsterStatBlock[] = [
     traits: [
       feature(
         'Regeneration',
-        'It regains 15 Hit Points at the start of each of its turns unless it took Acid or Fire ' +
-          'damage since its last turn. It dies only if it starts its turn with 0 Hit Points and ' +
+        'It regains 15 Hit Points at the start of each round unless it took Acid or Fire damage ' +
+          'during the previous round. It dies only if it starts a round with 0 Hit Points and ' +
           "doesn't regenerate.",
       ),
       feature(
         'Loathsome Limbs',
-        'Whenever it takes 15 or more Slashing damage in one turn, one of its limbs is severed and ' +
-          "fights on as a separate creature until the brute's next turn.",
+        'Whenever it takes 15 or more Slashing damage in one round, one of its limbs is severed ' +
+          'and fights on as a separate creature until the end of the next round.',
       ),
     ],
     actions: [

@@ -47,7 +47,7 @@ export const STREET_RAT: ProfessionDefinition = {
         bonusAction(
           'Rally the Gang',
           'Up to three allies within 30 feet that can hear you have Advantage on their next ' +
-            'attack roll before the start of your next turn.',
+            'attack roll before the end of the round.',
           PB_PER_LONG_REST,
         ),
       ],
@@ -73,9 +73,9 @@ export const STREET_RAT: ProfessionDefinition = {
         action(
           'Make an Example',
           'A creature you can see within 60 feet makes a Wisdom saving throw against your ' +
-            'Profession roll. On a failure, it is Frightened of you for 1 minute, and every other ' +
-            'creature of your choice that sees this has Disadvantage on attack rolls against you ' +
-            'until the end of your next turn.',
+            'Profession roll. On a failure, it is Frightened of you for 1 minute, and every ' +
+            'other creature of your choice that sees this has Disadvantage on attack rolls ' +
+            'against you until the end of the next round.',
           ONCE_PER_LONG_REST,
         ),
       ],

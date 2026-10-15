@@ -76,7 +76,7 @@ export const HOSPITALITY: ProfessionDefinition = {
           'Eviction Notice',
           'A creature within 30 feet that can hear you makes a Wisdom saving throw against your ' +
             'Profession roll. On a failure, it is Frightened of you for 1 minute. It repeats the ' +
-            'save at the end of each of its turns.',
+            'save at the end of each round.',
           PB_PER_LONG_REST,
         ),
       ],

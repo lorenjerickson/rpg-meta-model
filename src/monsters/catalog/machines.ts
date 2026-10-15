@@ -110,14 +110,15 @@ export const MACHINES: readonly MonsterStatBlock[] = [
           ['3d6', 'decay'],
         ],
         extra:
-          "The target must succeed on a Hardiness saving throw against {effect:hardiness} or contract embalmer's rot: " +
-          'its Hit Point maximum cannot be restored until the rot is treated.',
+          'The target must succeed on a Hardiness saving throw against {effect:hardiness} or ' +
+          "contract embalmer's rot: its Hit Point maximum cannot be restored until the rot is " +
+          'treated.',
       }),
       save('Dreadful Glare', {
         save: 'sanity',
         dcAttribute: 'wisdom',
         target: 'one creature the specimen can see within 60 feet',
-        failure: 'The target has the Frightened condition until the end of its next turn.',
+        failure: 'The target has the Frightened condition until the end of the next round.',
         success: 'Nothing happens.',
       }),
     ],
@@ -144,11 +145,11 @@ export const MACHINES: readonly MonsterStatBlock[] = [
       feature(
         'Aversion to Fire',
         'If it takes Fire damage, it has Disadvantage on attack rolls and ability checks until ' +
-          'the end of its next turn.',
+          'the end of the next round.',
       ),
       feature(
         'Berserk',
-        'Whenever it starts its turn Bloodied, roll a d6. On a 6, it attacks the nearest ' +
+        'Whenever it starts a round Bloodied, roll a d6. On a 6, it attacks the nearest ' +
           'creature it can see until it is destroyed or regains all its Hit Points.',
       ),
       GALVANIC_ABSORPTION,
@@ -184,9 +185,9 @@ export const MACHINES: readonly MonsterStatBlock[] = [
         reach: 5,
         damage: [['1', 'piercing']],
         extra:
-          'The target must succeed on a Hardiness saving throw against {effect:hardiness} or have the Poisoned ' +
-          'condition for 1 minute. If it fails by 5 or more, it is also Unconscious until it ' +
-          'takes damage or the minute ends.',
+          'The target must succeed on a Hardiness saving throw against {effect:hardiness} or ' +
+          'have the Poisoned condition for 1 minute. If it fails by 5 or more, it is also ' +
+          'Unconscious until it takes damage or the minute ends.',
       }),
     ],
   }),
@@ -261,7 +262,7 @@ export const MACHINES: readonly MonsterStatBlock[] = [
       feature(
         'Boiler',
         'If it takes Cold damage, its Speed is halved and it has Disadvantage on attack rolls ' +
-          'until the end of its next turn.',
+          'until the end of the next round.',
       ),
       feature('Siege Engine', 'It deals double damage to objects and structures.'),
     ],
@@ -431,7 +432,7 @@ export const MACHINES: readonly MonsterStatBlock[] = [
       feature(
         'Incorporeal',
         'It can move through creatures and objects as Difficult Terrain. It takes 5 (1d10) ' +
-          'Concussive damage if it ends its turn inside an object.',
+          'Concussive damage if it ends a round inside an object.',
       ),
     ],
     actions: [
@@ -441,7 +442,8 @@ export const MACHINES: readonly MonsterStatBlock[] = [
         dcAttribute: 'charisma',
         target: 'each creature within 60 feet that can see the apparition',
         failure:
-          'The target has the Frightened condition for 1 minute, repeating the save at the end of each of its turns.',
+          'The target has the Frightened condition for 1 minute, repeating the save at the end ' +
+          'of each round.',
         success: 'Nothing happens.',
       }),
       save('Neural Interference', {

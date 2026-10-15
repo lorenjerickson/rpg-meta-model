@@ -75,9 +75,9 @@ export const MECHANIC: ProfessionDefinition = {
         action(
           'Gadget',
           'Throw a gadget up to 30 feet. Choose smoke (a 10-foot-radius Sphere is Heavily ' +
-            'Obscured until the end of your next turn) or flash (each creature within 10 feet of ' +
-            'it makes a Hardiness saving throw against your Profession roll or is Blinded until the ' +
-            'end of its next turn).',
+            'Obscured until the end of the next round) or flash (each creature within 10 feet of ' +
+            'it makes a Hardiness saving throw against your Profession roll or is Blinded until ' +
+            'the end of the next round).',
           PB_PER_LONG_REST,
         ),
       ],
@@ -104,8 +104,8 @@ export const MECHANIC: ProfessionDefinition = {
         action(
           'Lightning Coil',
           'Each creature in a 60-foot-long, 5-foot-wide Line makes an Agility saving throw ' +
-            'against your Profession roll, taking 6d6 Lightning damage on a failure or half as much ' +
-            'on a success.',
+            'against your Profession roll, taking 6d6 Lightning damage on a failure or half as ' +
+            'much on a success.',
           ONCE_PER_LONG_REST,
         ),
       ],

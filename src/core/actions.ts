@@ -1,6 +1,6 @@
 import { bonus as plus, type DefenseBonus, type RollModifier } from './rollModifiers';
 
-/** The actions any creature can take on its turn. */
+/** The actions any creature can take in a round. */
 export const ACTIONS = [
   'attack',
   'compose',
@@ -22,16 +22,16 @@ export const ACTIONS = [
 
 export type ActionId = (typeof ACTIONS)[number];
 
-/** What part of a creature's turn an activity uses up. */
+/** What part of a creature's round an activity uses up. */
 export type ActionCost = 'action' | 'bonus-action' | 'reaction' | 'free';
 
 export interface ActionDefinition {
   name: string;
   /** The rules, one effect per entry. */
   effects: readonly string[];
-  /** Dice the action grants until the start of your next turn. */
+  /** Dice the action grants until the end of the round. */
   dice?: readonly RollModifier[];
-  /** Flat changes to your defense until the start of your next turn. */
+  /** Flat changes to your defense until the end of the round. */
   defense?: readonly DefenseBonus[];
 }
 
@@ -55,13 +55,13 @@ export const ACTION_DEFINITIONS: Readonly<Record<ActionId, ActionDefinition>> = 
   },
   dash: {
     name: 'Dash',
-    effects: ['For the rest of the turn, you gain extra movement equal to your Speed.'],
+    effects: ['You run: your Speed is doubled for the round.'],
   },
   defend: {
     name: 'Defend',
     effects: [
-      'Choose a creature or object you can see to guard; this is your action for the turn. ' +
-        'Until the start of your next turn, when a creature you can see attacks the guarded ' +
+      'Choose a creature or object you can see to guard; this is your action for the round. ' +
+        'Until the end of the round, when a creature you can see attacks the guarded ' +
         'target, you automatically use your Reaction to make one attack against the attacker ' +
         'after its attack.',
       'With a melee weapon, you must be within your reach of the guarded target, and your reach ' +
@@ -74,12 +74,12 @@ export const ACTION_DEFINITIONS: Readonly<Record<ActionId, ActionDefinition>> = 
   },
   disengage: {
     name: 'Disengage',
-    effects: ["Your movement doesn't provoke Opportunity Attacks for the rest of the turn."],
+    effects: ["Your movement doesn't provoke Opportunity Attacks for the rest of the round."],
   },
   dodge: {
     name: 'Dodge',
     effects: [
-      'Until the start of your next turn, your defense increases by 4 and you add 1d6 to ' +
+      'Until the end of the round, your defense increases by 4 and you add 1d6 to ' +
         'Agility saving throws.',
       'You lose these benefits if you are Incapacitated or your Speed is 0.',
     ],
@@ -90,9 +90,9 @@ export const ACTION_DEFINITIONS: Readonly<Record<ActionId, ActionDefinition>> = 
     name: 'Help',
     effects: [
       'Assist an ally with a task you could attempt yourself: they add 1d6 to their next ' +
-        'ability check for it before the start of your next turn.',
+        'ability check for it before the end of the round.',
       'Or distract a creature within 5 feet of you: the next attack an ally makes against it ' +
-        'before the start of your next turn adds 1d6.',
+        'before the end of the round adds 1d6.',
     ],
   },
   hide: {
@@ -125,8 +125,10 @@ export const ACTION_DEFINITIONS: Readonly<Record<ActionId, ActionDefinition>> = 
   ready: {
     name: 'Ready',
     effects: [
-      'Choose a trigger and an action. When the trigger happens before the start of your next ' +
-        'turn, you can take that action as a Reaction, or move up to your Speed.',
+      'Declare an attack, Operate or Utilize as your reaction, with a trigger: a creature enters ' +
+        'a location or comes within your reach or range, a creature leaves a location, or a ' +
+        'creature attacks or targets a given creature. When the trigger happens, you take that ' +
+        'action as your Reaction.',
       'Readying an apparatus effect needs Concentration until it is released.',
     ],
   },
@@ -155,9 +157,9 @@ export const ACTION_DEFINITIONS: Readonly<Record<ActionId, ActionDefinition>> = 
   'take-cover': {
     name: 'Take Cover',
     effects: [
-      'Move up to half your Speed into cover and hunker down. Until the start of your next ' +
-        'turn, your cover counts as one step better: none becomes half, half becomes ' +
-        'three-quarters, and three-quarters becomes total.',
+      'Move up to half your Speed into cover and hunker down. Until the end of the round, your ' +
+        'cover counts as one step better: none becomes half, half becomes three-quarters, and ' +
+        'three-quarters becomes total.',
       'You lose the benefit if you leave the cover or attack.',
     ],
   },

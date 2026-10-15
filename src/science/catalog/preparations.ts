@@ -77,7 +77,7 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
       savingThrow: 'hardiness',
       description:
         'Each creature in the Sphere makes a Hardiness saving throw or is Incapacitated until ' +
-        'the end of its next turn, when it repeats the save. If it fails again, it is ' +
+        'the end of the next round, when it repeats the save. If it fails again, it is ' +
         'Unconscious for the duration or until it takes damage or someone shakes it awake.',
     },
   }),
@@ -113,7 +113,7 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
       duration: lasting(1, 'hour'),
       savingThrow: 'agility',
       description:
-        'The Cube is Difficult Terrain. Each creature that starts its turn there or enters it ' +
+        'The Cube is Difficult Terrain. Each creature that starts a round there or enters it ' +
         'makes an Agility saving throw or is Restrained. It can escape with a Might (Athletics) ' +
         'check against the same DC. The foam is flammable.',
     },
@@ -133,9 +133,9 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
       duration: lasting(1, 'minute'),
       savingThrow: 'agility',
       description:
-        'Each creature in the Cube makes an Agility saving throw. On a failure, it glows with Dim ' +
-        "Light in a 10-foot radius, attack rolls against it have Advantage, and it can't benefit " +
-        'from the Unseen condition.',
+        'Each creature in the Cube makes an Agility saving throw. On a failure, it glows with ' +
+        "Dim Light in a 10-foot radius, attack rolls against it have Advantage, and it can't " +
+        'benefit from the Unseen condition.',
     },
   }),
   preparation('dynamite-stick', {
@@ -214,9 +214,9 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
       duration: lasting(1, 'minute'),
       description:
         'For the duration, the creature has double Speed and +2 defense, adds 1d6 to Agility ' +
-        'saving throws, and can take one extra action each turn: a single weapon ' +
+        'saving throws, and can take one extra action each round: a single weapon ' +
         "attack, Dash, Disengage, Hide or Utilize. When it ends, the creature can't move or take " +
-        'actions until after its next turn.',
+        'actions until the end of the next round.',
     },
   }),
   preparation('chlorine-gas-canister', {
@@ -236,7 +236,7 @@ export const PREPARATIONS: readonly PreparationDefinition[] = [
       damage: [{ dice: dice(5, 8), type: 'poison' }],
       description:
         'The Sphere is Heavily Obscured. A creature makes a Hardiness saving throw when the gas ' +
-        'first reaches it and when it starts its turn there, taking the damage on a failure or ' +
+        'first reaches it and when it starts a round there, taking the damage on a failure or ' +
         'half on a success. The gas drifts 10 feet downwind at the start of each round and sinks ' +
         'into low ground.',
     },

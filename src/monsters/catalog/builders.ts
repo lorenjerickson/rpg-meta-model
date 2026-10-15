@@ -127,9 +127,9 @@ export function horrifyingPresence(dcAttribute: Attribute = 'charisma'): SaveSpe
   return save('Horrifying Presence', {
     save: 'sanity',
     dcAttribute,
-    target: 'each creature that starts its turn within 30 feet of it and can see it',
+    target: 'each creature that starts a round within 30 feet of it and can see it',
     failure:
-      'The creature is Frightened until the start of its next turn. If it fails by 5 or more, ' +
+      'The creature is Frightened until the end of the round. If it fails by 5 or more, ' +
       'it also gains 1 level of Madness. A creature that succeeds is immune to this trait for ' +
       '24 hours.',
     success: 'The creature is immune to this trait for 24 hours.',

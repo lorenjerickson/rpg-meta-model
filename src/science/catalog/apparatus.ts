@@ -72,7 +72,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         attack: 'melee',
         damage: [{ dice: dice(1, 8), type: 'lightning' }],
         description:
-          "On a hit, the target can't take Reactions until the start of its next turn. You have " +
+          "On a hit, the target can't take Reactions until the end of the round. You have " +
           'Advantage on the attack if the target is wearing metal armor.',
       },
     ],
@@ -117,7 +117,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         attack: 'ranged',
         damage: [{ dice: dice(1, 8), type: 'cold' }],
         description:
-          "On a hit, the target's Speed is reduced by 10 feet until the start of your next turn.",
+          "On a hit, the target's Speed is reduced by 10 feet until the end of the round.",
       },
     ],
   }),
@@ -138,7 +138,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         duration: lasting(1, 'minute'),
         description:
           'The arm can pick up, move, open or close an object weighing up to 10 pounds, but ' +
-          "can't attack. You control it with a Utilize action each turn.",
+          "can't attack. You control it with a Utilize action each round.",
       },
     ],
   }),
@@ -199,8 +199,8 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         savingThrow: 'wisdom',
         description:
           'A humanoid you can see makes a Wisdom saving throw, with Advantage if you or your ' +
-          'allies are fighting it. On a failure, it is Mesmerised by you until the effect ends or ' +
-          'you or your allies harm it. Afterwards it knows it was mesmerized.',
+          'allies are fighting it. On a failure, it is Mesmerised by you until the effect ends ' +
+          'or you or your allies harm it. Afterwards it knows it was mesmerized.',
         overcharge: 'One more humanoid for each extra charge.',
       },
       {
@@ -212,7 +212,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         savingThrow: 'wisdom',
         description:
           'A creature you can see makes a Wisdom saving throw. On a failure, it obeys a ' +
-          'one-word command (approach, drop, flee, grovel or halt) on its next turn.',
+          'one-word command (approach, drop, flee, grovel or halt) during the next round.',
         overcharge: 'One more creature for each extra charge.',
       },
       {
@@ -224,8 +224,8 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         savingThrow: 'wisdom',
         description:
           'A creature you can see that can hear and understand you makes a Wisdom saving throw. ' +
-          'On a failure, it follows a reasonable-sounding course of action you suggest in no more ' +
-          'than 25 words.',
+          'On a failure, it follows a reasonable-sounding course of action you suggest in no ' +
+          'more than 25 words.',
       },
       {
         name: 'Domination',
@@ -235,8 +235,8 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         duration: sustained(1, 'minute'),
         savingThrow: 'wisdom',
         description:
-          'A humanoid you can see makes a Wisdom saving throw. On a failure, it is Mesmerised and ' +
-          'obeys your spoken commands. It repeats the save each time it takes damage.',
+          'A humanoid you can see makes a Wisdom saving throw. On a failure, it is Mesmerised ' +
+          'and obeys your spoken commands. It repeats the save each time it takes damage.',
         overcharge: 'The duration becomes 10 minutes for one extra charge, or 1 hour for two.',
       },
     ],
@@ -336,7 +336,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         range: SELF,
         duration: lasting(1, 'round'),
         description:
-          'Your defense increases by 5 until the start of your next turn, including against the ' +
+          'Your defense increases by 5 until the end of the round, including against the ' +
           'triggering attack.',
       },
     ],
@@ -427,7 +427,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         savingThrow: 'hardiness',
         description:
           'A humanoid you can see makes a Hardiness saving throw or is Paralyzed. It repeats the ' +
-          'save at the end of each of its turns, ending the effect on a success.',
+          'save at the end of each round, ending the effect on a success.',
         overcharge: 'One more humanoid for each extra charge.',
       },
     ],
@@ -528,7 +528,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         duration: sustained(1, 'minute'),
         savingThrow: 'might',
         description:
-          'A blast of air fills the Line. Each creature that starts its turn there makes a Might ' +
+          'A blast of air fills the Line. Each creature that starts a round there makes a Might ' +
           'saving throw or is pushed 15 feet along it. Moving toward you through the Line costs ' +
           'double movement, and it disperses gas, smoke and unprotected flames.',
       },
@@ -669,8 +669,8 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         savingThrow: 'sanity',
         description:
           'Each creature in the Cone makes a Sanity saving throw or drops what it is holding and ' +
-          'is Frightened, taking the Dash action away from you on its turns. It repeats the save ' +
-          "at the end of each turn on which it can't see you.",
+          'is Frightened, taking the Dash action away from you each round. It repeats the save ' +
+          "at the end of each round in which it can't see you.",
       },
     ],
   }),
@@ -694,9 +694,9 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         savingThrow: 'sanity',
         description:
           "Each creature in the Sphere makes a Sanity saving throw. On a failure, it can't take " +
-          'Reactions and rolls 1d10 at the start of each turn: on 1 it moves in a random ' +
+          'Reactions and rolls 1d10 at the start of each round: on 1 it moves in a random ' +
           'direction, on 2-6 it does nothing, on 7-8 it attacks a random creature within reach, ' +
-          'and on 9-10 it acts normally. It repeats the save at the end of each of its turns.',
+          'and on 9-10 it acts normally. It repeats the save at the end of each round.',
         overcharge: '+5 feet to the radius for each extra charge.',
       },
     ],
@@ -719,7 +719,7 @@ export const APPARATUS: readonly ApparatusDefinition[] = [
         duration: sustained(10, 'minute'),
         savingThrow: 'might',
         description:
-          'On each of your turns you can take a Utilize action to move an iron or steel object ' +
+          'Each round you can take a Utilize action to move an iron or steel object ' +
           'of up to 1,000 pounds up to 30 feet, or a creature wearing or holding substantial ' +
           'iron or steel, which can resist with a Might saving throw.',
       },
