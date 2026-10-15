@@ -19,6 +19,9 @@
     "simulate": "pnpm --filter @dnd-domain/system simulate",
     "db:start": "pnpm --filter @dnd-domain/db start",
     "db:stop": "pnpm --filter @dnd-domain/db stop",
+    "docker:up": "docker compose up --build --detach --wait",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs --follow",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

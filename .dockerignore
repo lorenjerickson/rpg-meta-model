@@ -1,0 +1,9 @@
+**/node_modules
+**/dist
+**/coverage
+**/.next
+**/.turbo
+**/*.tsbuildinfo
+**/next-env.d.ts
+**/.env
+.git

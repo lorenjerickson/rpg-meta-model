@@ -37,6 +37,17 @@ pnpm dev
 `pnpm dev` builds the packages, then runs the web app (port 3000) and the API (port 3001), and
 rebuilds packages as they change.
 
+## Running in Docker
+
+`pnpm docker:up` builds images for the API and web app and starts them with PostgreSQL, using
+`compose.yaml` at the root (which includes `apps/db/compose.yaml`). It waits until every
+service is healthy. The web app is on port 3000, the API on 3001 and PostgreSQL on 5432; set
+`WEB_PORT`, `API_PORT` or `POSTGRES_PORT` to change them. `pnpm docker:down` stops and
+removes the containers, keeping the database's data.
+
+Each app's Dockerfile prunes the monorepo to that app and its packages with `turbo prune`, so
+images only rebuild when something they use changes.
+
 ## Scripts
 
 Run from the root, these use Turbo to run the script in every package that has it, building
@@ -53,6 +64,9 @@ dependencies first and caching results.
 | `pnpm simulate`      | Play-test combat with the system's simulation        |
 | `pnpm db:start`      | Start the local PostgreSQL database (needs Docker)   |
 | `pnpm db:stop`       | Stop the database, keeping its data                  |
+| `pnpm docker:up`     | Build and start the whole stack in Docker            |
+| `pnpm docker:down`   | Stop and remove the stack, keeping its data          |
+| `pnpm docker:logs`   | Follow the stack's logs                              |
 | `pnpm format`        | Format the repository with Prettier (`format:check`) |
 
 To run a script in one package, filter by name, for example

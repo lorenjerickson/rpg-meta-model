@@ -11,7 +11,10 @@ A NestJS 12 HTTP API serving the game system's data from `@dnd-domain/system`.
 | `GET /monsters/:id`    | One stat block, or 404 |
 
 It listens on `PORT` (default 3001) and allows cross-origin requests from `WEB_ORIGIN` (default
-`http://localhost:3000`, the web app).
+`http://localhost:3000`, the web app). In Docker it also receives `DATABASE_URL` for the stack's
+PostgreSQL; nothing uses it yet.
+
+The `Dockerfile` builds a production image from the repository root (`pnpm docker:up` does this).
 
 Nest 12 is ESM-only and relies on decorator metadata for dependency injection, so the app uses
 `@dnd-domain/config/tsconfig/nest.json` (Node ESM resolution, so relative imports end in `.js`)

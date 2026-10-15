@@ -13,6 +13,8 @@ running.
 | `pnpm reset` | Remove the container and delete all its data                   |
 
 From the repository root, `pnpm db:start` and `pnpm db:stop` do the same as `start` and `stop`.
+The root `compose.yaml` includes this file, so `pnpm docker:up` runs the same database, with the
+same data, alongside the API and web app.
 
 By default the database is `dnd`, with user `dnd` and password `dnd`, on port 5432:
 

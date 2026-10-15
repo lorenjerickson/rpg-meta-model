@@ -1,0 +1,33 @@
+# The whole stack: PostgreSQL, the API and the web app. Run from the repository root with
+# `pnpm docker:up`. The credentials are for local use only.
+name: dnd-domain
+
+include:
+  - apps/db/compose.yaml
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      PORT: 3001
+      WEB_ORIGIN: http://localhost:${WEB_PORT:-3000}
+      DATABASE_URL: postgres://${POSTGRES_USER:-dnd}:${POSTGRES_PASSWORD:-dnd}@postgres:5432/${POSTGRES_DB:-dnd}
+    ports:
+      - '${API_PORT:-3001}:3001'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      API_URL: http://api:3001
+    ports:
+      - '${WEB_PORT:-3000}:3000'
+    depends_on:
+      api:
+        condition: service_healthy
