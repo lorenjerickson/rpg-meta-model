@@ -1,0 +1,14 @@
+{
+  "name": "@dnd-domain/db",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A local PostgreSQL database for development, run with Docker Compose",
+  "scripts": {
+    "start": "docker compose up --detach --wait",
+    "stop": "docker compose stop",
+    "logs": "docker compose logs --follow postgres",
+    "psql": "docker compose exec postgres psql",
+    "down": "docker compose down",
+    "reset": "docker compose down --volumes"
+  }
+}

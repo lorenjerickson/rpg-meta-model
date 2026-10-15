@@ -1,0 +1,26 @@
+# A local PostgreSQL for development. The credentials are for local use only.
+name: dnd-domain
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-dnd}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dnd}
+      POSTGRES_DB: ${POSTGRES_DB:-dnd}
+      # Defaults for psql and pg_isready inside the container.
+      PGUSER: ${POSTGRES_USER:-dnd}
+      PGDATABASE: ${POSTGRES_DB:-dnd}
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      # PostgreSQL 18 images keep their data in a versioned folder under /var/lib/postgresql.
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD', 'pg_isready']
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+volumes:
+  postgres-data:

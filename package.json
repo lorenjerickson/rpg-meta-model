@@ -17,6 +17,8 @@
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
     "simulate": "pnpm --filter @dnd-domain/system simulate",
+    "db:start": "pnpm --filter @dnd-domain/db start",
+    "db:stop": "pnpm --filter @dnd-domain/db stop",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

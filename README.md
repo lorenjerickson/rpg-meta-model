@@ -10,6 +10,7 @@ with [pnpm](https://pnpm.io).
 | ----------------- | -------------------- | ------------------------------------------------------------- |
 | `apps/web`        | `@dnd-domain/web`    | Next.js 16 app (React 19, React Compiler)                     |
 | `apps/api`        | `@dnd-domain/api`    | NestJS 12 API serving the system's catalogs                   |
+| `apps/db`         | `@dnd-domain/db`     | Local PostgreSQL 18 for development, run with Docker Compose  |
 | `packages/system` | `@dnd-domain/system` | The game system: domain model, rules and catalogs             |
 | `packages/ai`     | `@dnd-domain/ai`     | AI features (empty for now)                                   |
 | `packages/ui`     | `@dnd-domain/ui`     | Shared React components                                       |
@@ -50,6 +51,8 @@ dependencies first and caching results.
 | `pnpm typecheck`     | Type-check everything                                |
 | `pnpm lint`          | Lint everything (`lint:fix` to auto-fix)             |
 | `pnpm simulate`      | Play-test combat with the system's simulation        |
+| `pnpm db:start`      | Start the local PostgreSQL database (needs Docker)   |
+| `pnpm db:stop`       | Stop the database, keeping its data                  |
 | `pnpm format`        | Format the repository with Prettier (`format:check`) |
 
 To run a script in one package, filter by name, for example
