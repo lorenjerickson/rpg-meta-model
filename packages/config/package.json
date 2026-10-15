@@ -1,0 +1,51 @@
+{
+  "name": "@dnd-domain/config",
+  "version": "0.1.0",
+  "description": "Shared tooling configuration: TypeScript, ESLint, Prettier, tsdown and Vitest",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./tsconfig/base.json": "./tsconfig/base.json",
+    "./tsconfig/library.json": "./tsconfig/library.json",
+    "./tsconfig/react-library.json": "./tsconfig/react-library.json",
+    "./tsconfig/nextjs.json": "./tsconfig/nextjs.json",
+    "./eslint": "./eslint/base.js",
+    "./eslint/react": "./eslint/react.js",
+    "./eslint/next": "./eslint/next.js",
+    "./prettier": "./prettier.json",
+    "./tsdown": {
+      "types": "./tsdown.d.ts",
+      "default": "./tsdown.js"
+    },
+    "./vitest": {
+      "types": "./vitest.d.ts",
+      "default": "./vitest.js"
+    }
+  },
+  "dependencies": {
+    "@eslint/js": "catalog:",
+    "eslint-config-next": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "eslint-plugin-react-hooks": "catalog:",
+    "typescript-eslint": "catalog:"
+  },
+  "peerDependencies": {
+    "eslint": "catalog:",
+    "tsdown": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "tsdown": {
+      "optional": true
+    },
+    "vitest": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "eslint": "catalog:",
+    "tsdown": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,0 +1,36 @@
+:root {
+  --background: #f7f3ea;
+  --foreground: #1f1a14;
+  --rule: #b9ab92;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #16130f;
+    --foreground: #ece4d4;
+    --rule: #5a4f3f;
+  }
+}
+
+body {
+  margin: 0;
+  padding: 2rem 1rem;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+main {
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+.panel {
+  border-top: 1px solid var(--rule);
+  padding: 1rem 0;
+}
+
+.panel-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+}

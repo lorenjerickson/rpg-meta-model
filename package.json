@@ -1,54 +1,29 @@
 {
   "name": "dnd-domain",
-  "version": "0.1.0",
-  "description": "TypeScript domain model and rules helpers for D&D 5e (2024 rules, SRD 5.2)",
+  "private": true,
+  "description": "A Victorian, steampunk and gothic-horror tabletop system built on D&D 5e (SRD 5.2), with its tools and web app",
   "license": "MIT",
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.cts",
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      },
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      }
-    },
-    "./package.json": "./package.json"
+  "packageManager": "pnpm@11.9.0",
+  "engines": {
+    "node": ">=20.9.0"
   },
-  "files": [
-    "dist"
-  ],
-  "sideEffects": false,
   "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "simulate": "tsx scripts/simulate.ts",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:coverage": "turbo run test:coverage",
+    "simulate": "pnpm --filter @dnd-domain/system simulate",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "prepublishOnly": "npm run lint && npm run typecheck && npm test && npm run build"
+    "format:check": "prettier --check ."
   },
+  "prettier": "@dnd-domain/config/prettier",
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/node": "^26.6.5",
-    "@vitest/coverage-v8": "^5.0.4",
-    "eslint": "^10.12.0",
-    "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.9.10",
-    "tsdown": "^0.23.1",
-    "tsx": "^4.23.15",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.71.2",
-    "vitest": "^5.0.4"
+    "@dnd-domain/config": "workspace:*",
+    "prettier": "catalog:",
+    "turbo": "catalog:"
   }
 }

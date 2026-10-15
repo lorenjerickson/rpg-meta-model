@@ -1,4 +1,7 @@
 dist
-node_modules
 coverage
-package-lock.json
+node_modules
+.next
+.turbo
+next-env.d.ts
+pnpm-lock.yaml

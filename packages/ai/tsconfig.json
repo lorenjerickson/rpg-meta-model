@@ -1,0 +1,7 @@
+{
+  "extends": "@dnd-domain/config/tsconfig/library.json",
+  "compilerOptions": {
+    "outDir": "dist"
+  },
+  "include": ["src", "tsdown.config.ts", "vitest.config.ts", "eslint.config.js"]
+}
