@@ -41,10 +41,13 @@ The components use hooks and browser events, so the build marks them as client c
 | `Text`                                      | Text in Dusk's type styles (display, headings, body, label, caption, code)                                                                                                                                    |
 | `Logo`                                      | The Wanderlust compass mark and wordmark                                                                                                                                                                      |
 | `Icon`, `IconButton`                        | Named stroke icons (from Lucide), and a 32px ghost button holding one                                                                                                                                         |
+| `ShapeForm`                                 | A form generated from a shape (`inferShape` in `@dnd-domain/utils`): simple fields in a grid, small groups inline, lists of entities as rows you add, edit and remove, opened one at a time with a trail back |
+| `MediaEditor`                               | An item's picture: upload, generate, remove, and an icon picker                                                                                                                                               |
 
-`Text` (with an optional status `tone`), `Logo`, `Icon`, `IconButton`, SideNav's collapsible mode and Link's `as` (for router links) are additions: Dusk defines
+`Text` (with an optional status `tone`), `Logo`, `Icon`, `IconButton`, `ShapeForm`,
+`MediaEditor`, SideNav's collapsible mode and Link's `as` (for router links) are additions: Dusk defines
 type styles but no text component or icon set, the logo comes from the Wanderlust navigation
-design, and the apps needed a drawer that collapses to icons. Icons come from
+design, and the apps needed a drawer that collapses to icons, generated forms and image editing. Icons come from
 [Lucide](https://lucide.dev), grouped by theme in `ICON_GROUPS`; add one there before using it.
 
 `colors`, `fonts`, `space`, `radius` and `elevation` export the token values for code that

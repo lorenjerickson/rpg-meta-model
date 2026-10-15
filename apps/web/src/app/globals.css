@@ -59,3 +59,53 @@ body {
   gap: var(--space-2);
   max-width: 720px;
 }
+
+/* A list entry's name, with an Edited tag beside it. */
+.entry-title {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* The entry editor: the picture beside the form, stacked on narrow screens. */
+.editor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-8);
+}
+
+.editor__media {
+  flex: 1 1 260px;
+  max-width: 320px;
+}
+
+.editor__form {
+  flex: 999 1 480px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Save and status stay in view while the form scrolls, under the 64px header. */
+.editor__bar {
+  position: sticky;
+  top: 64px;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 12px 0;
+  background: var(--charcoal-950);
+  border-bottom: 1px solid var(--charcoal-700);
+}
+
+.editor__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

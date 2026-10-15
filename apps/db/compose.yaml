@@ -1,4 +1,5 @@
-# A local PostgreSQL for development. The credentials are for local use only.
+# Local data services for development: PostgreSQL, and S3-compatible object storage (RustFS) for
+# the content repository. The credentials are for local use only.
 name: dnd-domain
 
 services:
@@ -22,5 +23,25 @@ services:
       timeout: 5s
       retries: 15
 
+  storage:
+    image: rustfs/rustfs:1.0.0
+    environment:
+      RUSTFS_ACCESS_KEY: ${S3_ACCESS_KEY_ID:-dnd-content}
+      RUSTFS_SECRET_KEY: ${S3_SECRET_ACCESS_KEY:-dnd-content-secret}
+      RUSTFS_VOLUMES: /data
+      RUSTFS_ADDRESS: ':9000'
+      RUSTFS_CONSOLE_ENABLE: 'true'
+    ports:
+      - '${S3_PORT:-9000}:9000'
+      - '${S3_CONSOLE_PORT:-9001}:9001'
+    volumes:
+      - storage-data:/data
+    healthcheck:
+      test: ['CMD', 'curl', '-fsS', '-o', '/dev/null', 'http://localhost:9000/health']
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
 volumes:
   postgres-data:
+  storage-data:

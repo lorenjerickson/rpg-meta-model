@@ -6,16 +6,16 @@ with [pnpm](https://pnpm.io).
 
 ## Layout
 
-| Folder            | Package              | Contents                                                       |
-| ----------------- | -------------------- | -------------------------------------------------------------- |
-| `apps/web`        | `@dnd-domain/web`    | Next.js 16 app (React 19, React Compiler)                      |
-| `apps/api`        | `@dnd-domain/api`    | NestJS 12 API serving the system's catalogs                    |
-| `apps/db`         | `@dnd-domain/db`     | Local PostgreSQL 18 for development, run with Docker Compose   |
-| `packages/system` | `@dnd-domain/system` | The game system: domain model, rules and catalogs              |
-| `packages/ai`     | `@dnd-domain/ai`     | AI features (empty for now)                                    |
-| `packages/ui`     | `@dnd-domain/ui`     | The Dusk design system as React components; all app UI uses it |
-| `packages/utils`  | `@dnd-domain/utils`  | Small general-purpose helpers                                  |
-| `packages/config` | `@dnd-domain/config` | Shared TypeScript, ESLint, Prettier, tsdown and Vitest config  |
+| Folder            | Package              | Contents                                                               |
+| ----------------- | -------------------- | ---------------------------------------------------------------------- |
+| `apps/web`        | `@dnd-domain/web`    | Next.js 16 app (React 19, React Compiler)                              |
+| `apps/api`        | `@dnd-domain/api`    | NestJS 12 API: catalogs, edits, images and the content repository      |
+| `apps/db`         | `@dnd-domain/db`     | Local Postgres and S3-compatible storage (RustFS), with Docker Compose |
+| `packages/system` | `@dnd-domain/system` | The game system: domain model, rules and catalogs                      |
+| `packages/ai`     | `@dnd-domain/ai`     | AI features: image generation (OpenAI) behind a provider interface     |
+| `packages/ui`     | `@dnd-domain/ui`     | The Dusk design system as React components; all app UI uses it         |
+| `packages/utils`  | `@dnd-domain/utils`  | Shape inference and validation, the catalog API types, small helpers   |
+| `packages/config` | `@dnd-domain/config` | Shared TypeScript, ESLint, Prettier, tsdown and Vitest config          |
 
 The libraries in `packages` are all set up the same way: built with tsdown to ESM and CommonJS
 with type declarations, tested with Vitest, and type-checked and linted with the shared settings
@@ -31,11 +31,23 @@ pnpm install
 ```
 
 ```bash
+pnpm db:start
+```
+
+```bash
 pnpm dev
 ```
 
-`pnpm dev` builds the packages, then runs the web app (port 3000) and the API (port 3001), and
+Copy `apps/api/.env.example` to `apps/api/.env` first so the API uses the database and storage that `pnpm db:start` runs. `pnpm dev` builds the packages, then runs the web app (port 3000) and the API (port 3001), and
 rebuilds packages as they change.
+
+## Catalogs and images
+
+The System pages list the game system's seeded catalogs. Each entry's name links to an editor
+whose form is generated at runtime from the entry's inferred shape, so every catalog edits the
+same way without per-entity code. Each entry has an image (uploaded, or generated with OpenAI)
+or an icon, shown as a thumbnail wherever it is listed. Edits and image records live in Postgres,
+images in S3-compatible storage. See [apps/api/README.md](apps/api/README.md) for the details.
 
 ## Running in Docker
 
@@ -43,7 +55,7 @@ rebuilds packages as they change.
 `compose.yaml` at the root (which includes `apps/db/compose.yaml`). It waits until every
 service is healthy. The web app is on port 3000, the API on 3001 and PostgreSQL on 5432; set
 `WEB_PORT`, `API_PORT` or `POSTGRES_PORT` to change them. `pnpm docker:down` stops and
-removes the containers, keeping the database's data.
+removes the containers, keeping the stored data. Set `OPENAI_API_KEY` in the environment or a root `.env` file to turn on image generation.
 
 Each app's Dockerfile prunes the monorepo to that app and its packages with `turbo prune`, so
 images only rebuild when something they use changes.

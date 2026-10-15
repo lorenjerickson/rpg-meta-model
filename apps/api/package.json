@@ -18,19 +18,26 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "catalog:",
+    "@dnd-domain/ai": "workspace:*",
     "@dnd-domain/system": "workspace:*",
+    "@dnd-domain/utils": "workspace:*",
     "@nestjs/common": "catalog:",
     "@nestjs/core": "catalog:",
     "@nestjs/platform-express": "catalog:",
+    "pg": "catalog:",
     "reflect-metadata": "catalog:",
-    "rxjs": "catalog:"
+    "rxjs": "catalog:",
+    "sharp": "catalog:"
   },
   "devDependencies": {
     "@dnd-domain/config": "workspace:*",
     "@nestjs/cli": "catalog:",
     "@nestjs/testing": "catalog:",
     "@types/express": "catalog:",
+    "@types/multer": "catalog:",
     "@types/node": "catalog:",
+    "@types/pg": "catalog:",
     "@types/supertest": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "eslint": "catalog:",

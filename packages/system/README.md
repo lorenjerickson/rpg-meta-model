@@ -15,6 +15,9 @@ TypeScript domain model and rules helpers for D&D 5th edition, following the 202
 | `src/equipment`   | Items, body slots, weapons and firearms, armour, tools, gear, mounts and vehicles, and the catalog |
 | `src/monsters`    | Stat blocks, challenge ratings, encounter XP budgets, and the bestiary                             |
 
+`CATALOGS` lists every seeded catalog (skills, ethnicities, professions, weapons, the bestiary
+and the rest) with its entries and how to summarise one, for browsing and editing them.
+
 Closed sets such as attributes, skills and conditions are `as const` arrays with a derived
 union type (`SKILLS` / `Skill`).
 

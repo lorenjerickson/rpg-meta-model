@@ -39,6 +39,7 @@
     "prepublishOnly": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build"
   },
   "dependencies": {
+    "@dnd-domain/utils": "workspace:*",
     "lucide-react": "catalog:"
   },
   "peerDependencies": {

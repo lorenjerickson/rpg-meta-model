@@ -1,4 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server';
+import { inferShape, type ShapeError } from '@dnd-domain/utils';
 import { describe, expect, it } from 'vitest';
 import {
   Badge,
@@ -14,7 +15,9 @@ import {
   Input,
   List,
   Logo,
+  MediaEditor,
   RadioGroup,
+  ShapeForm,
   SideNav,
   Switch,
   Text,
@@ -219,5 +222,168 @@ describe('icons and the collapsible SideNav', () => {
     const markup = html(<SideNav title="Worlds" groups={groups} modal collapsible collapsed />);
     expect(markup).not.toContain('ds-sidenav--collapsed');
     expect(markup).not.toContain('Collapse navigation');
+  });
+});
+
+describe('ShapeForm', () => {
+  const shape = inferShape(
+    [
+      {
+        id: 'sabre',
+        name: 'Sabre',
+        cost: 300,
+        concealable: false,
+        attribute: 'might',
+        properties: ['finesse'],
+        damage: { dice: '1d8' },
+        parentId: null,
+      },
+      {
+        id: 'rifle',
+        name: 'Rifle',
+        cost: 900,
+        concealable: false,
+        attribute: 'agility',
+        properties: [],
+        damage: { dice: '1d10' },
+        parentId: 'sabre',
+        capacity: 5,
+      },
+    ],
+    {
+      valueSets: [
+        { name: 'attributes', values: ['might', 'agility'] },
+        { name: 'weapon_properties', values: ['finesse', 'heavy'] },
+      ],
+      readOnly: ['id'],
+    },
+  );
+  const render = (value: unknown, errors: ShapeError[] = []) =>
+    html(<ShapeForm shape={shape} value={value} onChange={() => undefined} errors={errors} />);
+  const sabre = {
+    id: 'sabre',
+    name: 'Sabre',
+    cost: 300,
+    concealable: false,
+    attribute: 'might',
+    properties: ['finesse'],
+    damage: { dice: '1d8' },
+    parentId: null,
+  };
+
+  it('generates a control for every kind of field', () => {
+    const markup = render(sabre);
+    // The id field is read-only.
+    expect(markup).toMatch(/<input(?=[^>]*disabled="")(?=[^>]*value="sabre")[^>]*>/);
+    expect(markup).toContain('type="number"');
+    expect(markup).toContain('role="switch"');
+    expect(markup).toContain('role="combobox"');
+    expect(markup).toContain('aria-label="Remove Finesse"');
+    // A small object of simple fields is shown in place, under a light heading.
+    expect(markup).toContain('<span class="ds-section__label">Damage</span>');
+  });
+
+  it('offers absent optional and null fields to add back', () => {
+    const markup = render(sabre);
+    expect(markup).toContain('+ Capacity');
+    expect(markup).toContain('+ Parent id');
+  });
+
+  it('shows errors beside their fields', () => {
+    expect(render(sabre, [{ path: ['cost'], message: 'must be a number' }])).toContain(
+      'must be a number',
+    );
+  });
+});
+
+describe('ShapeForm lists and nested objects', () => {
+  const professions = [
+    {
+      name: 'Soldier',
+      hitPoints: { average: 22, formula: { count: 4, die: 8 } },
+      specializations: [
+        { name: 'Rifleman', rank: 'apprentice', actions: [{ name: 'Steady Aim' }] },
+        { name: 'Sniper', rank: 'journeyman', actions: [] },
+      ],
+    },
+  ];
+  const shape = inferShape(professions);
+  const markup = html(
+    <ShapeForm
+      shape={shape}
+      value={professions[0]}
+      onChange={() => undefined}
+      errors={[{ path: ['specializations', 1, 'rank'], message: 'is required' }]}
+    />,
+  );
+
+  it('shows a list of entities as rows to edit or remove', () => {
+    expect(markup).toContain('<span class="ds-section__label">Specializations</span>');
+    expect(markup).toContain('<span class="ds-section__count">2</span>');
+    expect(markup).toContain('>Rifleman</button>');
+    expect(markup).toContain('Rank: Apprentice');
+    expect(markup).toContain('aria-label="Edit Sniper"');
+    expect(markup).toContain('aria-label="Remove Sniper"');
+    expect(markup).toContain('+ Specialization');
+  });
+
+  it('keeps the rows’ own lists out of view until an item is opened', () => {
+    expect(markup).not.toContain('Steady Aim');
+  });
+
+  it('shows a larger nested object as one row, and flags problems inside rows', () => {
+    expect(markup).toContain('>Hit points</button>');
+    expect(markup).toContain('Average: 22');
+    expect(markup).toContain('aria-label="1 problems in Sniper"');
+  });
+});
+
+describe('MediaEditor', () => {
+  const props = {
+    name: 'Ghoul',
+    icon: 'skull' as const,
+    defaultPrompt: 'Ghoul: a pallid eater of the dead',
+    onUpload: () => undefined,
+    onGenerate: () => undefined,
+    onRemoveImage: () => undefined,
+    onIconChange: () => undefined,
+  };
+
+  it('shows the icon without an image, and explains when generation is off', () => {
+    const markup = html(<MediaEditor {...props} canGenerate={false} />);
+    expect(markup).toContain('aria-label="Ghoul icon"');
+    expect(markup).toContain('OPENAI_API_KEY');
+    expect(markup).not.toContain('Remove image');
+    expect(markup).toContain('aria-pressed="true"');
+  });
+
+  it('shows the image with a remove action', () => {
+    const markup = html(<MediaEditor {...props} canGenerate imageUrl="/content/x.webp" />);
+    expect(markup).toContain('<img class="ds-media__image" src="/content/x.webp" alt="Ghoul"/>');
+    expect(markup).toContain('Remove image');
+  });
+});
+
+describe('ShapeForm row titles', () => {
+  const shape = inferShape([
+    {
+      weaponProficiencies: [{ category: 'simple' }],
+      specializations: [{ name: 'Rifleman', rank: 'apprentice' }],
+    },
+  ]);
+
+  it('names unnamed items by their first simple value, and untitled named ones by position', () => {
+    const markup = html(
+      <ShapeForm
+        shape={shape}
+        value={{
+          weaponProficiencies: [{ category: 'martial' }],
+          specializations: [{ name: '', rank: 'novice' }],
+        }}
+        onChange={() => undefined}
+      />,
+    );
+    expect(markup).toContain('>Martial</button>');
+    expect(markup).toContain('>Specialization 1</button>');
   });
 });

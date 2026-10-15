@@ -2,7 +2,7 @@
   "extends": "@dnd-domain/config/tsconfig/nest.json",
   "compilerOptions": {
     "outDir": "dist",
-    "types": ["node"]
+    "types": ["node", "multer"]
   },
   "include": ["src", "vitest.config.ts", "eslint.config.js"]
 }
