@@ -6,16 +6,16 @@ with [pnpm](https://pnpm.io).
 
 ## Layout
 
-| Folder            | Package              | Contents                                                      |
-| ----------------- | -------------------- | ------------------------------------------------------------- |
-| `apps/web`        | `@dnd-domain/web`    | Next.js 16 app (React 19, React Compiler)                     |
-| `apps/api`        | `@dnd-domain/api`    | NestJS 12 API serving the system's catalogs                   |
-| `apps/db`         | `@dnd-domain/db`     | Local PostgreSQL 18 for development, run with Docker Compose  |
-| `packages/system` | `@dnd-domain/system` | The game system: domain model, rules and catalogs             |
-| `packages/ai`     | `@dnd-domain/ai`     | AI features (empty for now)                                   |
-| `packages/ui`     | `@dnd-domain/ui`     | Shared React components                                       |
-| `packages/utils`  | `@dnd-domain/utils`  | Small general-purpose helpers                                 |
-| `packages/config` | `@dnd-domain/config` | Shared TypeScript, ESLint, Prettier, tsdown and Vitest config |
+| Folder            | Package              | Contents                                                       |
+| ----------------- | -------------------- | -------------------------------------------------------------- |
+| `apps/web`        | `@dnd-domain/web`    | Next.js 16 app (React 19, React Compiler)                      |
+| `apps/api`        | `@dnd-domain/api`    | NestJS 12 API serving the system's catalogs                    |
+| `apps/db`         | `@dnd-domain/db`     | Local PostgreSQL 18 for development, run with Docker Compose   |
+| `packages/system` | `@dnd-domain/system` | The game system: domain model, rules and catalogs              |
+| `packages/ai`     | `@dnd-domain/ai`     | AI features (empty for now)                                    |
+| `packages/ui`     | `@dnd-domain/ui`     | The Dusk design system as React components; all app UI uses it |
+| `packages/utils`  | `@dnd-domain/utils`  | Small general-purpose helpers                                  |
+| `packages/config` | `@dnd-domain/config` | Shared TypeScript, ESLint, Prettier, tsdown and Vitest config  |
 
 The libraries in `packages` are all set up the same way: built with tsdown to ESM and CommonJS
 with type declarations, tested with Vitest, and type-checked and linted with the shared settings

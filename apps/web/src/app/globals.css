@@ -1,36 +1,61 @@
-:root {
-  --background: #f7f3ea;
-  --foreground: #1f1a14;
-  --rule: #b9ab92;
-}
+/* Page-level setup only; every component's look comes from @dnd-domain/ui. */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #16130f;
-    --foreground: #ece4d4;
-    --rule: #5a4f3f;
-  }
+:root {
+  /* Montserrat is self-hosted by next/font under its own family name. */
+  --font-sans: var(--font-montserrat), system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 body {
   margin: 0;
-  padding: 2rem 1rem;
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Georgia, 'Times New Roman', serif;
+  background: var(--charcoal-950);
+  color: var(--ink);
+  font-family: var(--font-sans);
 }
 
-main {
-  max-width: 48rem;
+/* The secondary navigation beside the page, under the 64px header. */
+.shell {
+  display: flex;
+  align-items: flex-start;
+  min-height: calc(100vh - 64px);
+}
+
+.shell__sidenav {
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  flex: none;
+}
+
+.shell__menu {
+  display: none;
+}
+
+/* On phones the secondary navigation opens from the header's menu button instead. */
+@media (max-width: 767px) {
+  .shell__sidenav {
+    display: none;
+  }
+
+  .shell__menu {
+    display: inline-flex;
+  }
+}
+
+.page {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 1120px;
   margin: 0 auto;
+  padding: var(--space-8) 24px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
 }
 
-.panel {
-  border-top: 1px solid var(--rule);
-  padding: 1rem 0;
-}
-
-.panel-title {
-  margin: 0 0 0.5rem;
-  font-size: 1.25rem;
+.page__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 720px;
 }

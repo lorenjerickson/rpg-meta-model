@@ -13,7 +13,6 @@ export * from './Label';
 export * from './Link';
 export * from './List';
 export * from './Logo';
-export * from './Panel';
 export * from './SideNav';
 export * from './Slider';
 export * from './Text';
