@@ -1,7 +1,57 @@
 # @dnd-domain/ui
 
-React components shared by the apps.
+React components and styles for the **Dusk** design system. Every app in the monorepo builds its
+UI from this package: use its components rather than writing one-off ones, and when something is
+missing, add it here first.
 
-Built with tsdown to ESM and CommonJS with type declarations, tested with Vitest, and linted and
-type-checked with the shared settings in `@dnd-domain/config`. Run `pnpm build`, `pnpm test`,
-`pnpm lint` or `pnpm typecheck` here, or the same scripts from the repository root through Turbo.
+The components mirror Dusk's own component bundle (same props, behaviour and `ds-*` class names),
+and `styles.css` holds Dusk's tokens as CSS variables plus its component rules.
+
+## Using it
+
+Import the stylesheet once, at the root of the app, then use the components:
+
+```tsx
+import '@dnd-domain/ui/styles.css';
+import { Button, Header, Logo } from '@dnd-domain/ui';
+```
+
+Dusk is dark-first: give the page `background: var(--charcoal-950)` and `color: var(--ink)`. Its
+font is Montserrat; load it (in Next.js, with `next/font`) and point `--font-sans` at it if the
+loader renames the family.
+
+The components use hooks and browser events, so the build marks them as client components.
+
+## Components
+
+| Component                                   | Use                                                                                                                                                                                                           |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`                                    | Actions: `primary` (amber, the one key action), `secondary`, `default`                                                                                                                                        |
+| `Label`, `Input`, `Textarea`                | Text fields with label, hint and error                                                                                                                                                                        |
+| `Combobox`                                  | A text field that filters a dropdown of options                                                                                                                                                               |
+| `Checkbox`, `Radio`, `RadioGroup`, `Switch` | Choices; selected states in purple                                                                                                                                                                            |
+| `Slider`                                    | A number in a range                                                                                                                                                                                           |
+| `List`                                      | Simple, rich (image, description, meta) or columnar lists                                                                                                                                                     |
+| `Card`                                      | Image, title, content and actions at elevation 2                                                                                                                                                              |
+| `Header`                                    | The top navigation bar, with an account menu or log-in buttons                                                                                                                                                |
+| `SideNav`                                   | Secondary navigation in groups: inline (collapsible to an icon strip) or as a drawer                                                                                                                          |
+| `Breadcrumb`, `Link`                        | Paths and text links                                                                                                                                                                                          |
+| `Badge`, `Chip`                             | Update indicators and tags                                                                                                                                                                                    |
+| `Toolbar`                                   | Dockable icon or label buttons with tooltips                                                                                                                                                                  |
+| `Text`                                      | Text in Dusk's type styles (display, headings, body, label, caption, code)                                                                                                                                    |
+| `Logo`                                      | The Wanderlust compass mark and wordmark                                                                                                                                                                      |
+| `Icon`, `IconButton`                        | Named stroke icons (from Lucide), and a 32px ghost button holding one                                                                                                                                         |
+
+`Text` (with an optional status `tone`), `Logo`, `Icon`, `IconButton`, SideNav's collapsible mode and Link's `as` (for router links) are additions: Dusk defines
+type styles but no text component or icon set, the logo comes from the Wanderlust navigation
+design, and the apps needed a drawer that collapses to icons. Icons come from
+[Lucide](https://lucide.dev), grouped by theme in `ICON_GROUPS`; add one there before using it.
+
+`colors`, `fonts`, `space`, `radius` and `elevation` export the token values for code that
+needs them outside CSS.
+
+## Scripts
+
+Built with tsdown to ESM and CommonJS with type declarations (and `dist/styles.css`), tested with
+Vitest. Run `pnpm build`, `pnpm test`, `pnpm lint` or `pnpm typecheck` here, or the same scripts
+from the repository root through Turbo.

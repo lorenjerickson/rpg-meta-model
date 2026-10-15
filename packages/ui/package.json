@@ -1,7 +1,7 @@
 {
   "name": "@dnd-domain/ui",
   "version": "0.1.0",
-  "description": "React components shared by the apps",
+  "description": "React components and styles for the Dusk design system, shared by the apps",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -18,12 +18,15 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json"
   },
   "files": [
     "dist"
   ],
-  "sideEffects": false,
+  "sideEffects": [
+    "*.css"
+  ],
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
@@ -34,6 +37,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prepublishOnly": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build"
+  },
+  "dependencies": {
+    "lucide-react": "catalog:"
   },
   "peerDependencies": {
     "react": "catalog:"
