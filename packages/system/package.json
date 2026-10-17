@@ -36,6 +36,9 @@
     "lint:fix": "eslint . --fix",
     "prepublishOnly": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build"
   },
+  "dependencies": {
+    "zod": "catalog:"
+  },
   "devDependencies": {
     "@dnd-domain/config": "workspace:*",
     "@types/node": "catalog:",

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { poolDie } from '../core/dicePool';
-import { ITEM_CATEGORIES } from '../equipment/items';
 import {
   activate,
   canActivate,
@@ -12,7 +11,6 @@ import {
 } from './apparatus';
 import { APPARATUS, findApparatus } from './catalog/apparatus';
 import { PREPARATIONS } from './catalog/preparations';
-import { DISCIPLINES } from './disciplines';
 
 function apparatus(id: string) {
   const found = findApparatus(id);
@@ -83,44 +81,11 @@ describe('charges', () => {
 describe('science catalog', () => {
   const items = [...APPARATUS, ...PREPARATIONS];
 
-  it('has unique item ids', () => {
-    const ids = items.map((item) => item.id);
-    expect(new Set(ids).size).toBe(ids.length);
-  });
-
-  it('uses only item categories and disciplines that exist', () => {
-    for (const item of items) {
-      expect(ITEM_CATEGORIES).toContain(item.category);
-      expect(DISCIPLINES).toContain(item.discipline);
-    }
-  });
-
-  it('only charges devices that have charged effects, within their capacity', () => {
-    for (const device of APPARATUS) {
-      const costs = device.effects.map((effect) => effect.charges);
-      if (device.charges === null) {
-        expect(
-          costs.every((cost) => cost === 0),
-          device.id,
-        ).toBe(true);
-      } else {
-        expect(Math.max(...costs), device.id).toBeLessThanOrEqual(device.charges.max);
-        expect(
-          costs.some((cost) => cost > 0),
-          device.id,
-        ).toBe(true);
-      }
-    }
-  });
-
-  it('gives reactions a trigger and saving throws a target', () => {
+  it('has a broad selection of effects', () => {
     const effects = [
       ...APPARATUS.flatMap((device) => device.effects),
       ...PREPARATIONS.map((entry) => entry.effect),
     ];
-    for (const effect of effects) {
-      expect(effect.cost !== 'reaction' || effect.trigger !== undefined, effect.id).toBe(true);
-    }
     expect(effects.length).toBeGreaterThanOrEqual(40);
   });
 

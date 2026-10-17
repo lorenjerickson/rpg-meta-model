@@ -6,3 +6,4 @@ export * from './professions';
 export * from './science';
 export * from './monsters';
 export * from './catalogs';
+export * from './compendium';

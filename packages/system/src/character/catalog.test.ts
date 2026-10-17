@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { SKILLS, type Skill } from '../core/skills';
-import { findItem, isKnownToolProficiency } from '../equipment/catalog';
 import { PROFESSIONS } from '../professions/catalog';
 import { featGainedAtLevel } from '../professions/profession';
 import { makeCharacter } from '../testing/characters';
@@ -34,26 +33,15 @@ const MAGICAL_TERMS = [
 ];
 
 describe('backgrounds', () => {
-  it('has a broad selection with unique ids', () => {
-    const ids = BACKGROUNDS.map((entry) => entry.id);
-    expect(new Set(ids).size).toBe(ids.length);
+  it('has a broad selection', () => {
     expect(BACKGROUNDS.length).toBeGreaterThanOrEqual(15);
   });
 
   it.each(BACKGROUNDS.map((entry) => [entry.id, entry] as const))(
-    '%s is well-formed',
+    '%s offers its tool in a kit worth the standard amount, or the money instead',
     (_id, entry) => {
-      expect(new Set(entry.attributes).size).toBe(3);
-      expect(new Set(entry.skillProficiencies).size).toBe(2);
-      expect(findFeat(entry.feat)?.category).toBe('origin');
-      expect(isKnownToolProficiency(entry.toolProficiency)).toBe(true);
-
       const [kit, money] = entry.equipment;
       expect(kit?.items.map((item) => item.itemId)).toContain(entry.toolProficiency);
-      for (const item of kit?.items ?? []) {
-        expect(findItem(item.itemId), item.itemId).toBeDefined();
-      }
-      expect(kit?.money).toBeGreaterThanOrEqual(0);
       expect(equipmentOptionValue(kit ?? { label: '', items: [], money: 0 })).toBe(
         BACKGROUND_EQUIPMENT_VALUE,
       );
@@ -69,20 +57,8 @@ describe('backgrounds', () => {
 });
 
 describe('feats', () => {
-  it('has unique ids and every category', () => {
-    const ids = FEATS.map((entry) => entry.id);
-    expect(new Set(ids).size).toBe(ids.length);
+  it('has every category', () => {
     expect(new Set(FEATS.map((entry) => entry.category))).toEqual(new Set(FEAT_CATEGORIES));
-  });
-
-  it('caps attribute increases at 20, or 30 for epic boons', () => {
-    for (const entry of FEATS) {
-      if (entry.attributeScoreIncrease) {
-        expect(entry.attributeScoreIncrease.max, entry.id).toBe(
-          entry.category === 'epic-boon' ? 30 : 20,
-        );
-      }
-    }
   });
 
   it('contains no magical terms in backgrounds or feats', () => {

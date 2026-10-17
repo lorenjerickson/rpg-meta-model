@@ -13,3 +13,4 @@ export * from './traits';
 export * from './catalog';
 export * from './rests';
 export * from './combat';
+export * from './schemas';

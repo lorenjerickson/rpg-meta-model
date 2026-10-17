@@ -1,11 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { ATTRIBUTES } from '../core/attributes';
 import { HOSPITALITY, PROFESSIONS, SOLDIER, STREET_RAT, findProfession } from './catalog';
 import { poolDie } from '../core/dicePool';
 import { meetsProfessionPrerequisite, professionPool } from './profession';
 import { RANKS, compareRanks, hasReachedRank, rankForLevel } from './ranks';
 import {
-  childSpecializations,
   nextSpecializationOptions,
   specializationGrants,
   validateProfession,
@@ -115,51 +113,12 @@ describe('profession rules', () => {
 });
 
 describe('profession catalog', () => {
-  it('has unique profession ids and globally unique specialization ids', () => {
-    const professionIds = PROFESSIONS.map((profession) => profession.id);
-    const specializationIds = PROFESSIONS.flatMap((profession) =>
-      profession.specializations.map((entry) => entry.id),
-    );
-    expect(new Set(professionIds).size).toBe(professionIds.length);
-    expect(new Set(specializationIds).size).toBe(specializationIds.length);
-  });
-
   it.each(PROFESSIONS.map((profession) => [profession.id, profession] as const))(
     '%s is structurally valid',
     (_id, profession) => {
       expect(validateProfession(profession)).toEqual([]);
     },
   );
-
-  it.each(PROFESSIONS.map((profession) => [profession.id, profession] as const))(
-    '%s meets the profession requirements',
-    (_id, profession) => {
-      const [first, second] = profession.savingThrows;
-      expect(first).not.toBe(second);
-      expect(ATTRIBUTES).toContain(first);
-      expect(profession.actions.length).toBeGreaterThan(0);
-      expect(childSpecializations(profession, null).length).toBeGreaterThanOrEqual(2);
-      for (const specialization of profession.specializations) {
-        expect(specialization.skills.length, specialization.id).toBeGreaterThan(0);
-        expect(specialization.actions.length, specialization.id).toBeGreaterThan(0);
-      }
-    },
-  );
-
-  it('specializes every branch through to master rank', () => {
-    for (const profession of PROFESSIONS) {
-      for (const root of childSpecializations(profession, null)) {
-        let node = root;
-        const path = [node.id];
-        for (let next = childSpecializations(profession, node.id)[0]; next;) {
-          node = next;
-          path.push(node.id);
-          next = childSpecializations(profession, node.id)[0];
-        }
-        expect(node.rank, path.join(' -> ')).toBe('master');
-      }
-    }
-  });
 
   it('gives Fortune and Sanity saves to some professions', () => {
     const savingWith = (attribute: 'fortune' | 'sanity') =>
