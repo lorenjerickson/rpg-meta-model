@@ -53,6 +53,7 @@
   font-weight: 600;
   white-space: nowrap;
   border: 1px solid transparent;
+  text-decoration: none;
   cursor: pointer;
   transition:
     background-color 0.12s ease,
@@ -1662,19 +1663,9 @@ a.ds-menu__item:focus,
   flex-wrap: wrap;
   gap: var(--space-2);
 }
-.ds-form__choices {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
 .ds-form__json .ds-textarea {
   font-family: var(--font-mono);
   font-size: 13px;
-}
-.ds-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
 }
 
 /* The trail back out of a nested item */
@@ -1892,4 +1883,112 @@ a.ds-menu__item:focus,
 }
 .ds-text--success {
   color: var(--success);
+}
+
+/* Filter: a search field over a long list */
+.ds-filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+}
+.ds-filter__icon {
+  position: absolute;
+  left: 9px;
+  display: inline-flex;
+  color: var(--grey-400);
+  pointer-events: none;
+}
+.ds-filter__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-left: 30px;
+}
+.ds-filter__count {
+  flex: none;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--grey-400);
+  font-variant-numeric: tabular-nums;
+}
+.ds-filter__empty {
+  margin: 0;
+  padding: var(--space-2) 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--grey-400);
+}
+.ds-list-block,
+.ds-sidenav__filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.ds-sidenav__filter {
+  padding: 0 4px;
+}
+
+/* Tag input: removable chips inside a field, with the text box after them */
+.ds-tags {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 3px 6px;
+  font-family: var(--font-sans);
+  background: var(--charcoal-900);
+  border: 1px solid var(--grey-500);
+  border-radius: var(--radius-sm);
+  cursor: text;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+.ds-tags--sm {
+  min-height: 28px;
+}
+.ds-tags--md {
+  min-height: 36px;
+}
+.ds-tags--lg {
+  min-height: 44px;
+  border-radius: var(--radius-md);
+}
+.ds-tags:hover:not(.is-disabled) {
+  border-color: var(--grey-400);
+}
+.ds-tags:focus-within {
+  border-color: var(--purple-400);
+  box-shadow: 0 0 0 1px var(--purple-400);
+}
+.ds-tags.is-invalid {
+  border-color: var(--danger);
+}
+.ds-tags.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.ds-tags__input {
+  flex: 1 1 80px;
+  min-width: 80px;
+  height: 26px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  color: var(--grey-200);
+}
+.ds-tags__input::placeholder {
+  color: var(--grey-400);
+}
+.ds-tags__input:focus {
+  outline: none;
+}
+.ds-tags__input:disabled {
+  cursor: not-allowed;
 }

@@ -57,6 +57,12 @@ service is healthy. The web app is on port 3000, the API on 3001 and PostgreSQL 
 `WEB_PORT`, `API_PORT` or `POSTGRES_PORT` to change them. `pnpm docker:down` stops and
 removes the containers, keeping the stored data. Set `OPENAI_API_KEY` in the environment or a root `.env` file to turn on image generation.
 
+`pnpm docker:watch` starts the same stack in the foreground and watches the sources: when a file
+the API or web app uses changes (its own folder, a workspace package it depends on, or
+`pnpm-lock.yaml`), Compose rebuilds that image and replaces its running container. Each rebuild
+is a full production build, so it takes a little while; use `pnpm dev` for instant reloads.
+Press Ctrl+C to stop watching and the stack with it.
+
 Each app's Dockerfile prunes the monorepo to that app and its packages with `turbo prune`, so
 images only rebuild when something they use changes.
 
@@ -77,6 +83,7 @@ dependencies first and caching results.
 | `pnpm db:start`      | Start the local PostgreSQL database (needs Docker)   |
 | `pnpm db:stop`       | Stop the database, keeping its data                  |
 | `pnpm docker:up`     | Build and start the whole stack in Docker            |
+| `pnpm docker:watch`  | Start the stack and rebuild the apps on change       |
 | `pnpm docker:down`   | Stop and remove the stack, keeping its data          |
 | `pnpm docker:logs`   | Follow the stack's logs                              |
 | `pnpm format`        | Format the repository with Prettier (`format:check`) |

@@ -15,11 +15,13 @@ import {
   Input,
   List,
   Logo,
+  matchesQuery,
   MediaEditor,
   RadioGroup,
   ShapeForm,
   SideNav,
   Switch,
+  TagInput,
   Text,
   Toolbar,
 } from './index';
@@ -279,6 +281,7 @@ describe('ShapeForm', () => {
     expect(markup).toContain('role="switch"');
     expect(markup).toContain('role="combobox"');
     expect(markup).toContain('aria-label="Remove Finesse"');
+    expect(render({ ...sabre, attribute: '' })).toContain('placeholder="Choose attribute…"');
     // A small object of simple fields is shown in place, under a light heading.
     expect(markup).toContain('<span class="ds-section__label">Damage</span>');
   });
@@ -293,6 +296,40 @@ describe('ShapeForm', () => {
     expect(render(sabre, [{ path: ['cost'], message: 'must be a number' }])).toContain(
       'must be a number',
     );
+  });
+  it('edits a signed roll as one dice field, and summarises it in rows', () => {
+    const armour = {
+      modifiers: [{ kind: 'soak', count: 1, die: 4, sign: -1, damageTypes: ['cold'] }],
+    };
+    const form = inferShape([armour]);
+    const rows = html(<ShapeForm shape={form} value={armour} onChange={() => undefined} />);
+    expect(rows).toContain('<div class="ds-rows__detail">-1d4</div>');
+    const soak = form.kind === 'object' ? form.fields[0]?.shape : undefined;
+    const item = soak?.kind === 'array' ? soak.items : undefined;
+    if (!item) throw new Error('no item shape');
+    const fields = html(
+      <ShapeForm shape={item} value={armour.modifiers[0]} onChange={() => undefined} />,
+    );
+    expect(fields).toContain('value="-1d4"');
+    expect(fields).not.toContain('>Count<');
+    expect(fields).not.toContain('>Sign<');
+  });
+
+  it('shows dice as notation in place', () => {
+    const dice = inferShape([
+      { damage: { dice: { terms: [{ count: 1, die: 12 }], modifier: 1 }, type: 'piercing' } },
+    ]);
+    const markup = html(
+      <ShapeForm
+        shape={dice}
+        value={{
+          damage: { dice: { terms: [{ count: 1, die: 12 }], modifier: 1 }, type: 'piercing' },
+        }}
+        onChange={() => undefined}
+      />,
+    );
+    expect(markup).toContain('<span class="ds-section__label">Damage</span>');
+    expect(markup).toContain('value="1d12 + 1"');
   });
 });
 
@@ -385,5 +422,87 @@ describe('ShapeForm row titles', () => {
     );
     expect(markup).toContain('>Martial</button>');
     expect(markup).toContain('>Specialization 1</button>');
+  });
+});
+
+describe('filtering long lists', () => {
+  const many = Array.from({ length: 12 }, (_, index) => `Item ${String(index + 1)}`);
+
+  it('matches every word, ignoring case and accents', () => {
+    expect(matchesQuery('Café Society Gentlemen', 'cafe GENT')).toBe(true);
+    expect(matchesQuery('Café Society', 'cafe club')).toBe(false);
+    expect(matchesQuery('anything', '  ')).toBe(true);
+  });
+
+  it('puts a filter over lists longer than ten items, and not over short ones', () => {
+    expect(html(<List aria-label="Ghouls" items={many} />)).toContain(
+      'placeholder="Filter ghouls…"',
+    );
+    expect(html(<List items={many.slice(0, 3)} />)).not.toContain('ds-filter');
+    expect(html(<List items={many.slice(0, 3)} filter />)).toContain('ds-filter');
+    expect(html(<List items={many} />)).toContain(
+      '<span class="ds-filter__count" aria-live="polite">12</span>',
+    );
+  });
+
+  it('filters long side navigation, but not the collapsed strip', () => {
+    const groups = [
+      { label: 'Rules', items: many.map((label) => ({ label, icon: <Icon name="map" /> })) },
+    ];
+    expect(html(<SideNav title="System" groups={groups} />)).toContain(
+      'placeholder="Filter destinations…"',
+    );
+    expect(
+      html(<SideNav title="System" groups={groups} collapsible defaultCollapsed />),
+    ).not.toContain('ds-filter');
+  });
+
+  it('filters the icon picker and long rows in generated forms', () => {
+    const editor = html(
+      <MediaEditor
+        name="Ghoul"
+        icon="skull"
+        defaultPrompt=""
+        canGenerate={false}
+        onUpload={() => undefined}
+        onGenerate={() => undefined}
+        onRemoveImage={() => undefined}
+        onIconChange={() => undefined}
+      />,
+    );
+    expect(editor).toContain('placeholder="Filter icons…"');
+    const shape = inferShape([{ traits: [{ name: 'Keen Smell' }] }]);
+    const traits = many.map((name) => ({ name }));
+    expect(
+      html(<ShapeForm shape={shape} value={{ traits }} onChange={() => undefined} />),
+    ).toContain('placeholder="Filter traits…"');
+  });
+});
+
+describe('TagInput', () => {
+  it('puts the tags inside the field as removable chips, before the text box', () => {
+    const markup = html(
+      <TagInput label="Tags" value={['Undead', 'Cultist']} onChange={() => undefined} />,
+    );
+    expect(markup).toMatch(/class="ds-tags ds-tags--md".*Undead.*Cultist.*<input/);
+    expect(markup).toContain('aria-label="Remove Undead"');
+    expect(markup).toContain('Type and press Tab or Enter to add');
+    expect(markup).not.toContain('role="combobox"');
+  });
+
+  it('suggests from its options and shows their labels', () => {
+    const markup = html(
+      <TagInput
+        label="Damage types"
+        value={['fire']}
+        options={[
+          { value: 'fire', label: 'Fire' },
+          { value: 'cold', label: 'Cold' },
+        ]}
+        onChange={() => undefined}
+      />,
+    );
+    expect(markup).toContain('role="combobox"');
+    expect(markup).toContain('aria-label="Remove Fire"');
   });
 });

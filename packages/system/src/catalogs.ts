@@ -40,6 +40,8 @@ export interface CatalogDefinition {
    * tools and ammunition). Each part has its own shape.
    */
   parts: readonly (readonly CatalogEntry[])[];
+  /** What one entry of each part is called, such as "weapon", or "tool" and "vehicle". */
+  kinds: readonly string[];
   summarize: (entry: CatalogEntry) => CatalogSummary;
 }
 
@@ -51,7 +53,19 @@ function catalog(
   summarize: (entry: CatalogEntry) => CatalogSummary,
 ): CatalogDefinition {
   const typed = parts as readonly (readonly CatalogEntry[])[];
-  return { key, label, entries: typed.flat(), parts: typed, summarize };
+  const kinds = typed.map((part) =>
+    typed.length > 1 && typeof part[0]?.category === 'string'
+      ? part[0].category.replace(/-/g, ' ')
+      : singular(label.toLowerCase()),
+  );
+  return { key, label, entries: typed.flat(), parts: typed, kinds, summarize };
+}
+
+/** "Ethnicities" → "ethnicities" → "ethnicity", "Weapons" → "weapon"; "apparatus" stays. */
+function singular(noun: string): string {
+  if (noun.endsWith('ies')) return `${noun.slice(0, -3)}y`;
+  if (noun.endsWith('s') && !/(us|ss)$/.test(noun)) return noun.slice(0, -1);
+  return noun;
 }
 
 function entriesOf(record: Readonly<Record<string, object>>): CatalogEntry[] {

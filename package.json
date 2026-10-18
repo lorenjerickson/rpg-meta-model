@@ -20,6 +20,7 @@
     "db:start": "pnpm --filter @dnd-domain/db start",
     "db:stop": "pnpm --filter @dnd-domain/db stop",
     "docker:up": "docker compose up --build --detach --wait",
+    "docker:watch": "docker compose up --build --watch",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs --follow",
     "format": "prettier --write .",

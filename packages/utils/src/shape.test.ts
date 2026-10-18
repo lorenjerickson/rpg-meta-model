@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { formatDiceNotation, formatSignedDice, parseDiceNotation, parseSignedDice } from './dice';
 import {
   defaultValue,
   findValueSets,
@@ -75,11 +76,12 @@ describe('shape inference', () => {
 describe('defaults and validation', () => {
   const shape = inferShape(weapons, { valueSets: [ATTRIBUTES] });
 
-  it('makes a valid default with only required fields', () => {
+  it('makes a default with only required fields, and its choices still to make', () => {
     const value = defaultValue(shape) as Record<string, unknown>;
-    expect(value).toMatchObject({ id: '', cost: 0, attribute: 'might', properties: [] });
+    expect(value).toMatchObject({ id: '', cost: 0, attribute: '', properties: [] });
     expect(value).not.toHaveProperty('capacity');
-    expect(validateShape(shape, value)).toEqual([]);
+    expect(validateShape(shape, value)).toEqual([{ path: ['attribute'], message: 'choose one' }]);
+    expect(validateShape(shape, { ...value, attribute: 'wisdom' })).toEqual([]);
   });
 
   it('reports problems by path', () => {
@@ -98,6 +100,67 @@ describe('defaults and validation', () => {
     expect(
       findValueSets({ SIZES: ['small', 'large'], lower: ['a', 'b'], ONE: ['x'], NUMS: [1, 2] }),
     ).toEqual([{ name: 'sizes', values: ['small', 'large'] }]);
+  });
+});
+
+describe('dice', () => {
+  const d12 = { terms: [{ count: 1, die: 12 }], modifier: 0 };
+  const shape = inferShape([{ damage: d12 }, { damage: { terms: [], modifier: 2 } }]);
+
+  it('infers dice values as one field', () => {
+    expect(shape).toMatchObject({ fields: [{ key: 'damage', shape: { kind: 'dice' } }] });
+    expect(inferShape([{ terms: [{ count: 1, die: 7 }], modifier: 0 }]).kind).toBe('object');
+  });
+
+  it('validates dice and defaults to 1d6', () => {
+    expect(validateShape(shape, { damage: d12 })).toEqual([]);
+    expect(validateShape(shape, { damage: '1d12' })).toEqual([
+      { path: ['damage'], message: 'must be dice, such as 1d8 + 2' },
+    ]);
+    expect(defaultValue({ kind: 'dice' })).toEqual({ terms: [{ count: 1, die: 6 }], modifier: 0 });
+  });
+
+  it('formats and parses notation', () => {
+    expect(formatDiceNotation({ terms: [{ count: 2, die: 6 }], modifier: -1 })).toBe('2d6 - 1');
+    expect(formatDiceNotation({ terms: [], modifier: 3 })).toBe('3');
+    expect(parseDiceNotation(' d20 + 1d4 + 2 ')).toEqual({
+      terms: [
+        { count: 1, die: 20 },
+        { count: 1, die: 4 },
+      ],
+      modifier: 2,
+    });
+    expect(parseDiceNotation('1d7')).toBeUndefined();
+    expect(parseDiceNotation('1d6 -')).toBeUndefined();
+    expect(parseDiceNotation('0d6')).toBeUndefined();
+  });
+});
+
+describe('signed dice', () => {
+  const modifiers = [
+    { kind: 'soak', count: 1, die: 4, sign: 1, damageTypes: ['cold'] },
+    { kind: 'attack', count: 1, die: 6, sign: -1 },
+  ];
+  const shape = inferShape(modifiers);
+
+  it('marks objects whose count, die and sign are one signed roll', () => {
+    expect(shape).toMatchObject({ kind: 'object', signedDice: true });
+    expect(inferShape([{ count: 3, die: 5, sign: 1 }])).not.toHaveProperty('signedDice');
+  });
+
+  it('reports bad dice once, on the die', () => {
+    expect(validateShape(shape, modifiers[0])).toEqual([]);
+    expect(validateShape(shape, { ...modifiers[1], die: 7 })).toEqual([
+      { path: ['die'], message: 'must be dice, such as 1d4 or -1d4' },
+    ]);
+  });
+
+  it('formats and parses a signed roll', () => {
+    expect(formatSignedDice({ count: 1, die: 4, sign: -1 })).toBe('-1d4');
+    expect(parseSignedDice(' +2d6 ')).toEqual({ count: 2, die: 6, sign: 1 });
+    expect(parseSignedDice('-d4')).toEqual({ count: 1, die: 4, sign: -1 });
+    expect(parseSignedDice('1d4 + 1')).toBeUndefined();
+    expect(parseSignedDice('1d5')).toBeUndefined();
   });
 });
 

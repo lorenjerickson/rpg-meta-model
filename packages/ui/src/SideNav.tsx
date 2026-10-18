@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Badge } from './Badge';
+import { FILTER_THRESHOLD, FilterInput, NoMatches, matchesQuery } from './Filter';
 import { IconButton } from './IconButton';
 import { cx } from './internal';
 
@@ -41,6 +42,8 @@ export interface SideNavProps {
   /** Collapsed to icons at first (uncontrolled). */
   defaultCollapsed?: boolean;
   onCollapsedChange?: (collapsed: boolean) => void;
+  /** Show a filter over the destinations. Default: when there are more than 10. Never collapsed. */
+  filter?: boolean;
   'aria-label'?: string;
   className?: string;
 }
@@ -78,6 +81,7 @@ export function SideNav({
   onClose,
   closeOnNavigate,
   collapsible = false,
+  filter,
   collapsed: controlledCollapsed,
   defaultCollapsed = false,
   onCollapsedChange,
@@ -85,6 +89,7 @@ export function SideNav({
   ...props
 }: SideNavProps) {
   const open = openProp !== false;
+  const [query, setQuery] = useState('');
   const [innerCollapsed, setInnerCollapsed] = useState(defaultCollapsed);
   const collapsed = !modal && (controlledCollapsed ?? innerCollapsed);
 
@@ -106,6 +111,19 @@ export function SideNav({
     if (controlledCollapsed === undefined) setInnerCollapsed(next);
     onCollapsedChange?.(next);
   }
+
+  const total = groups.reduce((count, group) => count + group.items.length, 0);
+  const filtering = !collapsed && (filter ?? total > FILTER_THRESHOLD);
+  const activeQuery = filtering ? query : '';
+  const visibleGroups = groups
+    .map((group) => ({
+      group,
+      items: group.items.filter((item) =>
+        matchesQuery(`${item.label} ${group.label ?? ''}`, activeQuery),
+      ),
+    }))
+    .filter(({ items }) => items.length > 0);
+  const shownCount = visibleGroups.reduce((count, { items }) => count + items.length, 0);
 
   const showToggle = collapsible && !modal;
   const fallbackLabel = typeof title === 'string' ? `${title} navigation` : 'Secondary';
@@ -141,7 +159,19 @@ export function SideNav({
           ) : null}
         </div>
       ) : null}
-      {groups.map((group, groupIndex) => {
+      {filtering ? (
+        <div className="ds-sidenav__filter">
+          <FilterInput
+            query={query}
+            onQueryChange={setQuery}
+            shown={shownCount}
+            total={total}
+            noun="destinations"
+          />
+          {shownCount ? null : <NoMatches query={query} />}
+        </div>
+      ) : null}
+      {visibleGroups.map(({ group, items }, groupIndex) => {
         const groupId = `ds-sng-${String(groupIndex)}-${(group.label ?? '').replace(/\W+/g, '')}`;
         return (
           <div key={group.label ?? groupIndex} className="ds-sidenav__group">
@@ -151,7 +181,7 @@ export function SideNav({
               </div>
             ) : null}
             <ul className="ds-sidenav__list" aria-labelledby={group.label ? groupId : undefined}>
-              {group.items.map((item) => {
+              {items.map((item) => {
                 const key = item.key ?? item.label;
                 const isCurrent = item.current === true || current === key;
                 return (

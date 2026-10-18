@@ -4,9 +4,11 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -30,6 +32,20 @@ export class CatalogController {
     return this.catalogs.entries(catalog);
   }
 
+  /** A blank entry of one kind (`?part=`, default 0) to fill in and create. */
+  @Get(':catalog/new')
+  draft(@Param('catalog') catalog: string, @Query('part') part?: string) {
+    return this.catalogs.draft(catalog, part === undefined ? 0 : Number(part));
+  }
+
+  @Post(':catalog')
+  create(@Param('catalog') catalog: string, @Body() body: { part?: unknown; entry?: unknown }) {
+    if (body.part !== undefined && typeof body.part !== 'number') {
+      throw new BadRequestException('Send the kind of entry as a number');
+    }
+    return this.catalogs.create(catalog, body.part ?? 0, body.entry);
+  }
+
   @Get(':catalog/:id')
   entry(@Param('catalog') catalog: string, @Param('id') id: string) {
     return this.catalogs.detail(catalog, id);
@@ -42,6 +58,12 @@ export class CatalogController {
     @Body() body: { entry?: unknown },
   ) {
     return this.catalogs.save(catalog, id, body.entry);
+  }
+
+  @Delete(':catalog/:id')
+  @HttpCode(204)
+  remove(@Param('catalog') catalog: string, @Param('id') id: string) {
+    return this.catalogs.remove(catalog, id);
   }
 
   @Delete(':catalog/:id/edits')

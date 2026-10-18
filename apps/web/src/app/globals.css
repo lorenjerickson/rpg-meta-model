@@ -60,7 +60,20 @@ body {
   max-width: 720px;
 }
 
-/* A list entry's name, with an Edited tag beside it. */
+/* A catalog's list, under its Add buttons. */
+.catalog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.catalog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* A list entry's name, with an Edited or Added tag beside it. */
 .entry-title {
   display: inline-flex;
   flex-wrap: wrap;

@@ -144,6 +144,76 @@ describe('api', () => {
       );
       expect(reverted).toMatchObject({ edited: false, entry: { name: 'Soldier' } });
     });
+
+    it('starts a new entry from what the seeds of its kind share', async () => {
+      const draft = json<EntryDetail>(
+        await request(server).get('/catalogs/gear/new?part=1').expect(200),
+      );
+      expect(draft).toMatchObject({
+        added: true,
+        part: 1,
+        kind: 'tool',
+        entry: { id: '', name: '', category: 'tool' },
+      });
+      expect(fieldsOf(draft.shape).map((field) => field.key)).toContain('toolCategory');
+      await request(server).get('/catalogs/gear/new?part=9').expect(404);
+    });
+
+    it('adds, edits and deletes entries, but never deletes seeded ones', async () => {
+      const draft = json<EntryDetail>(await request(server).get('/catalogs/weapons/new'));
+      const blank = { ...draft.entry, id: 'boarding-pike', name: 'Boarding Pike' };
+      // Choices start unmade, so a blank entry can't be created until they are made.
+      const unchosen = json<{ errors: ShapeError[] }>(
+        await request(server).post('/catalogs/weapons').send({ entry: blank }).expect(400),
+      );
+      expect(unchosen.errors).toContainEqual({ path: ['mastery'], message: 'choose one' });
+      expect(unchosen.errors).toContainEqual({ path: ['damage', 'type'], message: 'choose one' });
+      const entry = {
+        ...blank,
+        weaponCategory: 'martial',
+        weaponType: 'melee',
+        mastery: 'topple',
+        damage: { ...(draft.entry.damage as object), type: 'piercing' },
+      };
+
+      const created = json<EntryDetail>(
+        await request(server).post('/catalogs/weapons').send({ entry }).expect(201),
+      );
+      expect(created).toMatchObject({
+        added: true,
+        edited: false,
+        entry: { name: 'Boarding Pike' },
+      });
+      const list = json<EntrySummary[]>(await request(server).get('/catalogs/weapons'));
+      expect(list.at(-1)).toMatchObject({ id: 'boarding-pike', added: true });
+
+      const taken = json<{ errors: ShapeError[] }>(
+        await request(server).post('/catalogs/weapons').send({ entry }).expect(400),
+      );
+      expect(taken.errors).toContainEqual({
+        path: ['id'],
+        message: 'is taken by another entry: choose another name',
+      });
+      for (const id of ['cutlass', 'new', 'Bad Id']) {
+        await request(server)
+          .post('/catalogs/weapons')
+          .send({ entry: { ...entry, id } })
+          .expect(400);
+      }
+
+      const renamed = json<EntryDetail>(
+        await request(server)
+          .put('/catalogs/weapons/boarding-pike')
+          .send({ entry: { ...entry, name: 'Half Pike' } })
+          .expect(200),
+      );
+      expect(renamed).toMatchObject({ added: true, edited: false, entry: { name: 'Half Pike' } });
+      await request(server).delete('/catalogs/weapons/boarding-pike/edits').expect(400);
+
+      await request(server).delete('/catalogs/weapons/cutlass').expect(400);
+      await request(server).delete('/catalogs/weapons/boarding-pike').expect(204);
+      await request(server).get('/catalogs/weapons/boarding-pike').expect(404);
+    });
   });
 
   describe('images and icons', () => {

@@ -1,8 +1,8 @@
 # @dnd-domain/api
 
 A NestJS 12 HTTP API for the game system's catalogs: it serves the seeded entries from
-`@dnd-domain/system`, saves edits to them, and keeps each entry's image or icon in the content
-repository.
+`@dnd-domain/system`, saves edits to them, adds new entries alongside them, and keeps each
+entry's image or icon in the content repository.
 
 ## Catalogs
 
@@ -20,8 +20,11 @@ deletes it.
 | -------------------------------------------- | ------------------------------------------------------- |
 | `GET /catalogs`                              | The catalogs, with entry counts                         |
 | `GET /catalogs/:catalog`                     | Its entries: name, summary, edited flag, image or icon  |
+| `GET /catalogs/:catalog/new?part=`           | A blank entry of one kind, from what its seeds share    |
+| `POST /catalogs/:catalog`                    | Adds `{ part, entry }`; its id must be new              |
 | `GET /catalogs/:catalog/:id`                 | One entry, with its shape, media and a starting prompt  |
 | `PUT /catalogs/:catalog/:id`                 | Saves `{ entry }`; 400 with `errors` by path if invalid |
+| `DELETE /catalogs/:catalog/:id`              | Deletes an added entry and its image (not seeds)        |
 | `DELETE /catalogs/:catalog/:id/edits`        | Reverts to the seeded entry                             |
 | `POST /catalogs/:catalog/:id/image`          | Uploads an image (`file` form field, up to 10 MB)       |
 | `POST /catalogs/:catalog/:id/image/generate` | Generates an image from `{ prompt }`                    |

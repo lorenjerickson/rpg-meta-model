@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ElementType, ReactNode } from 'react';
 import { cx, size, type Size } from './internal';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -29,5 +29,32 @@ export function Button({
     >
       {children}
     </button>
+  );
+}
+
+export interface ButtonLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+  variant?: ButtonProps['variant'];
+  size?: Size;
+  /** The element or router link component to render, such as Next.js's Link. Default "a". */
+  as?: ElementType;
+  children?: ReactNode;
+}
+
+/** A link that looks like a button, for an action that opens another page. */
+export function ButtonLink({
+  variant = 'default',
+  size: buttonSize,
+  as: Tag = 'a',
+  className,
+  children,
+  ...rest
+}: ButtonLinkProps) {
+  return (
+    <Tag
+      {...rest}
+      className={cx('ds-btn', `ds-btn--${variant}`, `ds-btn--${size(buttonSize)}`, className)}
+    >
+      {children}
+    </Tag>
   );
 }

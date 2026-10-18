@@ -27,6 +27,11 @@ export function getEntry(catalog: string, id: string) {
   return getJson<EntryDetail>(`/catalogs/${encodeURIComponent(catalog)}/${encodeURIComponent(id)}`);
 }
 
+/** A blank entry of one kind of a catalog, to fill in and create. */
+export function getDraft(catalog: string, part: number) {
+  return getJson<EntryDetail>(`/catalogs/${encodeURIComponent(catalog)}/new?part=${String(part)}`);
+}
+
 /**
  * Forwards a browser request to the API, so the browser only ever talks to this app. Used for
  * the catalog API under /api and for images under /content.

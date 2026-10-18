@@ -21,13 +21,26 @@ export interface EntryMedia {
   image?: StoredImage;
 }
 
-/** Edits to seeded catalog entries, and their pictures. Seeds themselves are never stored. */
+/** An entry added to a catalog, and which of the catalog's seed lists (parts) it is like. */
+export interface AddedEntry {
+  part: number;
+  entry: CatalogEntry;
+}
+
+/**
+ * Edits to seeded catalog entries, entries added alongside them, and their pictures. Seeds
+ * themselves are never stored.
+ */
 export interface CatalogStore {
   edits(catalog: string): Promise<Map<string, CatalogEntry>>;
   saveEdit(catalog: string, id: string, entry: CatalogEntry): Promise<void>;
   removeEdit(catalog: string, id: string): Promise<void>;
+  additions(catalog: string): Promise<Map<string, AddedEntry>>;
+  saveAddition(catalog: string, id: string, added: AddedEntry): Promise<void>;
+  removeAddition(catalog: string, id: string): Promise<void>;
   media(catalog: string): Promise<Map<string, EntryMedia>>;
   saveMedia(catalog: string, id: string, media: EntryMedia): Promise<void>;
+  removeMedia(catalog: string, id: string): Promise<void>;
 }
 
 const key = (catalog: string, id: string) => `${catalog}\u0000${id}`;
@@ -42,6 +55,7 @@ function byCatalog<T>(rows: Map<string, T>, catalog: string): Map<string, T> {
 /** Keeps everything in memory: for tests, and for running without a database. */
 export class MemoryCatalogStore implements CatalogStore {
   private readonly editRows = new Map<string, CatalogEntry>();
+  private readonly addedRows = new Map<string, AddedEntry>();
   private readonly mediaRows = new Map<string, EntryMedia>();
 
   edits(catalog: string) {
@@ -55,11 +69,26 @@ export class MemoryCatalogStore implements CatalogStore {
     this.editRows.delete(key(catalog, id));
     return Promise.resolve();
   }
+  additions(catalog: string) {
+    return Promise.resolve(byCatalog(this.addedRows, catalog));
+  }
+  saveAddition(catalog: string, id: string, added: AddedEntry) {
+    this.addedRows.set(key(catalog, id), structuredClone(added));
+    return Promise.resolve();
+  }
+  removeAddition(catalog: string, id: string) {
+    this.addedRows.delete(key(catalog, id));
+    return Promise.resolve();
+  }
   media(catalog: string) {
     return Promise.resolve(byCatalog(this.mediaRows, catalog));
   }
   saveMedia(catalog: string, id: string, media: EntryMedia) {
     this.mediaRows.set(key(catalog, id), structuredClone(media));
+    return Promise.resolve();
+  }
+  removeMedia(catalog: string, id: string) {
+    this.mediaRows.delete(key(catalog, id));
     return Promise.resolve();
   }
 }
@@ -69,6 +98,15 @@ const SCHEMA = `
     catalog text not null,
     id text not null,
     data jsonb not null,
+    updated_at timestamptz not null default now(),
+    primary key (catalog, id)
+  );
+  create table if not exists catalog_additions (
+    catalog text not null,
+    id text not null,
+    part integer not null,
+    data jsonb not null,
+    created_at timestamptz not null default now(),
     updated_at timestamptz not null default now(),
     primary key (catalog, id)
   );
@@ -121,6 +159,30 @@ export class PgCatalogStore implements CatalogStore {
     ]);
   }
 
+  async additions(catalog: string) {
+    const result = await this.pool.query<{ id: string; part: number; data: CatalogEntry }>(
+      'select id, part, data from catalog_additions where catalog = $1 order by created_at, id',
+      [catalog],
+    );
+    return new Map(result.rows.map((row) => [row.id, { part: row.part, entry: row.data }]));
+  }
+
+  async saveAddition(catalog: string, id: string, added: AddedEntry) {
+    await this.pool.query(
+      `insert into catalog_additions (catalog, id, part, data) values ($1, $2, $3, $4)
+       on conflict (catalog, id) do update
+       set part = excluded.part, data = excluded.data, updated_at = now()`,
+      [catalog, id, added.part, JSON.stringify(added.entry)],
+    );
+  }
+
+  async removeAddition(catalog: string, id: string) {
+    await this.pool.query('delete from catalog_additions where catalog = $1 and id = $2', [
+      catalog,
+      id,
+    ]);
+  }
+
   async media(catalog: string) {
     const result = await this.pool.query<{ id: string; media: EntryMedia }>(
       'select id, media from catalog_media where catalog = $1',
@@ -135,5 +197,12 @@ export class PgCatalogStore implements CatalogStore {
        on conflict (catalog, id) do update set media = excluded.media, updated_at = now()`,
       [catalog, id, JSON.stringify(media)],
     );
+  }
+
+  async removeMedia(catalog: string, id: string) {
+    await this.pool.query('delete from catalog_media where catalog = $1 and id = $2', [
+      catalog,
+      id,
+    ]);
   }
 }

@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { Button } from './Button';
+import { FilterInput, NoMatches, matchesQuery } from './Filter';
 import { ICON_GROUPS, Icon, type IconName } from './Icon';
 import { Textarea } from './Input';
 import { cx } from './internal';
@@ -49,6 +50,15 @@ export function MediaEditor({
 }: MediaEditorProps) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [prompt, setPrompt] = useState(defaultPrompt);
+  const [iconQuery, setIconQuery] = useState('');
+  const iconGroups = Object.entries(ICON_GROUPS).filter(([group]) => group !== 'Interface');
+  const allIcons = iconGroups.flatMap(([, icons]) => Object.keys(icons) as IconName[]);
+  // Icons match on their name and their group ("creatures", "weapons").
+  const shownIcons = iconGroups.flatMap(([group, icons]) =>
+    (Object.keys(icons) as IconName[]).filter((option) =>
+      matchesQuery(`${option.replace(/-/g, ' ')} ${group}`, iconQuery),
+    ),
+  );
   const working = busy !== null;
 
   return (
@@ -137,26 +147,31 @@ export function MediaEditor({
             </Button>
           ) : null}
         </div>
+        <FilterInput
+          query={iconQuery}
+          onQueryChange={setIconQuery}
+          shown={shownIcons.length}
+          total={allIcons.length}
+          noun="icons"
+        />
+        {shownIcons.length ? null : <NoMatches query={iconQuery} />}
         <div className="ds-media__icon-grid" role="group" aria-label="Choose an icon">
-          {Object.entries(ICON_GROUPS)
-            .filter(([group]) => group !== 'Interface')
-            .flatMap(([, icons]) => Object.keys(icons) as IconName[])
-            .map((option) => (
-              <button
-                key={option}
-                type="button"
-                className={cx('ds-media__icon', option === icon && 'is-selected')}
-                aria-pressed={option === icon}
-                aria-label={option.replace(/-/g, ' ')}
-                title={option.replace(/-/g, ' ')}
-                disabled={working}
-                onClick={() => {
-                  onIconChange(option);
-                }}
-              >
-                <Icon name={option} />
-              </button>
-            ))}
+          {shownIcons.map((option) => (
+            <button
+              key={option}
+              type="button"
+              className={cx('ds-media__icon', option === icon && 'is-selected')}
+              aria-pressed={option === icon}
+              aria-label={option.replace(/-/g, ' ')}
+              title={option.replace(/-/g, ' ')}
+              disabled={working}
+              onClick={() => {
+                onIconChange(option);
+              }}
+            >
+              <Icon name={option} />
+            </button>
+          ))}
         </div>
       </div>
     </div>

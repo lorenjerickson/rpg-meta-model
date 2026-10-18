@@ -1,6 +1,14 @@
 import {
   defaultValue,
+  formatDiceNotation,
+  formatSignedDice,
+  hasSignedDice,
   humanize,
+  isDiceValue,
+  parseDiceNotation,
+  parseSignedDice,
+  SIGNED_DICE_KEYS,
+  type SignedDice,
   type FieldShape,
   type Shape,
   type ShapeError,
@@ -8,11 +16,12 @@ import {
 import { useState } from 'react';
 import { Badge } from './Badge';
 import { Button } from './Button';
-import { Chip } from './Chip';
 import { Switch } from './Choice';
 import { Combobox } from './Combobox';
+import { FILTER_THRESHOLD, FilterInput, NoMatches, useFilter } from './Filter';
 import { IconButton } from './IconButton';
 import { Input, Textarea } from './Input';
+import { TagInput } from './TagInput';
 import { cx } from './internal';
 import { Breadcrumb } from './Link';
 
@@ -86,11 +95,16 @@ function errorAt(errors: readonly ShapeError[], path: Path): string | undefined 
 
 /* ---------- How each field is shown ---------- */
 
-/** Fits on one line in the grid: a short text, number, choice or switch. */
+function isSignedDiceKey(key: string): boolean {
+  return (SIGNED_DICE_KEYS as readonly string[]).includes(key);
+}
+
+/** Fits on one line in the grid: a short text, number, dice, choice or switch. */
 function isCompact(shape: Shape): boolean {
   return (
     (shape.kind === 'string' && !shape.multiline) ||
     shape.kind === 'number' ||
+    shape.kind === 'dice' ||
     shape.kind === 'boolean'
   );
 }
@@ -99,12 +113,12 @@ function isCompact(shape: Shape): boolean {
  * - compact: a field in the grid
  * - wide: a long text or raw JSON, full width
  * - inline: a small object of simple fields, shown in place under a light heading
- * - choices: a list of values from a set, as chips
+ * - tags: a list of short texts, as removable chips in a tag field (from a set, if it has one)
  * - values: a list of simple values, one input each
  * - rows: a list of entities, one row each, edited by drilling in
  * - nested: a larger object, one row, edited by drilling in
  */
-type Layout = 'compact' | 'wide' | 'inline' | 'choices' | 'values' | 'rows' | 'nested';
+type Layout = 'compact' | 'wide' | 'inline' | 'tags' | 'values' | 'rows' | 'nested';
 
 function layoutOf(shape: Shape): Layout {
   if (isCompact(shape)) return 'compact';
@@ -113,7 +127,7 @@ function layoutOf(shape: Shape): Layout {
   }
   if (shape.kind === 'array') {
     const items = shape.items;
-    if (items.kind === 'string' && items.valueSet) return 'choices';
+    if (items.kind === 'string' && (items.valueSet || !items.multiline)) return 'tags';
     if (items.kind === 'object') return 'rows';
     if (items.kind === 'string' || isCompact(items)) return 'values';
   }
@@ -128,6 +142,7 @@ function display(value: unknown): string | undefined {
   if (typeof value === 'string') return value ? humanize(value) : undefined;
   if (typeof value === 'number') return String(value);
   if (typeof value === 'boolean') return value ? 'yes' : undefined;
+  if (isDiceValue(value)) return formatDiceNotation(value);
   return undefined;
 }
 
@@ -165,12 +180,25 @@ function detailOf(value: unknown, shape: Shape): string | undefined {
     return description.length > 110 ? `${description.slice(0, 107)}…` : description;
   }
   const titleKey = titleKeyOf(value, shape);
-  const parts = shape.fields
-    .filter((field) => isCompact(field.shape) && field.key !== titleKey && field.key !== 'id')
-    .map((field) => {
-      const shown = display(value[field.key]);
-      return shown === undefined ? undefined : `${field.label}: ${shown}`;
-    })
+  const dice =
+    shape.signedDice && hasSignedDice(value)
+      ? [formatSignedDice(value as unknown as SignedDice)]
+      : [];
+  const parts = [
+    ...dice,
+    ...shape.fields
+      .filter(
+        (field) =>
+          isCompact(field.shape) &&
+          field.key !== titleKey &&
+          field.key !== 'id' &&
+          !(shape.signedDice && isSignedDiceKey(field.key)),
+      )
+      .map((field) => {
+        const shown = display(value[field.key]);
+        return shown === undefined ? undefined : `${field.label}: ${shown}`;
+      }),
+  ]
     .filter((part): part is string => part !== undefined)
     .slice(0, 3);
   return parts.length ? parts.join(' · ') : undefined;
@@ -332,8 +360,12 @@ function ObjectFields({
     if (layoutOf(field.shape) === 'nested') context.open([...path, field.key]);
   };
 
-  const present = shape.fields.filter((field) => !isEmpty(field));
-  const missing = shape.fields.filter((field) => canEmpty(field) && isEmpty(field));
+  // A signed roll's count, die and sign are edited together, as one dice field.
+  const fields = shape.signedDice
+    ? shape.fields.filter((field) => !isSignedDiceKey(field.key))
+    : shape.fields;
+  const present = fields.filter((field) => !isEmpty(field));
+  const missing = fields.filter((field) => canEmpty(field) && isEmpty(field));
   const withLayout = (...layouts: Layout[]) =>
     present.filter((field) => layouts.includes(layoutOf(field.shape)));
 
@@ -357,14 +389,32 @@ function ObjectFields({
   const compact = withLayout('compact');
   return (
     <>
-      {compact.length ? (
+      {compact.length || shape.signedDice ? (
         <div className="ds-form__grid">
+          {shape.signedDice ? (
+            <div className="ds-form__field">
+              <NotationInput
+                label="Dice"
+                value={hasSignedDice(record) ? (record as unknown as SignedDice) : undefined}
+                format={formatSignedDice}
+                parse={parseSignedDice}
+                example="1d4 or -1d4"
+                onChange={(dice) => {
+                  onChange({ ...record, ...dice });
+                }}
+                disabled={context.disabled}
+                error={SIGNED_DICE_KEYS.map((key) => errorAt(context.errors, [...path, key])).find(
+                  Boolean,
+                )}
+              />
+            </div>
+          ) : null}
           {compact.map((field) => (
             <FieldInput key={field.key} {...props(field)} />
           ))}
         </div>
       ) : null}
-      {withLayout('wide', 'choices').map((field) => (
+      {withLayout('wide', 'tags').map((field) => (
         <FieldInput key={field.key} {...props(field)} />
       ))}
       {withLayout('inline').map((field) => (
@@ -549,9 +599,18 @@ function NestedRow({ shape, value, path, label, context, onRemove }: FieldProps)
 
 /** A list of entities: a row each, with add, edit and remove. */
 function EntityRows({ shape, value, onChange, path, label, context, onRemove }: FieldProps) {
-  if (shape.kind !== 'array') return null;
   const items = Array.isArray(value) ? (value as unknown[]) : [];
+  const itemShape = shape.kind === 'array' ? shape.items : shape;
   const itemLabel = humanize(singular(label));
+  const rows = items.map((item, index) => ({
+    index,
+    title: titleOf(item, itemShape) ?? `${itemLabel} ${String(index + 1)}`,
+    detail: detailOf(item, itemShape),
+  }));
+  const { query, setQuery, matches } = useFilter(rows, (row) => `${row.title} ${row.detail ?? ''}`);
+  const filtering = rows.length > FILTER_THRESHOLD;
+  const shown = filtering ? matches.map(({ item }) => item) : rows;
+  if (shape.kind !== 'array') return null;
   const error = errorAt(context.errors, path);
   return (
     <section className="ds-section" aria-label={label}>
@@ -562,16 +621,25 @@ function EntityRows({ shape, value, onChange, path, label, context, onRemove }: 
         disabled={context.disabled}
       />
       {error ? <div className="ds-hint ds-hint--error">{error}</div> : null}
-      {items.length ? (
+      {filtering ? (
+        <FilterInput
+          query={query}
+          onQueryChange={setQuery}
+          shown={matches.length}
+          total={rows.length}
+          noun={label.toLowerCase()}
+        />
+      ) : null}
+      {filtering && !shown.length ? <NoMatches query={query} /> : null}
+      {shown.length ? (
         <ul className="ds-rows">
-          {items.map((item, index) => {
+          {shown.map(({ index, title, detail }) => {
             const itemPath = [...path, index];
-            const title = titleOf(item, shape.items) ?? `${itemLabel} ${String(index + 1)}`;
             return (
               <Row
                 key={index}
                 title={title}
-                detail={detailOf(item, shape.items)}
+                detail={detail}
                 problems={errorsUnder(context.errors, itemPath)}
                 onOpen={() => {
                   context.open(itemPath);
@@ -585,7 +653,7 @@ function EntityRows({ shape, value, onChange, path, label, context, onRemove }: 
             );
           })}
         </ul>
-      ) : (
+      ) : items.length ? null : (
         <p className="ds-section__empty">None yet.</p>
       )}
       <div className="ds-form__add">
@@ -627,6 +695,7 @@ function FieldInput(props: FieldProps) {
           label={label}
           options={optionsOf(shape.valueSet.values)}
           value={text}
+          placeholder={`Choose ${label.toLowerCase()}…`}
           onChange={onChange}
           disabled={disabled}
           error={error}
@@ -671,6 +740,22 @@ function FieldInput(props: FieldProps) {
             onChange={(event) => {
               onChange(event.target.value === '' ? null : Number(event.target.value));
             }}
+            disabled={disabled}
+            error={error}
+          />
+          {remove}
+        </div>
+      );
+    case 'dice':
+      return (
+        <div className="ds-form__field">
+          <NotationInput
+            label={label}
+            value={isDiceValue(value) ? value : undefined}
+            format={formatDiceNotation}
+            parse={parseDiceNotation}
+            example="1d8 + 2"
+            onChange={onChange}
             disabled={disabled}
             error={error}
           />
@@ -723,45 +808,30 @@ function ValueList({
   readOnly,
   onRemove,
 }: FieldProps) {
-  if (shape.kind !== 'array') return null;
   const items = Array.isArray(value) ? (value as unknown[]) : [];
+  const { query, setQuery, matches } = useFilter(items, (item) =>
+    typeof item === 'string' || typeof item === 'number' ? String(item) : JSON.stringify(item),
+  );
+  if (shape.kind !== 'array') return null;
   const disabled = context.disabled || readOnly === true;
   const error = errorAt(context.errors, path);
   const itemShape = shape.items;
+  const filtering = items.length > FILTER_THRESHOLD;
+  const shown = filtering ? matches : items.map((item, index) => ({ item, index }));
 
-  if (itemShape.kind === 'string' && itemShape.valueSet) {
-    const chosen = items.filter((item): item is string => typeof item === 'string');
-    const rest = itemShape.valueSet.values.filter((option) => !chosen.includes(option));
+  if (itemShape.kind === 'string' && (itemShape.valueSet || !itemShape.multiline)) {
+    const tags = items.filter((item): item is string => typeof item === 'string');
     return (
       <div className="ds-form__field ds-form__field--wide">
-        <div className="ds-form__choices">
-          <Combobox
-            label={label}
-            placeholder={`Add ${singular(label).toLowerCase()}…`}
-            options={optionsOf(rest)}
-            value=""
-            onChange={(next) => {
-              onChange([...chosen, next]);
-            }}
-            disabled={disabled || !rest.length}
-            error={error}
-          />
-          {chosen.length ? (
-            <div className="ds-chips">
-              {chosen.map((item, index) => (
-                <Chip
-                  key={item}
-                  variant="outlined"
-                  label={humanize(item)}
-                  disabled={disabled}
-                  onRemove={() => {
-                    onChange(chosen.filter((_, i) => i !== index));
-                  }}
-                />
-              ))}
-            </div>
-          ) : null}
-        </div>
+        <TagInput
+          label={label}
+          value={tags}
+          onChange={onChange}
+          {...(itemShape.valueSet ? { options: optionsOf(itemShape.valueSet.values) } : {})}
+          placeholder={`Add ${singular(label).toLowerCase()}…`}
+          disabled={disabled}
+          error={error}
+        />
         {onRemove ? (
           <RemoveButton
             label={label}
@@ -784,9 +854,19 @@ function ValueList({
         disabled={context.disabled}
       />
       {error ? <div className="ds-hint ds-hint--error">{error}</div> : null}
-      {items.length ? (
+      {filtering ? (
+        <FilterInput
+          query={query}
+          onQueryChange={setQuery}
+          shown={matches.length}
+          total={items.length}
+          noun={label.toLowerCase()}
+        />
+      ) : null}
+      {filtering && !shown.length ? <NoMatches query={query} /> : null}
+      {shown.length ? (
         <div className={cx('ds-values', isCompact(itemShape) && 'ds-values--compact')}>
-          {items.map((item, index) => (
+          {shown.map(({ item, index }) => (
             <FieldInput
               key={index}
               shape={itemShape}
@@ -803,7 +883,7 @@ function ValueList({
             />
           ))}
         </div>
-      ) : (
+      ) : items.length ? null : (
         <p className="ds-section__empty">None yet.</p>
       )}
       <div className="ds-form__add">
@@ -818,6 +898,53 @@ function ValueList({
         </Button>
       </div>
     </section>
+  );
+}
+
+/** Dice typed as notation, such as "2d6 + 3"; applied as soon as it parses. */
+function NotationInput<T>({
+  label,
+  value,
+  format,
+  parse,
+  example,
+  onChange,
+  disabled,
+  error,
+}: {
+  label: string;
+  /** The current dice, or undefined when there are none yet. */
+  value: T | undefined;
+  format: (value: T) => string;
+  parse: (text: string) => T | undefined;
+  example: string;
+  onChange: (value: T) => void;
+  disabled: boolean;
+  error: string | undefined;
+}) {
+  const external = value === undefined ? '' : format(value);
+  const [text, setText] = useState(external);
+  const [seen, setSeen] = useState(external);
+  const parsed = parse(text);
+  // A change from outside (a discard, say) replaces the text; the field's own edits don't.
+  if (external !== seen) {
+    setSeen(external);
+    if (!parsed || format(parsed) !== external) setText(external);
+  }
+  return (
+    <Input
+      label={label}
+      value={text}
+      placeholder={example}
+      spellCheck={false}
+      onChange={(event) => {
+        setText(event.target.value);
+        const next = parse(event.target.value);
+        if (next) onChange(next);
+      }}
+      disabled={disabled}
+      error={parsed ? error : `Use dice notation, such as ${example}`}
+    />
   );
 }
 

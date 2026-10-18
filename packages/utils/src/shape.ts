@@ -1,3 +1,5 @@
+import { hasSignedDice, isDiceValue, SIGNED_DICE_KEYS } from './dice';
+
 /**
  * Shapes inferred at runtime from sample values, so a form or validator can be generated for any
  * entity without writing one by hand. Shapes are plain JSON and can be sent between processes.
@@ -13,8 +15,15 @@ export type Shape =
   | { kind: 'string'; multiline: boolean; valueSet?: ValueSet }
   | { kind: 'number'; integer: boolean }
   | { kind: 'boolean' }
-  | { kind: 'object'; fields: readonly FieldShape[] }
+  | {
+      kind: 'object';
+      fields: readonly FieldShape[];
+      /** Its count, die and sign fields are one signed roll, edited as notation such as -1d4. */
+      signedDice?: true;
+    }
   | { kind: 'array'; items: Shape }
+  /** A `{ terms, modifier }` dice value, edited as notation such as "2d6 + 3". */
+  | { kind: 'dice' }
   /** Mixed or unknown values, edited as raw JSON. */
   | { kind: 'any' };
 
@@ -123,12 +132,15 @@ function infer(
     };
   }
   if (kind === 'object') {
+    if (present.every(isDiceValue)) return { kind: 'dice' };
     const objects = present as Record<string, unknown>[];
     const keys = [...new Set(objects.flatMap((object) => Object.keys(object)))];
     const readOnly = new Set(options.readOnly ?? []);
     const nested = { ...options, readOnly: [] };
+    const signedDice = objects.every(hasSignedDice);
     return {
       kind: 'object',
+      ...(signedDice ? { signedDice: true as const } : {}),
       fields: keys.map((key) => {
         const values = objects.map((object) => object[key]);
         return {
@@ -150,14 +162,17 @@ function infer(
 /** A starting value for a new field or array element of this shape. */
 export function defaultValue(shape: Shape): unknown {
   switch (shape.kind) {
+    // A choice starts unmade, so it has to be chosen rather than taking the first by accident.
     case 'string':
-      return shape.valueSet?.values[0] ?? '';
+      return '';
     case 'number':
       return 0;
     case 'boolean':
       return false;
     case 'array':
       return [];
+    case 'dice':
+      return { terms: [{ count: 1, die: 6 }], modifier: 0 };
     case 'object':
       return Object.fromEntries(
         shape.fields
@@ -185,6 +200,7 @@ export function validateShape(
   switch (shape.kind) {
     case 'string':
       if (typeof value !== 'string') return fail('must be text');
+      if (shape.valueSet && value === '') return fail('choose one');
       if (shape.valueSet && !shape.valueSet.values.includes(value)) {
         return fail(`must be one of the ${humanize(shape.valueSet.name).toLowerCase()}`);
       }
@@ -198,8 +214,20 @@ export function validateShape(
     case 'array':
       if (!Array.isArray(value)) return fail('must be a list');
       return value.flatMap((item, index) => validateShape(shape.items, item, [...path, index]));
+    case 'dice':
+      return isDiceValue(value) ? [] : fail('must be dice, such as 1d8 + 2');
     case 'object':
       if (!isPlainObject(value)) return fail('must be an object');
+      if (shape.signedDice && !hasSignedDice(value)) {
+        // Reported once, on the die, rather than on each of the three fields.
+        const others = shape.fields.filter(
+          (field) => !(SIGNED_DICE_KEYS as readonly string[]).includes(field.key),
+        );
+        return [
+          { path: [...path, 'die'], message: 'must be dice, such as 1d4 or -1d4' },
+          ...validateShape({ kind: 'object', fields: others }, value, path),
+        ];
+      }
       return shape.fields.flatMap((field) => {
         const fieldValue = value[field.key];
         if (fieldValue === undefined) {

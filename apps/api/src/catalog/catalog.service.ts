@@ -7,8 +7,11 @@ import {
   type CatalogEntry,
 } from '@dnd-domain/system';
 import {
+  defaultValue,
+  ENTRY_ID,
   findValueSets,
   inferShape,
+  RESERVED_ENTRY_IDS,
   validateShape,
   type EntryDetail,
   type EntrySummary,
@@ -29,6 +32,14 @@ import type { ContentStore } from '../content/content-store.js';
 import { InvalidImageError, prepareImage } from '../content/images.js';
 import type { CatalogStore, EntryMedia, StoredImage } from './catalog-store.js';
 
+/** An entry found in a catalog: seeded (and maybe edited) or added. */
+interface Located {
+  part: number;
+  entry: CatalogEntry;
+  edited: boolean;
+  added: boolean;
+}
+
 const contentUrl = (key: string) => `/content/${key}`;
 
 function mediaView(media: EntryMedia | undefined): MediaView {
@@ -47,13 +58,15 @@ function mediaView(media: EntryMedia | undefined): MediaView {
 }
 
 /**
- * The editable catalogs: seeded entries from the game system, overlaid with saved edits, each
- * with an image or icon. Shapes are inferred from the seeds, so every catalog edits the same way.
+ * The editable catalogs: seeded entries from the game system, overlaid with saved edits, plus
+ * entries added alongside them, each with an image or icon. Shapes are inferred from the seeds,
+ * so every catalog edits the same way.
  */
 @Injectable()
 export class CatalogService {
   private readonly valueSets = findValueSets(system);
-  private readonly shapes = new Map<string, (entry: CatalogEntry) => Shape>();
+  /** Each catalog's shapes, one per part. */
+  private readonly shapes = new Map<string, Shape[]>();
 
   constructor(
     @Inject(CATALOG_STORE) private readonly store: CatalogStore,
@@ -69,71 +82,106 @@ export class CatalogService {
     }));
   }
 
+  /** Seeded entries in order, then added ones in the order they were added. */
   async entries(catalogKey: string): Promise<EntrySummary[]> {
     const catalog = this.catalog(catalogKey);
-    const [edits, media] = await Promise.all([
+    const [edits, additions, media] = await Promise.all([
       this.store.edits(catalog.key),
+      this.store.additions(catalog.key),
       this.store.media(catalog.key),
     ]);
-    return catalog.entries.map((seed) => {
-      const entry = edits.get(seed.id) ?? seed;
-      return {
-        id: entry.id,
-        name: entry.name,
-        ...catalog.summarize(entry),
-        edited: edits.has(seed.id),
-        media: mediaView(media.get(seed.id)),
-      };
+    const summary = (entry: CatalogEntry, edited: boolean, added: boolean): EntrySummary => ({
+      id: entry.id,
+      name: entry.name,
+      ...catalog.summarize(entry),
+      edited,
+      added,
+      media: mediaView(media.get(entry.id)),
     });
+    return [
+      ...catalog.entries.map((seed) =>
+        summary(edits.get(seed.id) ?? seed, edits.has(seed.id), false),
+      ),
+      ...[...additions.values()].map(({ entry }) => summary(entry, false, true)),
+    ];
   }
 
   async detail(catalogKey: string, id: string): Promise<EntryDetail> {
     const catalog = this.catalog(catalogKey);
-    const seed = this.seed(catalog, id);
-    const [edits, media] = await Promise.all([
-      this.store.edits(catalog.key),
+    const [found, media] = await Promise.all([
+      this.locate(catalog, id),
       this.store.media(catalog.key),
     ]);
-    const entry = edits.get(id) ?? seed;
-    const description = catalog.summarize(entry).description;
-    return {
-      catalog: { key: catalog.key, label: catalog.label },
-      entry,
-      edited: edits.has(id),
-      shape: this.shapeOf(catalog, seed),
-      media: mediaView(media.get(id)),
-      defaultPrompt: description ? `${entry.name}: ${description}` : entry.name,
-      canGenerate: this.generator !== null,
-    };
+    return this.describe(catalog, found, mediaView(media.get(id)));
   }
 
-  /** Problems with an edited entry, or none. Its id must not change. */
-  validate(catalogKey: string, id: string, entry: unknown): ShapeError[] {
+  /** A blank entry of one kind (a part of the catalog), to fill in and create. */
+  draft(catalogKey: string, part: number): EntryDetail {
     const catalog = this.catalog(catalogKey);
-    const seed = this.seed(catalog, id);
-    const errors = validateShape(this.shapeOf(catalog, seed), entry);
-    const record = entry as Partial<CatalogEntry> | null;
-    if (record?.id !== id) errors.push({ path: ['id'], message: 'cannot change' });
-    if (typeof record?.name !== 'string' || !record.name.trim()) {
-      errors.push({ path: ['name'], message: 'is required' });
+    this.checkPart(catalog, part);
+    const entry = this.template(catalog, part);
+    return this.describe(catalog, { part, entry, edited: false, added: true }, {});
+  }
+
+  /** Adds an entry of one kind. Its id must be new, and is kept for good. */
+  async create(catalogKey: string, part: number, entry: unknown): Promise<EntryDetail> {
+    const catalog = this.catalog(catalogKey);
+    this.checkPart(catalog, part);
+    const errors = this.problems(catalog, part, entry);
+    const id = (entry as Partial<CatalogEntry> | null)?.id;
+    if (typeof id !== 'string' || !ENTRY_ID.test(id) || RESERVED_ENTRY_IDS.includes(id)) {
+      errors.push({ path: ['id'], message: 'must be lower-case words joined by hyphens' });
+    } else if (await this.exists(catalog, id)) {
+      errors.push({ path: ['id'], message: 'is taken by another entry: choose another name' });
     }
-    return errors;
+    if (errors.length || typeof id !== 'string') {
+      throw new BadRequestException({ message: 'The entry has problems', errors });
+    }
+    await this.store.saveAddition(catalog.key, id, { part, entry: entry as CatalogEntry });
+    return this.detail(catalog.key, id);
   }
 
   async save(catalogKey: string, id: string, entry: unknown): Promise<EntryDetail> {
-    const errors = this.validate(catalogKey, id, entry);
+    const catalog = this.catalog(catalogKey);
+    const found = await this.locate(catalog, id);
+    const errors = this.problems(catalog, found.part, entry);
+    if ((entry as Partial<CatalogEntry> | null)?.id !== id) {
+      errors.push({ path: ['id'], message: 'cannot change' });
+    }
     if (errors.length) {
       throw new BadRequestException({ message: 'The entry has problems', errors });
     }
-    await this.store.saveEdit(catalogKey, id, entry as CatalogEntry);
-    return this.detail(catalogKey, id);
+    if (found.added) {
+      await this.store.saveAddition(catalog.key, id, {
+        part: found.part,
+        entry: entry as CatalogEntry,
+      });
+    } else {
+      await this.store.saveEdit(catalog.key, id, entry as CatalogEntry);
+    }
+    return this.detail(catalog.key, id);
   }
 
   /** Goes back to the seeded entry. */
   async revert(catalogKey: string, id: string): Promise<EntryDetail> {
-    this.seed(this.catalog(catalogKey), id);
-    await this.store.removeEdit(catalogKey, id);
-    return this.detail(catalogKey, id);
+    const catalog = this.catalog(catalogKey);
+    if ((await this.locate(catalog, id)).added) {
+      throw new BadRequestException('An added entry has no original to go back to');
+    }
+    await this.store.removeEdit(catalog.key, id);
+    return this.detail(catalog.key, id);
+  }
+
+  /** Deletes an added entry and its image. Seeded entries can only be reverted. */
+  async remove(catalogKey: string, id: string): Promise<void> {
+    const catalog = this.catalog(catalogKey);
+    if (!(await this.locate(catalog, id)).added) {
+      throw new BadRequestException('Seeded entries can be reverted, but not deleted');
+    }
+    const media = (await this.store.media(catalog.key)).get(id);
+    if (media?.image) await this.content.delete([media.image.key, media.image.thumbKey]);
+    await this.store.removeMedia(catalog.key, id);
+    await this.store.removeAddition(catalog.key, id);
   }
 
   async uploadImage(catalogKey: string, id: string, data: Uint8Array): Promise<MediaView> {
@@ -144,7 +192,7 @@ export class CatalogService {
     if (!this.generator) {
       throw new ServiceUnavailableException('Image generation is not configured');
     }
-    this.seed(this.catalog(catalogKey), id);
+    await this.locate(this.catalog(catalogKey), id);
     if (!prompt.trim()) throw new BadRequestException('Describe the image to generate');
     const image = await this.generator.generate({ prompt: withHouseStyle(prompt) });
     return this.storeImage(catalogKey, id, image.data, {
@@ -155,7 +203,7 @@ export class CatalogService {
   }
 
   async removeImage(catalogKey: string, id: string): Promise<MediaView> {
-    this.seed(this.catalog(catalogKey), id);
+    await this.locate(this.catalog(catalogKey), id);
     const media = (await this.store.media(catalogKey)).get(id) ?? {};
     if (media.image) {
       await this.content.delete([media.image.key, media.image.thumbKey]);
@@ -167,7 +215,7 @@ export class CatalogService {
 
   /** Chooses the icon shown without an image; null goes back to the default. */
   async setIcon(catalogKey: string, id: string, icon: string | null): Promise<MediaView> {
-    this.seed(this.catalog(catalogKey), id);
+    await this.locate(this.catalog(catalogKey), id);
     if (icon !== null && !/^[a-z0-9-]{1,40}$/.test(icon)) {
       throw new BadRequestException('Not an icon name');
     }
@@ -186,7 +234,7 @@ export class CatalogService {
     data: Uint8Array,
     origin: Pick<StoredImage, 'source' | 'prompt' | 'model'>,
   ): Promise<MediaView> {
-    this.seed(this.catalog(catalogKey), id);
+    await this.locate(this.catalog(catalogKey), id);
     let prepared;
     try {
       prepared = await prepareImage(data);
@@ -220,31 +268,93 @@ export class CatalogService {
     return catalog;
   }
 
-  private seed(catalog: CatalogDefinition, id: string): CatalogEntry {
-    const seed = catalog.entries.find((entry) => entry.id === id);
-    if (!seed) throw new NotFoundException(`No ${catalog.label.toLowerCase()} entry ${id}`);
-    return seed;
+  private checkPart(catalog: CatalogDefinition, part: number): void {
+    if (!Number.isInteger(part) || part < 0 || part >= catalog.parts.length) {
+      throw new NotFoundException(`No kind ${String(part)} of ${catalog.label.toLowerCase()}`);
+    }
+  }
+
+  /** Finds a seeded or added entry, or throws Not Found. */
+  private async locate(catalog: CatalogDefinition, id: string): Promise<Located> {
+    const part = catalog.parts.findIndex((seeds) => seeds.some((seed) => seed.id === id));
+    const seed = catalog.parts[part]?.find((candidate) => candidate.id === id);
+    if (seed) {
+      const edit = (await this.store.edits(catalog.key)).get(id);
+      return { part, entry: edit ?? seed, edited: edit !== undefined, added: false };
+    }
+    const added = (await this.store.additions(catalog.key)).get(id);
+    if (!added) throw new NotFoundException(`No ${catalog.label.toLowerCase()} entry ${id}`);
+    return { part: added.part, entry: added.entry, edited: false, added: true };
+  }
+
+  private async exists(catalog: CatalogDefinition, id: string): Promise<boolean> {
+    return (
+      catalog.entries.some((seed) => seed.id === id) ||
+      (await this.store.additions(catalog.key)).has(id)
+    );
+  }
+
+  private describe(catalog: CatalogDefinition, found: Located, media: MediaView): EntryDetail {
+    const { entry } = found;
+    const description = catalog.summarize(entry).description;
+    return {
+      catalog: { key: catalog.key, label: catalog.label },
+      entry,
+      edited: found.edited,
+      added: found.added,
+      part: found.part,
+      kind: catalog.kinds[found.part] ?? 'entry',
+      shape: this.shapeOf(catalog, found.part),
+      media,
+      defaultPrompt: description ? `${entry.name}: ${description}` : entry.name,
+      canGenerate: this.generator !== null,
+    };
+  }
+
+  /** Problems with an entry of one kind: its shape, plus a name. */
+  private problems(catalog: CatalogDefinition, part: number, entry: unknown): ShapeError[] {
+    const errors = validateShape(this.shapeOf(catalog, part), entry);
+    const name = (entry as Partial<CatalogEntry> | null)?.name;
+    if (typeof name !== 'string' || !name.trim()) {
+      errors.push({ path: ['name'], message: 'is required' });
+    }
+    return errors;
   }
 
   /**
-   * An entry's shape, inferred from the seeded entries of its kind: a catalog made from several
-   * seed lists (gear, tools and ammunition) has one shape per list, and in those the category is
-   * fixed, because it says which list an entry belongs to.
+   * A new entry of one kind: the shape's defaults, with every value the kind's seeds all share
+   * (such as their category), and no id or name yet.
    */
-  private shapeOf(catalog: CatalogDefinition, seed: CatalogEntry): Shape {
-    let shapeFor = this.shapes.get(catalog.key);
-    if (!shapeFor) {
+  private template(catalog: CatalogDefinition, part: number): CatalogEntry {
+    const seeds = catalog.parts[part] ?? [];
+    const [first] = seeds;
+    const shared = Object.entries(first ?? {}).filter(
+      ([key, value]) =>
+        !['id', 'name', 'description'].includes(key) &&
+        seeds.every((seed) => JSON.stringify(seed[key]) === JSON.stringify(value)),
+    );
+    return {
+      ...(defaultValue(this.shapeOf(catalog, part)) as object),
+      ...structuredClone(Object.fromEntries(shared)),
+      id: '',
+      name: '',
+    };
+  }
+
+  /**
+   * The shape of one part of a catalog, inferred from its seeded entries: a catalog made from
+   * several seed lists (gear, tools and ammunition) has one shape per list, and in those the
+   * category is fixed, because it says which list an entry belongs to.
+   */
+  private shapeOf(catalog: CatalogDefinition, part: number): Shape {
+    let shapes = this.shapes.get(catalog.key);
+    if (!shapes) {
       const readOnly = catalog.parts.length > 1 ? ['id', 'category'] : ['id'];
-      const shapes = catalog.parts.map((part) => ({
-        part,
-        shape: inferShape(part, { valueSets: this.valueSets, readOnly }),
-      }));
-      shapeFor = (entry) =>
-        shapes.find(({ part }) => part.some((candidate) => candidate.id === entry.id))?.shape ?? {
-          kind: 'any',
-        };
-      this.shapes.set(catalog.key, shapeFor);
+      shapes = catalog.parts.map((seeds) =>
+        inferShape(seeds, { valueSets: this.valueSets, readOnly }),
+      );
+      this.shapes.set(catalog.key, shapes);
     }
-    return shapeFor(seed);
+    return shapes[part] ?? { kind: 'any' };
   }
 }

@@ -1,5 +1,6 @@
 # The whole stack: PostgreSQL, object storage, the API and the web app. Run from the repository
-# root with `pnpm docker:up`. The credentials are for local use only.
+# root with `pnpm docker:up`, or `pnpm docker:watch` to rebuild and restart the API and web app
+# whenever a source they use changes. The credentials are for local use only.
 name: dnd-domain
 
 include:
@@ -10,6 +11,16 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+    # The image is a production build, so a change rebuilds it and replaces the container.
+    # Paths in .dockerignore (installs, build output) never trigger one.
+    develop:
+      watch:
+        - { action: rebuild, path: apps/api }
+        - { action: rebuild, path: packages/ai }
+        - { action: rebuild, path: packages/system }
+        - { action: rebuild, path: packages/utils }
+        - { action: rebuild, path: packages/config }
+        - { action: rebuild, path: pnpm-lock.yaml }
     environment:
       PORT: 3001
       WEB_ORIGIN: http://localhost:${WEB_PORT:-3000}
@@ -33,6 +44,15 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+    develop:
+      watch:
+        - { action: rebuild, path: apps/web }
+        - { action: rebuild, path: packages/ai }
+        - { action: rebuild, path: packages/system }
+        - { action: rebuild, path: packages/ui }
+        - { action: rebuild, path: packages/utils }
+        - { action: rebuild, path: packages/config }
+        - { action: rebuild, path: pnpm-lock.yaml }
     environment:
       API_URL: http://api:3001
     ports:

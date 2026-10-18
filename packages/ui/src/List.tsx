@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
+import { FILTER_THRESHOLD, FilterInput, NoMatches, useFilter } from './Filter';
 import { cx, size, type Size } from './internal';
 
 export interface ListItem {
@@ -16,6 +17,8 @@ export interface ListItem {
   imageShape?: 'circle' | 'square';
   /** Trailing text at the right, grey-400 (a time, a count, a status). */
   meta?: ReactNode;
+  /** Text the filter matches, when the title or description is not plain text (a link). */
+  filterText?: string;
 }
 
 export interface ListColumn<Row> {
@@ -38,6 +41,10 @@ interface ListBaseProps {
   dividers?: boolean;
   'aria-label'?: string;
   className?: string;
+  /** Show a filter above the list. Default: when it has more than 10 items. */
+  filter?: boolean;
+  /** What the items are, for the filter's placeholder ("professions"). */
+  filterNoun?: string;
 }
 
 export interface SimpleListProps extends ListBaseProps {
@@ -83,8 +90,46 @@ function Media({ item }: { item: ListItem }) {
   );
 }
 
-/** A vertical list of items separated by grey dividers: simple, rich, or columnar. */
+/** The text a filter matches for an item: its own text, or its plain-text parts. */
+function filterTextOf(item: unknown): string {
+  if (typeof item === 'string' || typeof item === 'number') return String(item);
+  if (item === null || typeof item !== 'object') return '';
+  const record = item as Record<string, unknown>;
+  if (typeof record.filterText === 'string') return record.filterText;
+  return Object.values(record)
+    .filter((value) => typeof value === 'string' || typeof value === 'number')
+    .join(' ');
+}
+
+/**
+ * A vertical list of items separated by grey dividers: simple, rich, or columnar. Long lists get
+ * a filter above them.
+ */
 export function List<Row extends object>(props: ListProps<Row>) {
+  const items: readonly unknown[] = props.items;
+  const { query, setQuery, matches } = useFilter(items, filterTextOf);
+  const filtered = props.filter ?? items.length > FILTER_THRESHOLD;
+  const shown = filtered ? matches : items.map((item, index) => ({ item, index }));
+  const body = <ListBody<Row> {...props} shown={shown} />;
+  if (!filtered) return body;
+  return (
+    <div className="ds-list-block">
+      <FilterInput
+        query={query}
+        onQueryChange={setQuery}
+        shown={matches.length}
+        total={items.length}
+        noun={props.filterNoun ?? props['aria-label']?.toLowerCase() ?? 'items'}
+      />
+      {matches.length ? body : <NoMatches query={query} />}
+    </div>
+  );
+}
+
+/** The list itself, showing the given items with their original indexes. */
+function ListBody<Row extends object>(
+  props: ListProps<Row> & { shown: readonly { item: unknown; index: number }[] },
+) {
   const className = cx(
     'ds-list',
     `ds-list--${size(props.size)}`,
@@ -94,7 +139,7 @@ export function List<Row extends object>(props: ListProps<Row>) {
   );
 
   if (props.columns?.length) {
-    const { columns, items, onItemClick } = props;
+    const { columns, onItemClick } = props;
     const cell = (column: ListColumn<Row>, row: Row | null, index: number) => {
       const align = column.align ?? (column.numeric ? 'right' : 'left');
       const cellClass = cx(
@@ -126,29 +171,33 @@ export function List<Row extends object>(props: ListProps<Row>) {
           <tr>{columns.map((column, index) => cell(column, null, index))}</tr>
         </thead>
         <tbody>
-          {items.map((row, rowIndex) => (
-            <tr
-              key={itemKey(row, rowIndex)}
-              onClick={
-                onItemClick
-                  ? () => {
-                      onItemClick(row, rowIndex);
-                    }
-                  : undefined
-              }
-            >
-              {columns.map((column, index) => cell(column, row, index))}
-            </tr>
-          ))}
+          {props.shown.map(({ item, index: rowIndex }) => {
+            const row = item as Row;
+            return (
+              <tr
+                key={itemKey(row, rowIndex)}
+                onClick={
+                  onItemClick
+                    ? () => {
+                        onItemClick(row, rowIndex);
+                      }
+                    : undefined
+                }
+              >
+                {columns.map((column, index) => cell(column, row, index))}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     );
   }
 
-  const { items, onItemClick } = props as SimpleListProps;
+  const { onItemClick } = props as SimpleListProps;
   return (
     <ul className={className} aria-label={props['aria-label']}>
-      {items.map((item, index) => {
+      {props.shown.map(({ item: entry, index }) => {
+        const item = entry as string | number | ListItem;
         const onClick = onItemClick
           ? () => {
               onItemClick(item, index);
